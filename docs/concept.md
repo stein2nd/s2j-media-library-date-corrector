@@ -75,6 +75,24 @@ WordPress のメディアライブラリは、以下の2つの情報を独立し
   ・ファイル構造とメタ情報が一致
 ```
 
+```mermaid
+flowchart LR
+
+subgraph Before["Before（不整合状態）"]
+  A1["ファイルパス: /uploads/2017/12/bnr_nec.jpg"]
+  A2["post_date: 2026-03-01"]
+  A3["年月フィルター: 不一致"]
+  A1 --> A2 --> A3
+end
+
+subgraph After["After（補正後）"]
+  B1["ファイルパス: /uploads/2017/12/bnr_nec.jpg"]
+  B2["post_date: 2017-12-01"]
+  B3["年月フィルター: 一致"]
+  B1 --> B2 --> B3
+end
+```
+
 ### 補正ロジック（概要）
 
 本プラグインは、以下の手順で補正を行います：
@@ -83,6 +101,13 @@ WordPress のメディアライブラリは、以下の2つの情報を独立し
 2. パス中の `yyyy/mm` を抽出
 3. `post_date` を `yyyy-mm-01 00:00:00` に補正
 4. 必要に応じて選択的または一括で更新
+
+```mermaid
+flowchart TD
+  A["_wp_attached_file"] --> B["yyyy/mm 抽出"]
+  B --> C["post_date 生成"]
+  C --> D["DB更新"]
+```
 
 ### 操作フロー（UI）
 
