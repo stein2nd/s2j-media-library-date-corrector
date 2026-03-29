@@ -6,3 +6,13 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue.svg)](https://www.typescriptlang.org/)
 [![Dart SASS](https://img.shields.io/badge/SCSS-1.98-blue.svg)](https://sass-lang.com/dart-sass/)
 [![Vite](https://img.shields.io/badge/vite-8.0-blue.svg)](https://vite.dev)
+
+## Description
+
+S2J MediaLibrary Date Corrector は、WordPress におけるメディア一括登録後のメタデータ不整合を解消するための補正ツールです。
+
+[Bulk Media Register](https://ja.wordpress.org/plugins/bulk-media-register/) 等で登録されたメディアは、ファイルが `uploads/yyyy/mm` 配下に配置されていても、データベース上の `post_date` が現在日時となる場合があります。この状態では、メディアライブラリの年月フィルターと実際のファイル構造が一致しません。
+
+本プラグインは、`_wp_attached_file` に格納されたパス情報を基に年月を抽出し、`post_date` を適切な値へ補正します。差分の可視化および選択的な一括更新を、メディアライブラリ画面上で実行可能です。
+
+実装には React + TypeScript + Vite を採用し、`@wordpress/element` を介して WordPress 管理画面へ統合します。
