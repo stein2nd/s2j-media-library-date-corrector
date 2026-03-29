@@ -1,0 +1,31 @@
+{
+  "name": "s2j-media-library-date-corrector",
+  "version": "1.0.0",
+  "description": "S2J MediaLibrary Date Corrector is a tool designed to resolve metadata inconsistencies that occur after bulk media uploads in WordPress.",
+  "type": "module",
+  "author": "Koutarou ISHIKAWA",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stein2nd/s2j-media-library-date-corrector.git"
+  },
+  "homepage": "https://github.com/stein2nd/s2j-media-library-date-corrector#readme",
+  "bugs": {
+    "url": "https://github.com/stein2nd/s2j-media-library-date-corrector/issues"
+  },
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "media",
+    "library",
+    "date",
+    "corrector"
+  ],
+  "main": "s2j-media-library-date-corrector.php",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {},
+  "overrides": {},
+  "devDependencies": {}
+}
