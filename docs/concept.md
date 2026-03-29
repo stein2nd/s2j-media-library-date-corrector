@@ -76,7 +76,7 @@ WordPress のメディアライブラリは、以下の2つの情報を独立し
 ```
 
 ```mermaid
-flowchart LR
+flowchart
 
 subgraph Before["Before（不整合状態）"]
   A1["ファイルパス: /uploads/2017/12/bnr_nec.jpg"]
@@ -91,6 +91,8 @@ subgraph After["After（補正後）"]
   B3["年月フィルター: 一致"]
   B1 --> B2 --> B3
 end
+
+A3 -.-> B1
 ```
 
 ### 補正ロジック（概要）
