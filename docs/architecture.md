@@ -96,7 +96,7 @@ s2j-media-library-date-corrector/
 
 ### UI レイヤー
 
-* 選択状態管理
+* 選択状態の管理
 * API 呼び出し
 * 状態表示
 
@@ -134,7 +134,7 @@ s2j-media-library-date-corrector/
 
 ### 4.1. ビルドターゲット
 
-`vite.config.ts` の `npm_lifecycle_event` から対象を判定する：
+`vite.config.ts` の `npm_lifecycle_event` から対象を判定する:
 
 | ターゲット | エントリ (想定) | 用途 |
 |------------|------------------|------|
@@ -147,11 +147,11 @@ s2j-media-library-date-corrector/
 
 ### 4.2. 外部化
 
-Rollup の `external` に `@wordpress/*`、`react`、`react-dom`、`jquery` を指定し、管理画面で WordPress が既に提供するグローバル (`wp.*`、`React` 等) にマッピングする。
+Rollup の `external` に `@wordpress/*`、`react`、`react-dom`、`jquery` を指定し、管理画面で WordPress がすでに提供しているグローバル (`wp.*`、`React` 等) にマッピングする。
 
 ### 4.3. 出力
 
-* 出力先：`ディストリビューションのルート/dist` (`emptyOutDir: false` でターゲット間の連続ビルドを想定)
+* 出力先: `ディストリビューションのルート/dist` (`emptyOutDir: false` でターゲット間の連続ビルドを想定)
 * `FLUSH_DIST=true` でビルド前に `dist` を削除可能
 * 本番時は `NODE_ENV=production` で minify
 
@@ -185,10 +185,10 @@ sequenceDiagram
 1. **表示**: メディア一覧で標準カラムに加え、「年月 (パス)」「差分」を表示する (PHP フィルターまたは初期データと REST の組み合わせ。実装方針は一覧のデータ取得コストに応じて選択)。
 2. **選択**: ユーザーがチェックボックスで対象を選ぶ、または「差分のみ選択」等の UI 操作。
 3. **実行**: UI が REST へ補正リクエスト。サーバー側で **各添付ファイルごと** に `current_user_can` を検証する。
-4. **更新**: `Media_Date_Service` が `yyyy/mm-01 00:00:00` (サイトタイムゾーン) へ `post_date` を揃え、必要に応じて `post_date_gmt` も整合させる (詳細は [データ辞書](./data_dictionary.md))。
+4. **更新**: `Media_Date_Service` が `yyyy/mm-01 00:00:00` (サイトのタイムゾーン) へ `post_date` をそろえ、必要に応じて `post_date_gmt` も整合させる (詳細は [データ辞書](./data_dictionary.md))。
 5. **完了**: UI が成功/失敗を表示し、一覧を更新する。
 
-バッチ件数が大きい場合は、REST でチャンク処理するか、バックグラウンドキュー (将来拡張) を検討する。初期実装では「1リクエスト＝限定件数」でタイムアウトを避ける。
+バッチ件数が大きい場合は、REST でチャンク処理するか、バックグラウンドキュー (将来拡張) を検討する。初期実装では「1リクエスト=限定件数」でタイムアウトを避ける。
 
 ---
 
