@@ -13,21 +13,21 @@
 | Namespace | `s2j-mldc` |
 | Version | `v1` |
 
-完全パス例：`/wp-json/s2j-mldc/v1/...`
+完全パス例: `/wp-json/s2j-mldc/v1/...`
 
 実装時はプラグイン定数 (例: `S2J_MLDC_REST_NAMESPACE`) に寄せ、変更時の影響範囲を限定する。
 
-### 1.2. 要求ヘッダ
+### 1.2. 要求ヘッダー
 
-| ヘッダ | 必須 | 説明 |
+| ヘッダー | 必須 | 説明 |
 |--------|------|------|
-| `X-WP-Nonce` | ログインユーザー操作時 **必須** | `wp_create_nonce( 'wp_rest' )` の値。`api-fetch` は既定で付与 |
+| `X-WP-Nonce` | ログインユーザー操作時 **必須** | `wp_create_nonce( 'wp_rest' )` の値。`api-fetch` はデフォルトで付与 |
 | `Content-Type` | POST/PUT 時 | `application/json` |
 
 ### 1.3. レスポンス形式
 
-* 成功時：`application/json`、本文は各エンドポイントの定義に従う
-* エラー時：WordPress REST のエラーオブジェクト (`code`, `message`, `data.status`)
+* 成功時: `application/json`、本文は各エンドポイントの定義に従う
+* エラー時: WordPress REST のエラーオブジェクト (`code`, `message`, `data.status`)
 
 ---
 
@@ -49,10 +49,10 @@
 | 観点 | 対策 |
 |------|------|
 | CSRF | 認証済みリクエストは **REST nonce** (`wp_rest`) を検証 |
-| 認証 | ログインセッション (Cookie) ＋アプリケーションパスワード等の標準 REST 認証に準拠 |
+| 認証 | ログインセッション (Cookie) + アプリケーションパスワード等の標準 REST 認証に準拠 |
 | 入力検証 | `attachment` ID は整数配列にキャストし、存在・`post_type === 'attachment'` を確認 |
-| エスケープ | レスポンスの表示用文字列は管理者 UI 側でも適宜エスケープ |
-| レート制限 | コアに任せる。大量件数は **チャンク API** またはクエリ上限で分割 |
+| エスケープ | レスポンス表示用の文字列は、管理者 UI 側でも適宜エスケープ |
+| レート制限 | コアに任せる。大量件数は **チャンク API** またはクエリー上限で分割 |
 | 情報漏洩 | エラーメッセージにファイルシステム絶対パスを含めない |
 
 **匿名公開** のエンドポイントは設けない (フロント用のブロックは PHP レンダリングで完結させ、公開 REST は不要を原則とする)。
@@ -63,7 +63,7 @@
 
 管理画面の JavaScript からは `@wordpress/api-fetch` を使用し、ルート URL が同一オリジンのとき **Nonce ミドルウェア** が `X-WP-Nonce` を付与する。
 
-手動で `fetch` する場合：
+手動で `fetch` する場合:
 
 ```text
 X-WP-Nonce: <wpApiSettings.nonce または wp_create_nonce('wp_rest')>
@@ -78,7 +78,7 @@ X-WP-Nonce: <wpApiSettings.nonce または wp_create_nonce('wp_rest')>
 ## 対象範囲
 
 * IDs 指定
-* フィルタ結果
+* フィルター結果
 * 全件
 
 ## 制限
@@ -90,11 +90,11 @@ X-WP-Nonce: <wpApiSettings.nonce または wp_create_nonce('wp_rest')>
 
 ## 5. エンドポイント一覧 (想定)
 
-以下は [管理画面 UI 仕様](./admin_ui_spec.md) の一括/行操作を満たすための **最小セット**。実装時に URL・フィールド名をコードと完全一致させる。
+以下は [管理画面 UI 仕様](./admin_ui_spec.md) の一括/行操作を満たすための **最小セット**。実装時に URL、フィールド名をコードと完全一致させる。
 
 ### 5.1. 添付の日付診断 (プレビュー)
 
-**目的:** 選択中または現在のフィルターに基づく ID の `match/mismatch` と補正候補の取得。
+**目的:** 選択中または現在のフィルターにもとづく ID の `match/mismatch` と補正候補の取得。
 
 | 項目 | 内容 |
 |------|------|
@@ -173,24 +173,24 @@ X-WP-Nonce: <wpApiSettings.nonce または wp_create_nonce('wp_rest')>
 
 ---
 
-### 5.3. 現在の一覧相当の一括補正 (Date Correct (All))
+### 5.3. 現在の一覧相当の一括補正「Date Correct (All)」
 
 **目的:** [管理画面 UI 仕様](./admin_ui_spec.md) に従い、「**現在の一覧 (検索・フィルター結果)** が対象」の全件補正。
 
-一覧のクエリをクライアントから完全に再現するのは複雑なため、次の **いずれか** を採用する：
+一覧のクエリーをクライアントから完全に再現するのは複雑なため、次の **いずれか** を採用する:
 
 | 方式 | 概要 |
 |------|------|
-| **A. ID リスト方式 (推奨)** | 画面上で「表示中の全 ID」をクライアントが収集し、`correct` に複数回チャンクで送る。サーバーは毎回権限検証 |
-| **B. クエリ委譲方式** | クライアントが `query` オブジェクト (`post_mime_type`, `m`, `s`, `paged` 等の許可リスト) を送り、サーバーが `WP_Query` を再構築。`manage_options` 相当の厳格なサニタイズが必要 |
+| **A. ID リスト方式 (推奨)** | 画面上で「表示中の全 ID」をクライアントが収集し、`correct` に複数回チャンクで送る。サーバーは毎回、権限検証 |
+| **B. クエリー委譲方式** | クライアントが `query` オブジェクト (`post_mime_type`, `m`, `s`, `paged` 等の許可リスト) を送り、サーバーが `WP_Query` を再構築。`manage_options` 相当の厳格なサニタイズが必要 |
 
 初期実装は **A** を推奨する (WordPress 標準 UI の挙動と [管理画面 UI 仕様](./admin_ui_spec.md) の「現在の一覧」を一致させやすい)。
 
-専用ルート例 (任意)：
+専用ルート例 (任意):
 
 | Method | Route | 説明 |
 |--------|-------|------|
-| `POST` | `/s2j-mldc/v1/attachments/correct-many` | 内部で `correct` と同一処理にディスパッチ。`max` で 1 回の上限を制御 |
+| `POST` | `/s2j-mldc/v1/attachments/correct-many` | 内部で `correct` と同一処理にディスパッチ。`max` で1回の上限を制御 |
 
 ---
 
