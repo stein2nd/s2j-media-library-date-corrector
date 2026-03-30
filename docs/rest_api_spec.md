@@ -15,7 +15,7 @@
 
 完全パス例: `/wp-json/s2j-mldc/v1/...`
 
-実装時はプラグイン定数 (例: `S2J_MLDC_REST_NAMESPACE`) に寄せ、変更時の影響範囲を限定する。
+実装時はプラグイン定数 (例: `S2J_MLDC_REST_NAMESPACE`) に寄せ、変更時の影響範囲を限定します。
 
 ### 1.2. 要求ヘッダー
 
@@ -33,14 +33,14 @@
 
 ## 2. 権限 (Capability)
 
-原則として **メディアを編集できるユーザー** のみが、対象添付に対する **読取/更新** を行える。
+原則として **メディアを編集できるユーザー** のみが、対象添付に対する **読取/更新** を実行できます。
 
 | 操作 | 条件 (想定) |
 |------|----------------|
 | 一覧・プレビュー系 | 各 `attachment` ID に対し `current_user_can( 'edit_post', $id )` が真 |
-| 一括更新 | リクエスト本文の **各 ID** に対し同様に検証。1件でも権限がなければその件は `error` とするか、リクエスト全体を `403` にするかは、実装方針で決定 (推奨: **件別結果** で部分成功を許容) |
+| 一括更新 | リクエスト本文の **各 ID** に対し同様に検証します。1件でも権限がなければその件は `error` とするか、リクエスト全体を `403` にするかは、実装方針で決めます (推奨: **件別結果** で部分成功を許容) |
 
-サイト全体のメンテナンス用途で `manage_options` のみに制限するモードを将来追加する余地はあるが、初期版では上記でよい。
+サイト全体のメンテナンス用途で `manage_options` のみに制限するモードを将来追加する余地はありますが、初期版では上記で問題ありません。
 
 ---
 
@@ -55,15 +55,15 @@
 | レート制限 | コアに任せる。大量件数は **チャンク API** またはクエリー上限で分割 |
 | 情報漏洩 | エラーメッセージにファイルシステム絶対パスを含めない |
 
-**匿名公開** のエンドポイントは設けない (フロント用のブロックは PHP レンダリングで完結させ、公開 REST は不要を原則とする)。
+**匿名公開** のエンドポイントは設けません (フロント用のブロックは PHP レンダリングで完結させ、公開 REST は不要を原則とします)。
 
 ---
 
 ## 4. Nonce と `api-fetch`
 
-管理画面の JavaScript からは `@wordpress/api-fetch` を使用し、ルート URL が同一オリジンのとき **Nonce ミドルウェア** が `X-WP-Nonce` を付与する。
+管理画面の JavaScript からは `@wordpress/api-fetch` を使用し、ルート URL が同一オリジンのとき **Nonce ミドルウェア** が `X-WP-Nonce` を付与します。
 
-手動で `fetch` する場合:
+手動で `fetch` する場合は、次のとおりです。
 
 ```text
 X-WP-Nonce: <wpApiSettings.nonce または wp_create_nonce('wp_rest')>
@@ -71,26 +71,26 @@ X-WP-Nonce: <wpApiSettings.nonce または wp_create_nonce('wp_rest')>
 
 ---
 
-## 冪等性
+## 冪等性 (べきとうせい)
 
-同一リクエストを複数回実行しても、結果は変わらない。
+同一リクエストを複数回実行しても、結果は変わりません。
 
-## 対象範囲
+## 対象指定
 
-* IDs 指定
-* フィルター結果
-* 全件
+* id 指定
+* filter 条件
+* all
 
 ## 制限
 
-* 最大件数: 100件/リクエスト
-* それ以上は、分割処理
+* 1リクエストあたり、最大100件です。
+* 超過時は、分割します。
 
 ---
 
 ## 5. エンドポイント一覧 (想定)
 
-以下は [管理画面 UI 仕様](./admin_ui_spec.md) の一括/行操作を満たすための **最小セット**。実装時に URL、フィールド名をコードと完全一致させる。
+以下は [管理画面 UI 仕様](./admin_ui_spec.md) の一括/行操作を満たすための **最小セット**です。実装時に URL、フィールド名をコードと完全一致させます。
 
 ### 5.1. 添付の日付診断 (プレビュー)
 
@@ -126,7 +126,7 @@ X-WP-Nonce: <wpApiSettings.nonce または wp_create_nonce('wp_rest')>
 }
 ```
 
-* `ids` が空の場合は `400` とする。
+* `ids` が空の場合は `400` とします。
 
 ---
 
@@ -169,7 +169,7 @@ X-WP-Nonce: <wpApiSettings.nonce または wp_create_nonce('wp_rest')>
 }
 ```
 
-* `mismatch` でない項目は `ok: true, skipped: true` としてもよい ([データ辞書](./data_dictionary.md) の冪等性)。
+* `mismatch` でない項目は `ok: true, skipped: true` としてもかまいません ([データ辞書](./data_dictionary.md) の「冪等性 (べきとうせい)」)。
 
 ---
 
@@ -177,14 +177,14 @@ X-WP-Nonce: <wpApiSettings.nonce または wp_create_nonce('wp_rest')>
 
 **目的:** [管理画面 UI 仕様](./admin_ui_spec.md) に従い、「**現在の一覧 (検索・フィルター結果)** が対象」の全件補正。
 
-一覧のクエリーをクライアントから完全に再現するのは複雑なため、次の **いずれか** を採用する:
+一覧のクエリーをクライアントから完全に再現するのは複雑なため、次の **いずれか** を採用します。
 
 | 方式 | 概要 |
 |------|------|
 | **A. ID リスト方式 (推奨)** | 画面上で「表示中の全 ID」をクライアントが収集し、`correct` に複数回チャンクで送る。サーバーは毎回、権限検証 |
 | **B. クエリー委譲方式** | クライアントが `query` オブジェクト (`post_mime_type`, `m`, `s`, `paged` 等の許可リスト) を送り、サーバーが `WP_Query` を再構築。`manage_options` 相当の厳格なサニタイズが必要 |
 
-初期実装は **A** を推奨する (WordPress 標準 UI の挙動と [管理画面 UI 仕様](./admin_ui_spec.md) の「現在の一覧」を一致させやすい)。
+初期実装は **A** を推奨します (WordPress 標準 UI の挙動と [管理画面 UI 仕様](./admin_ui_spec.md) の「現在の一覧」を一致させやすいです)。
 
 専用ルート例 (任意):
 
@@ -205,6 +205,16 @@ X-WP-Nonce: <wpApiSettings.nonce または wp_create_nonce('wp_rest')>
 
 ---
 
+## エラーコード
+
+REST エラーレスポンスの `code` (または件別 `error` コード) で用いる、想定の値です。
+
+* `invalid_param`
+* `permission_denied`
+* `processing_error`
+
+---
+
 ## 7. 共通仕様との関係
 
-認証・国際化・エラー表現の共通ルールは [WP_PLUGIN_SPEC.md](https://github.com/stein2nd/wp-plugin-spec/blob/main/docs/WP_PLUGIN_SPEC.md) に従う。
+認証、国際化、エラー表現の共通ルールは [WP_PLUGIN_SPEC.md](https://github.com/stein2nd/wp-plugin-spec/blob/main/docs/WP_PLUGIN_SPEC.md) に従います。
