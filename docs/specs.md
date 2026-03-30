@@ -3,6 +3,16 @@
 本プロジェクトの仕様は、以下のドキュメントに分散して定義しています。
 共通仕様に加え、プラグイン固有の仕様を参照してください。
 
+## 読み方ガイド
+
+新規参入者は、次の順で読むと、全体像から画面・API へ辿りやすくなります。
+
+1. [コンセプト](./concept.md) — 想定ユースケース、課題、処理の流れ
+2. [管理画面の UI 仕様](./admin_ui_spec.md) — 画面上の操作と表示
+3. [REST API 仕様](./rest_api_spec.md) — エンドポイントとデータのやり取り
+
+その後は、下表の [概要](./overview.md) や [アーキテクチャー](./architecture.md) など、必要なトピックから参照してください。
+
 ## 共通仕様
 
 * [WP_PLUGIN_SPEC.md (共通仕様)](https://github.com/stein2nd/wp-plugin-spec/blob/main/docs/WP_PLUGIN_SPEC.md)
