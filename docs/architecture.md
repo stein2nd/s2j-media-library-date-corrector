@@ -92,6 +92,32 @@ s2j-media-library-date-corrector/
 
 ---
 
+## レイヤー責務
+
+### UI レイヤー
+
+* 選択状態管理
+* API 呼び出し
+* 状態表示
+
+### API レイヤー
+
+* 認証・認可
+* 入力検証
+* レスポンス整形
+
+### サービスレイヤー
+
+* 日付補正ロジック
+* 差分判定
+
+### データレイヤー
+
+* post_date 更新
+* meta 取得
+
+---
+
 ## 3. 技術スタック
 
 | 層 | 採用技術 | 備考 |
@@ -106,7 +132,7 @@ s2j-media-library-date-corrector/
 
 ## 4. ビルド
 
-### 4.1 ビルドターゲット
+### 4.1. ビルドターゲット
 
 `vite.config.ts` の `npm_lifecycle_event` から対象を判定する：
 
@@ -119,11 +145,11 @@ s2j-media-library-date-corrector/
 
 `gutenberg` ビルド時は `src/gutenberg/media-library-date-corrector/block.json` を `dist/blocks/...` にコピーする (`vite-plugin-static-copy`)。
 
-### 4.2 外部化
+### 4.2. 外部化
 
 Rollup の `external` に `@wordpress/*`、`react`、`react-dom`、`jquery` を指定し、管理画面で WordPress が既に提供するグローバル (`wp.*`、`React` 等) にマッピングする。
 
-### 4.3 出力
+### 4.3. 出力
 
 * 出力先：`ディストリビューションのルート/dist` (`emptyOutDir: false` でターゲット間の連続ビルドを想定)
 * `FLUSH_DIST=true` でビルド前に `dist` を削除可能
