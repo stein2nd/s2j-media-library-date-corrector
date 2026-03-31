@@ -140,6 +140,12 @@ s2j-media-library-date-corrector/
 * nonce による認証が必須です。
 * capability チェックを必須とします。
 
+### REST API における前提 capability
+
+REST API は、メディア補正画面と同様に、`upload_files` を前提とします。
+
+これにより、UI と API の権限モデルを統一します。
+
 ### 設計方針
 
 * 権限は、「最小権限の原則」に従います。
