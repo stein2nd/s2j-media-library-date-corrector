@@ -123,8 +123,8 @@ s2j-media-library-date-corrector/
 
 理由:
 
-* メディア操作権限と整合
-* 既存のメディア管理フローに準拠
+* メディア操作権限と整合しているためです。
+* 既存のメディア管理フローに準拠するためです。
 
 ### 設定画面
 
@@ -194,9 +194,9 @@ REST API コールは、WordPress の nonce による認証が必須です。
 
 本プラグインは、以下の理由により、細分化を行いません。
 
-* 機能が、単一責務 (日時補正)
-* WordPress の既存権限モデルと整合している
-* 権限管理の「複雑化の回避」を維持
+* 機能が、単一責務 (日時補正) にとどまるためです。
+* WordPress の既存権限モデルと整合しているためです。
+* 権限管理の「複雑化の回避」を維持するためです。
 
 #### 将来的な拡張
 
@@ -208,7 +208,7 @@ REST API コールは、WordPress の nonce による認証が必須です。
 ただし、導入検討のタイミングは、以下の条件を満たす場合に限定されます。
 
 * 機能が増加し、責務が分離されていること
-* 権限分離の要件が明確になっていること
+* 権限分離の要件が、明確になっていること
 
 #### REST API における適用
 
@@ -225,6 +225,121 @@ REST API コールは、WordPress の nonce による認証が必須です。
 * UI レイヤー: 表示の制御
 * API レイヤー: 権限のチェック
 * サービスレイヤー: 実行可否の判断
+
+### permission_callback 実装例
+
+REST API の各エンドポイントでは、`permission_callback` により、認可チェックを実装します。
+
+#### 基本実装
+
+```php
+register_rest_route(
+  's2j/v1',
+  '/media/date-correct',
+  [
+    'methods'  => 'POST',
+    'callback' => [ $this, 'handle_date_correct' ],
+    'permission_callback' => [ $this, 'can_correct_media' ],
+  ]
+);
+```
+
+#### `permission_callback` の実装
+
+```php
+public function can_correct_media( WP_REST_Request $request ) {
+  // 基本権限チェック
+  if ( ! current_user_can( 'upload_files' ) ) {
+    return new WP_Error(
+      'rest_forbidden',
+      __( 'You do not have permission to correct media.', 's2j-media-library-date-corrector' ),
+      [ 'status' => 403 ]
+    );
+  }
+
+  // ID 単位の追加チェック (任意)
+  $ids = $request->get_param( 'ids' );
+
+  if ( is_array( $ids ) ) {
+    foreach ( $ids as $id ) {
+      if ( ! current_user_can( 'edit_post', $id ) ) {
+        return new WP_Error(
+          'rest_forbidden',
+          __( 'You cannot edit one or more items.', 's2j-media-library-date-corrector' ),
+          [ 'status' => 403 ]
+        );
+      }
+    }
+  }
+
+  return true;
+}
+```
+
+#### 設計ポイント
+
+* capability は、「操作単位」と「対象単位」の2段階でチェックします。
+* エラーは、`WP_Error` で統一します。
+* ステータスコードは `403` を返します。
+
+#### 方針
+
+* `permission_callback` は、(省略せず) 必ず定義します。
+* ロジックは、Controller に集約します。
+
+### `api-fetch` ミドルウェア設計
+
+管理画面の API 通信は、`@wordpress/api-fetch` を使用し、共通ミドルウェアを導入します。
+
+#### 目的
+
+* nonce の自動付与
+* エラーハンドリングの統一
+* ログ・デバッグの一元化
+
+#### 基本設定
+
+```ts
+import apiFetch from '@wordpress/api-fetch';
+
+apiFetch.use( apiFetch.createNonceMiddleware( wpApiSettings.nonce ) );
+```
+
+#### カスタムミドルウェア
+
+```ts
+apiFetch.use( ( options, next ) => {
+  return next( options ).catch( ( error ) => {
+    console.error( 'API Error:', error );
+
+    // 共通エラーハンドリング
+    if ( error.code === 'rest_forbidden' ) {
+      alert( '権限がありません' );
+    }
+
+    throw error;
+  });
+});
+```
+
+#### 設計方針
+
+* nonce は、middleware で一元管理します。
+* 各コンポーネントで、個別付与しません。
+* エラーハンドリングは、共通化します。
+
+#### 拡張ポイント
+
+将来的に、以下の機能追加を検討します。
+
+* リトライ処理
+* ローディング管理
+* 通信ログ収集
+
+#### 注意点
+
+* middleware は、グローバルに1回だけ登録します。
+* 多重登録を防ぎます。
 
 ### 認証・認可フロー
 
