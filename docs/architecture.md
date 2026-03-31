@@ -353,6 +353,8 @@ apiFetch.use( ( options, next ) => {
 
 #### 状態定義
 
+UI 状態は、REST API の `status` と一致させます。
+
 * idle: 初期状態
 * loading: API ロード中
 * success: 全件成功
