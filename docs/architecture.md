@@ -341,6 +341,65 @@ apiFetch.use( ( options, next ) => {
 * middleware は、グローバルに1回だけ登録します。
 * 多重登録を防ぎます。
 
+### フロント状態管理 (error / success / retry)
+
+フロントエンドは、REST API のレスポンスに応じて、明確な状態遷移を持ちます。
+
+#### 状態定義
+
+* idle: 初期状態
+* loading: API呼び出し中
+* success: 全件成功
+* partial: 一部成功
+* error: 全体失敗
+
+#### 状態遷移
+
+```mermaid
+flowchart TD
+  A["idle"] --> B["loading"]
+  B --> C["(success | partial | error)"]
+```
+
+---
+
+#### state 構造 (例)
+
+```ts
+{
+  status: 'idle' | 'loading' | 'success' | 'partial' | 'error',
+  message: string | null,
+  summary: {
+    success: number,
+    failed: number,
+    skipped: number
+  }
+}
+```
+
+#### UI 挙動
+
+* success:
+  * 「成功メッセージ」の表示
+  * 一覧を再ロードします。
+* partial:
+  * 「警告メッセージ」の表示
+  * エラー件数を明示します。
+* error:
+  * 「エラーメッセージ」の表示
+  * 再試行可能な状態にします。
+
+#### リトライ設計
+
+* failed のみ、再実行可能です。
+* ユーザー操作により、再送信します。
+
+#### 設計方針
+
+* 状態は、単一の「state machine」として扱います。
+* 表示と状態を分離します。
+* API レスポンスを、そのまま UI 状態にマッピングします。
+
 ### 認証・認可フロー
 
 ```mermaid
@@ -349,7 +408,7 @@ flowchart TD
   B --> C["REST"]
   C --> D["nonce 検証"]
   D --> E["capability チェック"]
-  D --> E["実行"]
+  E --> F["実行"]
 ```
 
 ## 処理フロー (レイヤー横断)
@@ -366,6 +425,65 @@ flowchart TD
 * REST: 認証とバリデーション
 * Service: 補正ロジックの実行
 * Repository: 更新処理
+
+### REST API レスポンス仕様
+
+本プラグインの REST API は、一括処理を前提とし、成功/部分成功/失敗を明示的に区別するレスポンス構造を採用します。
+
+#### レスポンス構造
+
+```json
+{
+  "status": "success | partial | error",
+  "summary": {
+    "total": 10,
+    "processed": 10,
+    "success": 8,
+    "skipped": 1,
+    "failed": 1
+  },
+  "results": [
+    {
+      "id": 123,
+      "status": "success",
+      "message": "updated"
+    },
+    {
+      "id": 124,
+      "status": "skipped",
+      "message": "already_correct"
+    },
+    {
+      "id": 125,
+      "status": "error",
+      "message": "permission_denied"
+    }
+  ]
+}
+```
+
+#### ステータス定義
+
+| status | 意味 |
+| ------- | ---- |
+| success | 全件成功 |
+| partial | 一部成功 |
+| error | 全件失敗 |
+
+#### 設計方針
+
+* HTTP ステータスとは別に、業務ステータスを持ちます。
+* 部分成功を許容します。
+* UI は、summary を主に参照します。
+
+#### HTTP ステータス
+
+| ケース | HTTP |
+| --------------------- | ---- |
+| 正常 (success/partial) | 200 |
+| 認可エラー | 403 |
+| 入力エラー | 400 |
+| サーバーエラー | 500 |
 
 ## 冪等性 (べきとうせい)
 
@@ -421,14 +539,14 @@ sequenceDiagram
   participant Svc as Media_Date_Service
   participant DB as wp_posts / postmeta
 
-  User->>WP: メディア一覧を表示
-  WP->>UI: スクリプト・データ初期化
-  UI->>REST: 差分確認/補正対象 ID (任意でプレビュー)
-  REST->>Svc: 権限チェック後に処理委譲
-  Svc->>DB: _wp_attached_file 取得・post_date 比較/更新
-  Svc-->>REST: 結果 (成功/スキップ/エラー集計)
+  User->>WP: メディア一覧の表示
+  WP->>UI: スクリプト・データの初期化
+  UI->>REST: 差分確認・補正対象 ID (任意でプレビュー)
+  REST->>Svc: 権限チェック後に処理を委譲
+  Svc->>DB: _wp_attached_file を取得し post_date を比較・更新
+  Svc-->>REST: 結果 (成功、スキップ、エラーの集計)
   REST-->>UI: JSON レスポンス
-  UI-->>User: メッセージ・一覧の再描画
+  UI-->>User: メッセージと一覧の再描画
 ```
 
 1. **表示**: メディア一覧で標準カラムに加え、「年月 (パス)」「差分」を表示します (PHP フィルターまたは初期データと REST の組み合わせです。実装方針は一覧のデータ取得コストに応じて選択します)。
