@@ -4,7 +4,7 @@
 
 # S2J MediaLibrary Date Corrector - アーキテクチャー
 
-## 1. フォルダー構成 (想定)
+## フォルダー構成 (想定)
 
 本プラグインでは、ブートストラップ (PHP)、ドメインロジック (PHP)、管理画面 UI (React)、任意のブロック/フロント資産 (React) を分離します。
 
@@ -80,7 +80,7 @@ s2j-media-library-date-corrector/
 
 ---
 
-## 2. 主要ファイルの責務
+## 主要ファイルの責務
 
 | 領域 | 役割 |
 |------|------|
@@ -97,24 +97,24 @@ s2j-media-library-date-corrector/
 ### UI レイヤー
 
 * 選択状態の管理
-* API 呼び出し
-* 状態表示
+* API のコール
+* 状態の表示
 
 ### API レイヤー
 
 * 認証・認可
-* 入力検証
-* レスポンス整形
+* 入力の検証
+* レスポンスの整形
 
 ### サービスレイヤー
 
-* 日付補正ロジック
-* 差分判定
+* 日付補正を担います。
+* 差分を判定します。
 
 ### データレイヤー
 
-* post_date 更新
-* meta 取得
+* `post_date` の更新
+* meta の取得
 
 ## 処理フロー (レイヤー横断)
 
@@ -126,9 +126,9 @@ flowchart TD
   D --> E["DB"]
 ```
 
-* UI: 選択・実行
-* REST: 認証・バリデーション
-* Service: 補正ロジック
+* UI: 選択と実行
+* REST: 認証とバリデーション
+* Service: 補正ロジックの実行
 * Repository: 更新処理
 
 ## 冪等性 (べきとうせい)
@@ -137,48 +137,48 @@ flowchart TD
 
 ---
 
-## 3. 技術スタック
+## 技術スタック
 
 | 層 | 採用技術 | 備考 |
 |----|----------|------|
 | 基盤 | WordPress 6.3+ (README の下限に準拠) | メディアは `attachment` 投稿タイプ |
 | サーバー | PHP (WordPress 要件に準拠) | 直接 SQL は `wpdb` 経由に限定 |
-| 管理 UI | React、TypeScript、`@wordpress/element` / `components` / `i18n` 等 | README の方針 |
-| ビルド | Vite、Dart Sass、PostCSS (Autoprefixer) | `vite.config.ts` |
-| スタイル | SCSS | `src/styles/*.scss` |
+| 管理 UI | React、TypeScript、`@wordpress/element` / `components` / `i18n` 等 | README 記載の方針 |
+| ビルド | Vite、Dart Sass、PostCSS (Autoprefixer) | ビルドの定義は `vite.config.ts` |
+| スタイル | SCSS | スタイルのソースは `src/styles/*.scss` |
 
 ---
 
-## 4. ビルド
+## ビルド
 
-### 4.1. ビルドターゲット
+### ビルドターゲット
 
 `vite.config.ts` の `npm_lifecycle_event` から対象を判定します。
 
 | ターゲット | エントリ (想定) | 用途 |
 |------------|------------------|------|
 | `admin` | `src/admin/index.tsx` | メディアライブラリ一覧の拡張 UI |
-| `gutenberg` | `src/gutenberg/index.tsx` | ブロックの登録・エディター UI |
+| `gutenberg` | `src/gutenberg/index.tsx` | ブロックの登録、エディター UI |
 | `classic` | `src/classic/index.ts` | Classic エディター側の補助処理 |
 | `frontend` | `src/frontend/media-library-date-corrector.tsx` | ブロックのフロント表示 |
 
 `gutenberg` ビルド時は `src/gutenberg/media-library-date-corrector/block.json` を `dist/blocks/...` にコピーします (`vite-plugin-static-copy`)。
 
-### 4.2. 外部化
+### 外部化
 
 Rollup の `external` に `@wordpress/*`、`react`、`react-dom`、`jquery` を指定し、管理画面で WordPress がすでに提供しているグローバル (`wp.*`、`React` 等) にマッピングします。
 
-### 4.3. 出力
+### 出力
 
-* 出力先: `ディストリビューションのルート/dist` (`emptyOutDir: false` でターゲット間の連続ビルドを想定)
-* `FLUSH_DIST=true` でビルド前に `dist` を削除可能
-* 本番時は `NODE_ENV=production` で minify
+* 出力先は `ディストリビューションのルート/dist` とし、`emptyOutDir: false` でターゲット間の連続ビルドを想定します。
+* `FLUSH_DIST=true` の場合、ビルド前に `dist` を削除できます。
+* 本番時は `NODE_ENV=production` で、成果物を縮小 (minify) します。
 
 > **実装上の注意:** 現行 `vite.config.ts` の成果物ファイル名に別プロジェクト由来の接頭辞が含まれる場合は、リリース前にプラグインスラッグへ統一することを推奨します。
 
 ---
 
-## 5. 実行ロジック (エンドツーエンド)
+## 実行ロジック (エンドツーエンド)
 
 以下は [コンセプト](./concept.md) の「補正ロジック」と [管理画面 UI 仕様](./admin_ui_spec.md) の操作をサーバー/クライアントに分割した流れです。
 
@@ -204,13 +204,13 @@ sequenceDiagram
 1. **表示**: メディア一覧で標準カラムに加え、「年月 (パス)」「差分」を表示します (PHP フィルターまたは初期データと REST の組み合わせ。実装方針は一覧のデータ取得コストに応じて選択します)。
 2. **選択**: ユーザーがチェックボックスで対象を選ぶか、「差分のみ選択」等を行います。
 3. **実行**: UI が REST へ補正リクエストを送ります。サーバー側で **各添付ファイルごと** に `current_user_can` を検証します。
-4. **更新**: `Media_Date_Service` が `yyyy/mm-01 00:00:00` (サイトのタイムゾーン) へ `post_date` をそろえ、必要に応じて `post_date_gmt` も整合させます (詳細は [データ辞書](./data_dictionary.md))。
+4. **更新**: `Media_Date_Service` が `yyyy/mm-01 00:00:00` (サイトのタイムゾーン) へ `post_date` をそろえ、必要に応じて `post_date_gmt` も整合させます (詳細は [データ辞書](./data_dictionary.md) を参照)。
 5. **完了**: UI が成功/失敗を表示し、一覧を更新します。
 
 バッチ件数が大きい場合は、REST でチャンク処理するか、バックグラウンドキュー (将来拡張) を検討します。初期実装では「1リクエスト=限定件数」でタイムアウトを避けます。
 
 ---
 
-## 6. 共通仕様との関係
+## 共通仕様との関係
 
 プラグイン全体の規約・品質・セキュリティの共通ルールは、[WP_PLUGIN_SPEC.md](https://github.com/stein2nd/wp-plugin-spec/blob/main/docs/WP_PLUGIN_SPEC.md) に従います。
