@@ -348,7 +348,7 @@ apiFetch.use( ( options, next ) => {
 #### 状態定義
 
 * idle: 初期状態
-* loading: API呼び出し中
+* loading: API 呼び出し中
 * success: 全件成功
 * partial: 一部成功
 * error: 全体失敗
