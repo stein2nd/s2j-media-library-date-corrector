@@ -47,6 +47,19 @@
 
 HTTP ステータスと業務 `status` の対応は、[HTTP ステータスコード](#6-http-ステータスコード指針) に従います。
 
+#### エラーコード体系
+
+`results[].error` は、以下のコード体系を使用します。
+
+| code | 意味 |
+| ----------------- | ------------- |
+| `permission_denied` | 権限不足 |
+| `invalid_path` | パス解析不可 |
+| `not_found` | attachment 不在 |
+| `internal_error` | その他 |
+
+UI は、これを翻訳して表示します。
+
 ### 結果集計ルール (status、summary の算出)
 
 一括処理におけるトップレベル `status` および `summary` の算出ルールを、次のとおり定めます。
@@ -244,7 +257,7 @@ UI は、一括処理の結果にもとづき、ユーザーが再試行 (リト
 #### 設計方針
 
 * ユーザーに対象を明示します (暗黙リトライしません)。
-* 冪等性 (べきとうせい) を前提とします (安全に再実行可能です)。
+* [冪等性 (べきとうせい)](./architecture.md#冪等性-べきとうせい) を前提とします (安全に再実行可能です)。
 * UI は summary を主に参照し、results は詳細表示に用います。
 
 #### 設計意図
@@ -253,7 +266,7 @@ UI は、一括処理の結果にもとづき、ユーザーが再試行 (リト
 * 全件失敗を `error` とすることで、UI 上で異常を明確に検知できます。
 * 部分成功 (`partial`) を中心に設計することで、バッチ処理の実用性を高めます。
 
-* 冪等性 (べきとうせい) を維持するため、成功済みデータは再処理しません。
+* [冪等性 (べきとうせい)](./architecture.md#冪等性-べきとうせい) を維持するため、成功済みデータは再処理しません。
 * `skipped` は、状態が正しいため再処理不要とします。
 * `error` のみ再試行可能とすることで、処理効率を最適化します。
 
@@ -371,8 +384,6 @@ current_user_can( 'edit_post', $id )
 
 **匿名公開** のエンドポイントは設けません (フロント用のブロックは PHP レンダリングで完結させ、公開 REST は不要を原則とします)。
 
----
-
 ## Nonce と `api-fetch`
 
 管理画面の JavaScript からは `@wordpress/api-fetch` を使用し、ルート URL が同一オリジンのとき **Nonce ミドルウェア** が `X-WP-Nonce` を付与します。
@@ -383,11 +394,10 @@ current_user_can( 'edit_post', $id )
 X-WP-Nonce: <wpApiSettings.nonce または wp_create_nonce('wp_rest')>
 ```
 
----
-
 ## 冪等性 (べきとうせい)
 
 同一リクエストを複数回実行しても、結果は変わりません。
+実装に関しての詳細は、[アーキテクチャー > 冪等性 (べきとうせい)](./architecture.md#冪等性-べきとうせい) をご覧ください。
 
 ## 対象指定
 
@@ -477,8 +487,6 @@ X-WP-Nonce: <wpApiSettings.nonce または wp_create_nonce('wp_rest')>
 
 * `ids` が空の場合は `400` とします。
 
----
-
 ### 添付ファイルの日付補正 (選択 ID)
 
 **目的:** チェックされた添付、または行アクションの単件の `post_date` を補正します。
@@ -518,9 +526,7 @@ X-WP-Nonce: <wpApiSettings.nonce または wp_create_nonce('wp_rest')>
 }
 ```
 
-* `mismatch` でない項目は `ok: true, skipped: true` としてもかまいません ([データ辞書](./data_dictionary.md) の「冪等性 (べきとうせい)」)。
-
----
+* `mismatch` でない項目は `ok: true, skipped: true` としてもかまいません ([データ辞書](./data_dictionary.md#データ更新内容-まとめ) の「冪等性 (べきとうせい)」)。
 
 ### 現在の一覧相当の、一括補正「Date Correct (All)」
 
@@ -598,9 +604,7 @@ ID リスト方式 (推奨) の場合:
 * **件別 `results[].message`**
   * `200` 応答の本文内で、ID 単位の理由を表す短いコードです。UI は `summary` を主に表示し、詳細は `results` を参照します。
 
-REST エラーレスポンスの `code` (または件別 `error` コード) で用いる想定の値として、たとえば `invalid_param`、`permission_denied`、`processing_error` などがあります。
-
----
+REST エラーレスポンスの `code` (または件別 `error` コード) で用いる想定の値として、たとえば `invalid_param`、`permission_denied`、`processing_error` などがあります。詳細は、[REST API 仕様 > エラーコード体系](./rest_api_spec.md#エラーコード体系) をご覧ください。
 
 ## 共通仕様との関係
 
