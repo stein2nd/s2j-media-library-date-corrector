@@ -115,11 +115,18 @@
 | ------------------- | ---------------- | ------------------------------------------ |
 | `id` | `number` | 添付ファイル ID |
 | `postDateYm` | `string \| null` | `post_date` 由来の `yyyy/mm` (抽出不可の場合は、`null`) |
-| `pathYm` | `string \| null` | パス由来の `yyyy/mm` (未設定またはパース不可で、`null`) |
+| `pathYm` | `string \| null` | パス由来の `yyyy/mm` (未設定またはパース不可の場合は、`null`) |
 | `status` | `MismatchStatus` | 差分状態 (`unknown` を含む) |
 | `suggestedPostDate` | `string \| null` | 補正候補 (生成不可の場合は、`null`) |
 
 * `suggestedPostDate`: ISO 風の文字列、またはサイトのタイムゾーンにおける `Y-m-d H:i:s` 形式です。
+
+#### suggestedPostDate の生成条件
+
+下記の条件に該当しない場合のみ、生成します (下記の条件に該当する場合は、`null`)。
+
+* `pathYm === null`
+* `status === unknown`
 
 ### 欠損データの扱い - nullable、unknown
 
@@ -218,7 +225,7 @@ flowchart LR
 | `_wp_attached_file` | **変更しません** |
 | その他メタ | 初期スコープでは **変更しません** |
 
-冪等性 (べきとうせい): `match` の項目を再実行しても、スキップまたは no-op にできるよう、サービス層で判定します。
+[冪等性 (べきとうせい)](./architecture.md#冪等性-べきとうせい): `match` の項目を再実行しても、スキップまたは no-op にできるよう、サービス層で判定します。
 
 ## セキュリティ・整合性 (データ観点)
 
