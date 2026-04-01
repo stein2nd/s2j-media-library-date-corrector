@@ -152,6 +152,54 @@ s2j-media-library-date-corrector/
 | UX 要件 (ページ跨ぎ選択など) | [管理画面の UI 仕様](./admin_ui_spec.md) |
 | 実装方法 (sessionStorage 等) | [アーキテクチャー](./architecture.md) |
 
+### ソース・オブ・トゥルース (Source of Truth)
+
+本プロジェクトでは、データ構造および API 契約の「単一の正」(SSoT: Single Source of Truth) を、明確に定義します。
+
+#### 設計意図 (ゴール)
+
+* API、UI、実装間の、不整合の防止
+* 型安全性と、実行時の安全性の両立
+* 変更の「影響範囲」の最小化
+
+#### 設計方針 (規約)
+
+* OpenAPI を、最上位の契約します。
+* 型は、手動で二重定義しません。
+* validation は、契約に従属させます。
+* 仕様変更は、OpenAPI から開始します。
+
+#### 採用方針
+
+本プロジェクトは、以下の順序でデータ定義を管理します。
+
+```mermaid
+flowchart TD
+  A["OpenAPI"] --> B["TypeScript 型"]
+  B --> C["runtime スキーマ (zod)"]
+```
+
+#### 禁止事項
+
+* TypeScript 型を直接編集して、契約を変更すること
+* スキーマのみを変更して API 仕様と乖離させること
+
+#### 各レイヤーの役割
+
+| レイヤー | 役割 |
+| ------------ | ------------------ |
+| OpenAPI | API 契約の正 |
+| TypeScript 型 | 実装用の型定義 |
+| zod スキーマ | runtime validation |
+
+#### 生成フロー
+
+```mermaid
+flowchart TD
+  A["OpenAPI"] --> B["TypeScript 型 (自動生成)"]
+  B --> C["zod スキーマ (必要に応じて、生成または補完)"]
+```
+
 ## 権限設計 (Capabilities)
 
 本プラグインは、WordPress の権限モデルにもとづき、操作画面と設定画面で異なる権限を適用します。
