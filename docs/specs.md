@@ -14,6 +14,16 @@
 
 その後は、下表の [概要](./overview.md) や [データ辞書](./data_dictionary.md) など、必要なトピックから参照してください。
 
+各仕様で散見される「意図・方針」については、「意図 = ゴール」、「方針 = 意図を実現する為の規約」という関係にあります。
+
+```mermaid
+flowchart TD
+  A["意図: Why "] --> B["仕様: What"]
+  B --> C["方針: How (Rule/Criteria)"]
+  C --> D["設計: How-Where (構造・配置)"]
+  D --> E["実装: How-What (具体処理)"]
+```
+
 ## 共通仕様
 
 * [WP_PLUGIN_SPEC.md (共通仕様)](https://github.com/stein2nd/wp-plugin-spec/blob/main/docs/WP_PLUGIN_SPEC.md)
