@@ -4,81 +4,118 @@
 
 # S2J MediaLibrary Date Corrector - アーキテクチャー
 
-## フォルダー構成 (想定)
+## フロントエンド構成 (schema、types、api)
+
+フロントエンドのデータ処理層は、以下のディレクトリ構成で管理します。
+
+### 設計方針 (規約)
+
+* 責務ごとにディレクトリを分離します。
+* 副作用（API）は、`api/` に閉じ込めます。
+* 型は、すべて自動生成を前提とします。
+
+### フォルダー構成 (想定)
 
 本プラグインでは、ブートストラップ (PHP)、ドメインロジック (PHP)、管理画面 UI (React)、任意のブロック/フロント資産 (React) を分離します。
 
 ```text
 s2j-media-library-date-corrector/
-├── `README.md`
-├── `README.txt`
-├── `LICENSE`
-├── `package.json`  # ビルド設定
-├── node_modules/  # 依存 npm モジュール
-├── `vite.config.ts`
-├── `tsconfig.json`
-├── `eslint.config.js`  # ESLint 設定
-├── docs/  # 仕様・設計ドキュメント
-├── `s2j-media-library-date-corrector.php`  # プラグイン本体・フック登録
-├── `uninstall.php`  # プラグイン削除時の処理
-├┬─ languages/  # 翻訳ファイル
-│├─ `s2j-media-library-date-corrector.pot`
-│├─ `s2j-media-library-date-corrector-[ロケール名].po`
-│└─ `s2j-media-library-date-corrector-[ロケール名].mo`  # WordPress 表示用バイナリ
-├┬── includes/  # PHP クラス群 (設定画面、REST API、ブロック。オートロード対象)
-│├── `class-plugin.php`                    # 初期化・依存登録
-│├── `class-rest-controller.php`           # REST の登録と権限
-│├── `class-media-date-service.php`        # 年月抽出・比較・更新の核
-│├── `class-media-library-list-table.php`  # 一覧カラム・一括操作 (※)
-│└── ...
-├┬── src/  # TypeScript/React (Gutenberg ブロック、設定画面) /SCSS ソース
+├──── `README.md`
+├──── `README.txt`
+├──── `LICENSE`
+├──── `package.json`  # ビルド設定
+├──── node_modules/  # 依存 npm モジュール
+├──── `vite.config.ts`
+├──── `tsconfig.json`
+├──── `eslint.config.js`  # ESLint 設定
+├──── docs/  # 仕様・設計ドキュメント
+├──── `s2j-media-library-date-corrector.php`  # プラグイン本体・フック登録
+├──── `uninstall.php`  # プラグイン削除時の処理
+├┬─── languages/  # 翻訳ファイル
+│├─── `s2j-media-library-date-corrector.pot`
+│├─── `s2j-media-library-date-corrector-[ロケール名].po`
+│└─── `s2j-media-library-date-corrector-[ロケール名].mo`  # WordPress 表示用バイナリ
+├┬─── includes/  # PHP クラス群 (設定画面、REST API、ブロック。オートロード対象)
+│├─── `class-plugin.php`                    # 初期化・依存登録
+│├─── `class-rest-controller.php`           # REST の登録と権限
+│├─── `class-media-date-service.php`        # 年月抽出・比較・更新の核
+│├─── `class-media-library-list-table.php`  # 一覧カラム・一括操作 (※)
+│└─── ...
+├┬─── src/  # TypeScript/React (Gutenberg ブロック、設定画面) /SCSS ソース
 │├┬── admin/  # メディアライブラリ拡張 UI
-││├─ `index.tsx`  # 管理画面メイン・エントリーポイント
+││├── `index.tsx`  # 管理画面メイン・エントリーポイント
+││├┬─ media-corrector/
+│││├─ `reducer.ts`  # 状態管理
+│││└─ `actions.ts`  # アクション定義
 ││├┬─ components/
-│││└── ...
+│││└─ ...
 ││├┬─ data/
-│││└─ `constants.ts`  # 定数定義 (表示形式、ランク、動作オプション)
+│││└─ `constants.ts`  # 定数定義
 ││└┬─ utils/  # ユーティリティ
 ││　├─ `errorHandler.ts`  # エラー・ハンドリング
-││　└── ...
-│├┬─ frontend/  # フロントエンド表示
+││　└─ ...
+│├┬── api/  # API 通信
+││├── `client.ts`  # API コール (`api-fetch` ラッパー)
+││└── `endpoints.ts`  # エンドポイント定義
+│├┬── schema/  # ランタイム・バリデーション
+││└── `api.ts`  # zod スキーマ (APIレスポンス)
+│├┬── frontend/  # フロントエンド表示
 ││└── ...
 │├┬── gutenberg/  # Gutenberg ブロック用
-││├─ `index.tsx`
+││├── `index.tsx`
 ││└┬─ media-library-date-corrector/  # ブロック編集
 ││　├─ `index.tsx`  # コンポーネント
 ││　└─ `block.json`  # ブロック定義
-│├── classic/  # Classic エディター用スクリプト
-│├── frontend/  # フロント表示用 (ブロックの view 等)
-│├┬─ styles/  # プラグイン用のスタイル定義
-││├─ `admin.scss`  # 設定画面用
-││├─ `gutenberg.scss`  # Gutenberg ブロック用
-││├─ `frontend.scss`  # フロントエンド表示用
-││├─ `classic.scss`  # MetaBox 用
-││└─ `variables.scss`  # SCSS 変数定義
-│└┬─ types/  # プラグイン用のグローバル型定義
-│　├─ `index.ts`  # ContentModel
-│　├─ `wordpress.d.ts`  # WordPress
-│　├─ `dom.d.ts`  # DOM
-└┬─ dist/  # Vite ビルド成果物 (Git 管理外)、アイコン
-　├┬─ blocks/
+│├─── classic/  # Classic エディター用スクリプト
+│├─── frontend/  # フロント表示用 (ブロックの view 等)
+│├┬── styles/  # プラグイン用のスタイル定義
+││├── `admin.scss`  # 設定画面、操作画面用
+││├── `gutenberg.scss`  # Gutenberg ブロック用
+││├── `frontend.scss`  # フロントエンド表示用
+││├── `classic.scss`  # MetaBox 用
+││└── `variables.scss`  # SCSS 変数定義
+│└┬── types/  # プラグイン用のグローバル型定義
+│　├── `index.ts`
+│　├── `api.ts`  # TypeScript 型 (自動生成)
+│　├── `wordpress.d.ts`  # WordPress
+│　└── `dom.d.ts`  # DOM
+└┬─── dist/  # Vite ビルド成果物 (Git 管理外)、アイコン
+　├┬── blocks/
 　│└┬─ media-library-date-corrector/
 　│　└─ `block.json`  # ブロック定義
-　├┬─ css/  # プラグイン用のスタイル定義
-　│├─ `s2j-media-library-date-corrector-admin.css`
-　│├─ `s2j-media-library-date-corrector-gutenberg.css`
-　│├─ `s2j-media-library-date-corrector-frontend.css`
-　│└─ `s2j-media-library-date-corrector-classic.css`
-　└┬─ js/  # プラグイン用の Gutenberg ブロック、設定画面
-　　├─ `s2j-media-library-date-corrector-admin.js`
-　　├─ `s2j-media-library-date-corrector-gutenberg.js`
-　　├─ `s2j-media-library-date-corrector-frontend.js`
-　　└─ `s2j-media-library-date-corrector-classic.js`
+　├┬── css/  # プラグイン用のスタイル定義
+　│├── `s2j-media-library-date-corrector-admin.css`
+　│├── `s2j-media-library-date-corrector-gutenberg.css`
+　│├── `s2j-media-library-date-corrector-frontend.css`
+　│└── `s2j-media-library-date-corrector-classic.css`
+　└┬── js/  # プラグイン用の Gutenberg ブロック、設定画面、操作画面
+　　├── `s2j-media-library-date-corrector-admin.js`
+　　├── `s2j-media-library-date-corrector-gutenberg.js`
+　　├── `s2j-media-library-date-corrector-frontend.js`
+　　└── `s2j-media-library-date-corrector-classic.js`
 ```
 
 **注記:** `WP_List_Table` を直接継承するのではなく、`manage_media_custom_column` 等のフィルターと `bulk_actions-upload` 等で拡張する想定です。ファイル名は実装時に確定します。
 
-## 主要ファイルの責務
+### 各フォルダーの責務
+
+| フォルダー | 役割 |
+| ----------- | ----------------------- |
+| `admin/` | UI ロジック |
+| `api/` | API 通信 (副作用) |
+| `schema/` | runtime validation (zod) |
+| `types/` | 型定義 (OpenAPI 由来) |
+
+#### 依存関係
+
+```mermaid
+flowchart TD
+  A["types: 純粋な型 (最下層)"] --> B["schema: validation"]
+  B --> C["api: 通信"]
+  C --> D["admin: UI ロジック"]
+```
+
+### 主要ファイルの責務
 
 | 領域 | 役割 |
 |------|------|
@@ -88,26 +125,26 @@ s2j-media-library-date-corrector/
 | 管理画面 JS (`src/admin`) | 一覧の操作 UI、ローディング、REST との通信 (`api-fetch` 等) を扱います。見た目の状態遷移は [管理画面 UI 仕様](./admin_ui_spec.md) に従います。 |
 | Gutenberg/Classic/Frontend | [ブロック仕様](./block_spec.md) に従います。本プラグインの主機能は管理画面にあるため、ブロックは補助的に扱い、将来拡張も許容します。 |
 
-## レイヤー責務
+### レイヤー責務
 
-### UI レイヤー
+#### UI レイヤー
 
 * 選択状態の管理
 * API のコール
 * 状態の表示
 
-### API レイヤー
+#### API レイヤー
 
 * 認証・認可
 * 入力の検証
 * レスポンスの整形
 
-### サービスレイヤー
+#### サービスレイヤー
 
 * 日付補正を担います。
 * 差分を判定します。
 
-### データレイヤー
+#### データレイヤー
 
 * `post_date` の更新
 * meta の取得
@@ -814,6 +851,50 @@ flowchart TD
 | `frontend` | `src/frontend/media-library-date-corrector.tsx` | ブロックのフロント表示です。 |
 
 `gutenberg` ビルド時は `src/gutenberg/media-library-date-corrector/block.json` を `dist/blocks/...` にコピーします (`vite-plugin-static-copy`)。
+
+### 自動生成スクリプト (型・スキーマ)
+
+本プロジェクトでは、API 契約から型およびスキーマを自動生成します。
+
+#### 設計方針 (規約)
+
+* 手動で型を編集しません。
+* 生成物は常に再生成可能とします。
+* 差分は OpenAPI に集約します。
+
+#### 生成対象
+
+* TypeScript 型 (OpenAPI → types)
+* zod スキーマ (OpenAPI または型から生成)
+
+#### 実行タイミング
+
+* API 仕様変更時
+* CI/CD パイプライン
+* 開発開始前 (初期セットアップ)
+
+#### 生成フロー
+
+```mermaid
+flowchart TD
+  A["OpenAPI"] --> B["TypeScript 型生成"]
+  B --> C["zod スキーマ生成"]
+```
+
+* TypeScript 型生成: `openapi-typescript`
+* zod スキーマ生成: `openapi-zod-client` 等
+
+#### npm scripts 例
+
+```json
+{
+  "scripts": {
+    "generate:types": "openapi-typescript ./openapi.json -o src/types/api.ts",
+    "generate:schema": "openapi-zod-client ./openapi.json -o src/schema/api.ts",
+    "generate": "npm run generate:types && npm run generate:schema"
+  }
+}
+```
 
 ### OpenAPI 生成
 
