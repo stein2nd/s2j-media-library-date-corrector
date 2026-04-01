@@ -183,6 +183,73 @@
 | `skipped` | `boolean` (任意) | すでに一致のためスキップ等 |
 | `error` | `string` (任意) | 失敗理由コードまたはメッセージ |
 
+### TypeScript 型定義 (完全版)
+
+本プラグインのデータ構造は、以下の TypeScript 型として定義します。
+
+#### 設計方針 (規約)
+
+* API レスポンスと UI 状態は、「同一構造」を共有します。
+* `nullable` は、明示的に扱います。
+* `unknown` を、「状態」として保持します。
+
+#### MismatchStatus
+
+```ts
+type MismatchStatus = 'match' | 'mismatch' | 'unknown';
+```
+
+#### AttachmentDateRow
+
+```ts
+interface AttachmentDateRow {
+  id: number;
+  postDateYm: string | null;
+  pathYm: string | null;
+  status: MismatchStatus;
+  suggestedPostDate: string | null;
+}
+```
+
+#### ResultStatus
+
+```ts
+type ResultStatus = 'success' | 'skipped' | 'error';
+```
+
+#### ResultItem
+
+```ts
+interface ResultItem {
+  id: number;
+  status: ResultStatus;
+  message?: string;
+  error?: 'permission_denied' | 'invalid_path' | 'not_found' | 'internal_error';
+}
+```
+
+#### Summary
+
+```ts
+interface Summary {
+  total: number;
+  processed: number;
+  success: number;
+  skipped: number;
+  failed: number;
+}
+```
+
+#### APIResponse
+
+```ts
+interface APIResponse {
+  status: 'success' | 'partial' | 'error';
+  summary: Summary;
+  results: ResultItem[];
+}
+```
+
 ## データフロー
 
 ```mermaid
