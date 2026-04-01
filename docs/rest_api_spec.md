@@ -29,7 +29,7 @@
 
 #### 設計方針 (規約)
 
-* 本仕様書を、単一の正 (SSOT) とします。
+* 本仕様書を、「単一の正」(SSoT: Single Source of Truth) とします。
 * OpenAPI は、本仕様から生成します (手書きしません)。
 
 #### 対象
@@ -51,6 +51,12 @@
 本仕様は、OpenAPI 定義として表現され、TypeScript 型生成の基礎となります。
 
 生成方法は、[アーキテクチャー](./architecture.md#型生成-openapi--typescript) をご覧ください。
+
+#### ソース・オブ・トゥルースとの関係
+
+本仕様は、プロジェクトにおける API 契約の「単一の正」(SSoT: Single Source of Truth) として扱います。
+
+詳細な設計方針は、[アーキテクチャー > ソース・オブ・トゥルース](./architecture.md#ソースオブトゥルース-source-of-truth) をご覧ください。
 
 ### 要求ヘッダー
 
