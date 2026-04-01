@@ -608,8 +608,6 @@ Bulk Action の挙動は、以下のとおりです。
   * `per_page`: 1ページあたりの件数です。
   * `total`: 総件数です。
 
-### 理由
-
 * WordPress REST API (`WP_Query`) との親和性が高いためです。
 * 実装が単純なためです。
 
@@ -722,6 +720,21 @@ WordPress 標準のメディアライブラリ (List View) から、本プラグ
 * 引き継ぎ情報がない場合は、通常の一覧を表示します。
 
 ## アクション (Bulk/Row)
+
+### アクションと API の対応
+
+すべての操作は、同一の REST API を使用します。
+
+| 操作 | API |
+| ----------- | ---------- |
+| Row Action | `/correct` |
+| Bulk Action | `/correct` |
+| Retry | `/correct` |
+
+#### 設計方針
+
+* API を、単一化します。
+* UI の違いは、入力 (ID 集合) で表現します。
 
 ### Bulk Action (一覧の一括操作)
 
