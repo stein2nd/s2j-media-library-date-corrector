@@ -199,6 +199,12 @@
 
 実装は、[アーキテクチャー](./architecture.md#runtime-validation-zod--io-ts) をご覧ください。
 
+#### スキーマとの関係
+
+本ドキュメントの型定義は、zod スキーマにより実行時検証されます。
+
+詳細は、[アーキテクチャー](./architecture.md#スキーマ定義-完全実装) をご覧ください。
+
 #### MismatchStatus
 
 ```ts
