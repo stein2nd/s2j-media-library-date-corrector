@@ -193,6 +193,12 @@
 * `nullable` は、明示的に扱います。
 * `unknown` を、「状態」として保持します。
 
+#### Runtime Validation との関係
+
+本ドキュメントで定義する型は、runtime validation スキーマの基礎となります。
+
+実装は、[アーキテクチャー](./architecture.md#runtime-validation-zod--io-ts) をご覧ください。
+
 #### MismatchStatus
 
 ```ts
