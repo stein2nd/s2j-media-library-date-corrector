@@ -227,6 +227,12 @@ flowchart TD
 | partial | partial |
 | error | error |
 
+#### 実装との関係
+
+UI 状態は、reducer により管理されます。
+
+詳細な実装は、[アーキテクチャー > reducer設計 - 状態遷移](./architecture.md#reducer-設計---状態遷移) をご覧ください。
+
 ## UI メッセージ
 
 本プラグインは、処理状態および結果に応じて、ユーザーに対して適切なフィードバックメッセージを表示します。
