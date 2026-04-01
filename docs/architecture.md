@@ -124,7 +124,7 @@ s2j-media-library-date-corrector/
 
 ### 仕様 - What
 
-以下は、[管理画面の UI 仕様](./admin_ui_spec.md) にて定義します。
+[管理画面の UI 仕様](./admin_ui_spec.md) では、次の事項を定義します。
 
 * UI の構造
 * 操作仕様
@@ -261,6 +261,49 @@ REST API コールは、WordPress の nonce による認証が必須です。
 
 * 各リクエストごとに `current_user_can` を実行します。
 * ID 単位で権限チェックを行います。
+
+### Runtime Validation (zod / io-ts)
+
+本プラグインでは、REST API の入出力に対して「runtime validation」を実施します。
+
+#### 設計意図 (ゴール)
+
+* 型安全性の強化 (TypeScript だけに依存しない)
+* 外部入力 (REST) の信頼性確保
+* 不正データの早期検出
+
+#### 設計方針 (規約)
+
+* 型 (TypeScript) と実行時検証 (zod) を分離しません。
+* 「信頼できる境界」でのみ、validation を行います。
+
+#### 対象
+
+* API レスポンス: サーバー → クライアント
+* API リクエスト: クライアント → サーバー
+
+#### 実装方針
+
+* スキーマ定義ライブラリ (たとえば、zod) を使用します。
+* TypeScript 型とスキーマは、対応させます。
+
+```ts
+const ApiResponseSchema = z.object({
+  status: z.enum(['success', 'partial', 'error']),
+  summary: SummarySchema,
+  results: z.array(ResultItemSchema),
+});
+```
+
+#### 適用タイミング
+
+* `api-fetch` のレスポンス受信時に検証します。
+* 必要に応じて、送信前にも検証します。
+
+#### エラー時の挙動
+
+* validation エラーは、`error` 状態として扱います。
+* UI にエラーメッセージを表示します。
 
 ### 適用レイヤー
 
@@ -456,7 +499,7 @@ flowchart TD
 
 リトライ対象および挙動の詳細は、REST API 仕様に従います。
 
-* 参照: [REST API 仕様 > リトライ仕様 (統一定義)](./rest_api_spec.md#リトライ仕様-統一定義)
+* 詳細は、[REST API 仕様 > リトライ仕様 (統一定義)](./rest_api_spec.md#リトライ仕様-統一定義) をご覧ください。
 
 ### reducer 設計 - 状態遷移
 
@@ -584,7 +627,7 @@ flowchart TD
 ### REST API レスポンス仕様
 
 本プラグインの REST API は、一括処理を前提とします。
-成功/部分成功/失敗を明示的に区別する、レスポンス構造を採用します。
+成功/部分成功/失敗を、明示的に区別するレスポンス構造を採用します。
 
 #### 設計方針 (規約)
 
@@ -636,10 +679,10 @@ flowchart TD
 
 | ケース | HTTP |
 | --------------------- | ---- |
-| 正常 (success/partial) | 200 |
-| 認可エラー | 403 |
-| 入力エラー | 400 |
-| サーバーエラー | 500 |
+| 正常 (success/partial) | `200` |
+| 認可エラー | `403` |
+| 入力エラー | `400` |
+| サーバーエラー | `500` |
 
 ## 冪等性 (べきとうせい)
 
@@ -674,6 +717,33 @@ flowchart TD
 | `frontend` | `src/frontend/media-library-date-corrector.tsx` | ブロックのフロント表示です。 |
 
 `gutenberg` ビルド時は `src/gutenberg/media-library-date-corrector/block.json` を `dist/blocks/...` にコピーします (`vite-plugin-static-copy`)。
+
+### OpenAPI 生成
+
+OpenAPI 定義は、TypeScript 型および validation スキーマから生成します。
+
+#### 方針
+
+* 手動編集は、行いません。
+* 型定義を、単一のソースとします。
+
+#### 利用用途
+
+* API ドキュメント表示
+* クライアント生成
+* テスト自動化
+
+#### 生成方法
+
+下記のいずれかの方法を、採用します。
+
+* zod → OpenAPI 変換
+* TypeScript 型 → OpenAPI 生成ツール
+
+#### 出力
+
+* `openapi.json` として生成します。
+* 開発およびテストに利用します。
 
 ### 外部化
 
