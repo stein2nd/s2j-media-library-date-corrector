@@ -458,6 +458,84 @@ flowchart TD
 
 * 参照: [REST API 仕様 > リトライ仕様 (統一定義)](./rest_api_spec.md#リトライ仕様-統一定義)
 
+### reducer 設計 - 状態遷移
+
+フロントエンドの状態管理は、単一の reducer により管理します。
+
+#### 設計方針 (規約)
+
+* REST API の `status` を、そのまま state に反映します。
+* 状態は、単一の source of truth です。
+* 副作用は、reducer 外で処理します (`api-fetch`)。
+
+#### 状態遷移
+
+```mermaid
+flowchart TD
+  A["idle"] --> B["loading"]
+  B --> C["success | partial | error"]
+```
+
+#### State 定義
+
+```ts
+type Status = 'idle' | 'loading' | 'success' | 'partial' | 'error';
+
+interface State {
+  status: Status;
+  summary: Summary | null;
+  results: ResultItem[];
+  message: string | null;
+}
+```
+
+#### Action 定義
+
+```ts
+type Action =
+  | { type: 'START' }
+  | { type: 'SUCCESS'; payload: APIResponse }
+  | { type: 'ERROR'; error: string }
+  | { type: 'RESET' };
+```
+
+#### reducer
+
+```ts
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'START':
+      return { ...state, status: 'loading', message: null };
+
+    case 'SUCCESS':
+      return {
+        ...state,
+        status: action.payload.status,
+        summary: action.payload.summary,
+        results: action.payload.results,
+      };
+
+    case 'ERROR':
+      return {
+        ...state,
+        status: 'error',
+        message: action.error,
+      };
+
+    case 'RESET':
+      return {
+        status: 'idle',
+        summary: null,
+        results: [],
+        message: null,
+      };
+
+    default:
+      return state;
+  }
+}
+```
+
 ### 認証・認可フロー
 
 ```mermaid
