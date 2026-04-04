@@ -1026,6 +1026,62 @@ sequenceDiagram
 バッチ件数が大きい場合は、REST でチャンク処理を行うか、バックグラウンドキュー (将来拡張) を検討します。
 初期実装では、「1リクエスト = 限定件数」としてタイムアウトを避けます。
 
+### 参考実装 - WP-CLI による一括補正
+
+本プラグインのコア処理は、以下のような単純なロジックで実現可能です。
+尚、これは、WordPress CLI を用いた最小構成の参考実装です。
+
+#### 設計意図 (ゴール)
+
+* コアロジックの単純さを明示します。
+* 本プラグインの付加価値 (安全性、UX) を明確化します。
+
+#### 注意点 (本コードの制約)
+
+* タイムゾーン考慮が不十分です (`post_date_gmt` が固定値)。
+* エラーハンドリングが、ありません。
+* `_wp_attached_file` が不正な場合の考慮が、ありません。
+* バッチサイズ制御が、ありません。
+
+#### 本実装との違い
+
+本プラグインの実装では、以下の点を追加・改善します。
+
+* 権限チェック (`upload_files`, `edit_post`)
+* 差分判定 (match / mismatch / unknown)
+* 部分成功 (partial) 対応
+* retry 機構
+* REST API 経由の処理
+* UI による選択的実行
+
+#### サンプルコード
+
+```bash
+wp eval '
+$attachments = get_posts(["post_type"=>"attachment","posts_per_page"=>-1]);
+
+foreach($attachments as $a){
+  $file = get_post_meta($a->ID, "_wp_attached_file", true);
+  if(preg_match("#(\d{4})/(\d{2})#", $file, $m)){
+    wp_update_post([
+      "ID"=>$a->ID,
+      "post_date"=>"{$m[1]}-{$m[2]}-01 00:00:00",
+      "post_date_gmt"=>"{$m[1]}-{$m[2]}-01 00:00:00"
+    ]);
+  }
+}
+'
+```
+
+#### 本プラグインとの対応関係
+
+| 処理 | 本プラグインでの責務 |
+| ---------------------- | ------------ |
+| `_wp_attached_file` 取得 | Data Layer |
+| 正規表現で年月抽出 | Normalize 処理 |
+| `post_date` 更新 | Write 処理 |
+| 全件ループ | Batch 処理 |
+
 ## 共通仕様との関係
 
 プラグイン全体の規約・品質・セキュリティの共通ルールは、[WP_PLUGIN_SPEC.md](https://github.com/stein2nd/wp-plugin-spec/blob/main/docs/WP_PLUGIN_SPEC.md) に従います。
