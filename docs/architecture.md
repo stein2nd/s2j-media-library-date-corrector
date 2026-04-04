@@ -1054,6 +1054,15 @@ sequenceDiagram
 * REST API 経由の処理
 * UI による選択的実行
 
+#### 本プラグインとの対応関係
+
+| 処理 | 本プラグインでの責務 |
+| ---------------------- | ------------ |
+| `_wp_attached_file` 取得 | Data Layer |
+| 正規表現で年月抽出 | Normalize 処理 |
+| `post_date` 更新 | Write 処理 |
+| 全件ループ | Batch 処理 |
+
 #### サンプルコード
 
 ```bash
@@ -1072,15 +1081,6 @@ foreach($attachments as $a){
 }
 '
 ```
-
-#### 本プラグインとの対応関係
-
-| 処理 | 本プラグインでの責務 |
-| ---------------------- | ------------ |
-| `_wp_attached_file` 取得 | Data Layer |
-| 正規表現で年月抽出 | Normalize 処理 |
-| `post_date` 更新 | Write 処理 |
-| 全件ループ | Batch 処理 |
 
 ## 共通仕様との関係
 
