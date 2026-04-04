@@ -30,3 +30,11 @@
 * [Bulk Media Register](https://ja.wordpress.org/plugins/bulk-media-register/) などで一括登録した後に使います。
 * メディアの年月フィルターが崩れている場合に使います。
 * 既存の uploads 構造を維持したい場合に使います。
+
+## License
+
+このプロジェクトは GPL v3以降の下でライセンスされています - 詳細は [LICENSE](LICENSE) ファイルを参照してください。
+
+## Support and Contact
+
+サポート、機能リクエスト、またはバグ報告については、[GitHub Issues](https://github.com/stein2nd/s2j-media-library-date-corrector/issues) ページをご覧ください。
