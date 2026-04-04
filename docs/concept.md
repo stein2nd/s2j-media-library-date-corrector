@@ -17,7 +17,7 @@
 
 * 既存サイトや旧環境から、`wp-content/uploads/yyyy/mm` 構造を維持したままファイルを移行した場合
 * FTP やローカルコピーにより、メディアファイルのみを先に配置した場合
-* Bulk Media Register 等のツールを用いて、ファイルを一括でメディアライブラリに登録した場合
+* [Bulk Media Register](https://ja.wordpress.org/plugins/bulk-media-register/) 等のツールを用いて、ファイルを一括でメディアライブラリに登録した場合
 
 これらの操作において、ファイル自体は正しいディレクトリ構造に配置される一方で、WordPress のメディア情報 (特に `post_date`) は現在日時で登録されることがあります。
 
