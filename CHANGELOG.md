@@ -8,7 +8,7 @@
 * ドキュメント Lint 用スクリプト `npm run lint:docs` を追加。
 * GitHub Actions ワークフロー `.github/workflows/docs-lint.yml` を追加。
 * VS Code 向け textlint 設定 (`.vscode/settings.json`) を追加。
-* VS Code 推奨拡張設定 (`.vscode/extensions.json`) を追加。
+* VS Code 推奨拡張の設定 (`.vscode/extensions.json`) を追加。
 * `.npmrc` を追加 (`legacy-peer-deps=true`)。
 
 ### Changed
