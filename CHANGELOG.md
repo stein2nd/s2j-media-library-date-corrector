@@ -15,7 +15,7 @@
 
 * S2J Docs Linter の運用を Git submodule から npm パッケージ (`@s2j/docs-linter`) へ切り替え。
 * 依存 npm モジュールを最新化 (`@wordpress/*`、`@s2j/docs-linter` ほか)。
-* 依存 npm モジュールを再更新 (`TypeScript` v7.0、`@wordpress/block-editor` v16.0、`@wordpress/scripts` v33.0、`Vite` v8.1、`Rollup` v4.62 ほか)。
+* 依存 npm モジュールを再更新 (`TypeScript` v7.0、`@wordpress/block-editor` v16.0、`@wordpress/scripts` v33.0、`Vite` v8.1、`Rollup` v4.62ほか)。
 * VS Code の textlint 設定パスを `${workspaceFolder}` 基準に修正。
 * README のバッジを更新 (PHP v8.0、WordPress v6.9+、TypeScript v7.0、SCSS v1.101、Vite v8.1、Rollup v4.62)。
 * `lint:docs` の対象に `CHANGELOG.md` を追加。
@@ -23,7 +23,7 @@
 ### Fixed
 
 * GitHub Actions での `npm ci` 失敗を `.npmrc` (`legacy-peer-deps=true`) により修正。
-* npm 12 での `npm install` 失敗 (`EALLOWGIT`) を `.npmrc` (`allow-git=all`) により修正。
+* npm v12での `npm install` 失敗 (`EALLOWGIT`) を `.npmrc` (`allow-git=all`) により修正。
 
 ### Docs
 
