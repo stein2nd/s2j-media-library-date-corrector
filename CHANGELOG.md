@@ -2,6 +2,23 @@
 
 ## unreleased
 
+## 1.0.1 - 2026-08-08
+
+### Added
+
+* `package.json` に `allowScripts` を追加 (`@s2j/docs-linter@1.0.22` の postinstall スクリプトを許可)。
+
+### Changed
+
+* 依存 npm モジュールを更新 (`@wordpress/components` v38.0、`@wordpress/scripts` v34.0、`@s2j/docs-linter` v1.0.22、`Vite` v8.2、`SCSS` v1.102、`Rollup` v4.62.4ほか)。
+* README のバッジを更新 (SCSS v1.102、Vite v8.2)。
+
+### Fixed
+
+* npm v12で `@s2j/docs-linter` の postinstall スクリプトがブロックされる問題を `allowScripts` により修正。
+
+## 1.0.0
+
 ### Added
 
 * ビルド基盤を追加 (`package.json`、`vite.config.ts`、`tsconfig.json`)。
