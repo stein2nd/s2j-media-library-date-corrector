@@ -2,6 +2,18 @@
 
 ## unreleased
 
+## 1.0.2 - 2026-08-11
+
+### Changed
+
+* TypeScript を公式の side-by-side 構成に変更 (`@typescript/native` で `tsc` v7.0を維持し、`typescript` は `@typescript/typescript6` を alias して `typescript-eslint` 向け API を提供)。
+* `allowScripts` のキーをパッケージ名指定 (`@s2j/docs-linter`) に変更。
+* `@typescript-eslint/eslint-plugin` / `parser` を v8.67に更新。
+
+### Fixed
+
+* `src/` 未作成時に `npm run lint` が失敗する問題を修正 (ESLint に `--no-error-on-unmatched-pattern`、Stylelint に `--allow-empty-input` を追加。グロブを引用符で囲み、不要な `--ext` を削除)。
+
 ## 1.0.1 - 2026-08-08
 
 ### Added
