@@ -2,6 +2,13 @@
 
 ## unreleased
 
+## 1.0.3 - 2026-09-10
+
+### Changed
+
+* 依存 npm モジュールを更新 (`@wordpress/block-editor` v17.0、`@wordpress/components` v40.0、`@wordpress/scripts` v34.2、`@s2j/docs-linter` v1.0.24、`@typescript-eslint/*` v8.70、`ESLint` v10.10、`SCSS` v1.104、`Rollup` v4.63.1ほか)。
+* README のバッジを更新 (SCSS v1.104、Rollup v4.63)。
+
 ## 1.0.2 - 2026-08-11
 
 ### Changed
