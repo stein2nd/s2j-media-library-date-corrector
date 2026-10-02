@@ -2,6 +2,17 @@
 
 ## unreleased
 
+## 1.0.5 - 2026-10-03
+
+### Changed
+
+* 依存 npm モジュールを更新 (`@s2j/docs-linter` v1.0.26、`@typescript-eslint/*` v8.71、`ESLint` v10.12、`Stylelint` v17.16、`SCSS` v1.105.1、`Vite` v8.3.2、`Rollup` v4.64.0ほか)。
+* README のバッジを更新 (Rollup v4.64)。
+
+### Fixed
+
+* `@wordpress/scripts` 経由の脆弱性を `overrides` で修正 (`serialize-javascript` v7.1.2、`js-yaml` v5.4.2、`uuid` v11.1.1)。
+
 ## 1.0.4 - 2026-09-26
 
 ### Changed
