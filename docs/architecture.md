@@ -4,15 +4,15 @@
 
 # S2J MediaLibrary Date Corrector - アーキテクチャー
 
-## フロントエンド構成 (schema、types、api)
+## フロントエンド構成 (types、api)
 
-フロントエンドのデータ処理層は、以下のディレクトリ構成で管理します。
+フロントエンドのデータ処理層は、下記のディレクトリ構成で管理します。
 
 ### 設計方針 (規約)
 
 * 責務ごとにディレクトリを分離します。
 * 副作用 (API) は、`api/` に閉じ込めます。
-* 型は、すべて自動生成を前提とします。
+* 型は、データ辞書を手で写します。初期リリースでは自動生成しません。
 
 #### 副作用 (API) の扱い
 
@@ -25,7 +25,7 @@
 
 ### フォルダー構成 (想定)
 
-本プラグインでは、ブートストラップ (PHP)、ドメインロジック (PHP)、管理画面 UI (React)、任意のブロック/フロント資産 (React) を分離します。
+本プラグインでは、ブートストラップ (PHP)、ドメインロジック (PHP)、管理画面 UI (React) を分離します。初期リリースのビルド対象は `admin` だけです。
 
 ```text
 s2j-media-library-date-corrector/
@@ -44,13 +44,13 @@ s2j-media-library-date-corrector/
 │├─── `s2j-media-library-date-corrector.pot`
 │├─── `s2j-media-library-date-corrector-[ロケール名].po`
 │└─── `s2j-media-library-date-corrector-[ロケール名].mo`  # WordPress 表示用バイナリ
-├┬─── includes/  # PHP クラス群 (設定画面、REST API、ブロック。オートロード対象)
+├┬─── includes/  # PHP クラス群 (REST API、一覧拡張。オートロード対象)
 │├─── `class-plugin.php`                    # 初期化・依存登録
 │├─── `class-rest-controller.php`           # REST の登録と権限
 │├─── `class-media-date-service.php`        # 年月抽出・比較・更新の核
 │├─── `class-media-library-list-table.php`  # 一覧カラム・一括操作 (※)
 │└─── ...
-├┬─── src/  # TypeScript/React (Gutenberg ブロック、設定画面) /SCSS ソース
+├┬─── src/  # TypeScript/React (管理画面) /SCSS ソース
 │├┬── admin/  # メディアライブラリ拡張 UI
 ││├── `index.tsx`  # 管理画面メイン・エントリーポイント
 ││├┬─ media-corrector/
@@ -66,42 +66,19 @@ s2j-media-library-date-corrector/
 │├┬── api/  # API 通信
 ││├── `client.ts`  # API コール (`api-fetch` ラッパー)
 ││└── `endpoints.ts`  # エンドポイント定義
-│├┬── schema/  # ランタイム・バリデーション
-││└── `api.ts`  # zod スキーマ (APIレスポンス)
-│├┬── frontend/  # フロントエンド表示
-││└── ...
-│├┬── gutenberg/  # Gutenberg ブロック用
-││├── `index.tsx`
-││└┬─ media-library-date-corrector/  # ブロック編集
-││　├─ `index.tsx`  # コンポーネント
-││　└─ `block.json`  # ブロック定義
-│├─── classic/  # Classic エディター用スクリプト
-│├─── frontend/  # フロント表示用 (ブロックの view 等)
 │├┬── styles/  # プラグイン用のスタイル定義
-││├── `admin.scss`  # 設定画面、操作画面用
-││├── `gutenberg.scss`  # Gutenberg ブロック用
-││├── `frontend.scss`  # フロントエンド表示用
-││├── `classic.scss`  # MetaBox 用
+││├── `admin.scss`  # 操作画面用
 ││└── `variables.scss`  # SCSS 変数定義
 │└┬── types/  # プラグイン用のグローバル型定義
 │　├── `index.ts`
-│　├── `api.ts`  # TypeScript 型 (自動生成)
+│　├── `api.ts`  # TypeScript 型 (データ辞書を手で写す)
 │　├── `wordpress.d.ts`  # WordPress
 │　└── `dom.d.ts`  # DOM
 └┬─── dist/  # Vite ビルド成果物 (Git 管理外)、アイコン
-　├┬── blocks/
-　│└┬─ media-library-date-corrector/
-　│　└─ `block.json`  # ブロック定義
 　├┬── css/  # プラグイン用のスタイル定義
-　│├── `s2j-media-library-date-corrector-admin.css`
-　│├── `s2j-media-library-date-corrector-gutenberg.css`
-　│├── `s2j-media-library-date-corrector-frontend.css`
-　│└── `s2j-media-library-date-corrector-classic.css`
-　└┬── js/  # プラグイン用の Gutenberg ブロック、設定画面、操作画面
-　　├── `s2j-media-library-date-corrector-admin.js`
-　　├── `s2j-media-library-date-corrector-gutenberg.js`
-　　├── `s2j-media-library-date-corrector-frontend.js`
-　　└── `s2j-media-library-date-corrector-classic.js`
+　│└── `s2j-media-library-date-corrector-admin.css`
+　└┬── js/  # 管理画面
+　　└── `s2j-media-library-date-corrector-admin.js`
 ```
 
 **注記:** `WP_List_Table` を直接継承するのではなく、`manage_media_custom_column` 等のフィルターと `bulk_actions-upload` 等で拡張する想定です。ファイル名は実装時に確定します。
@@ -109,30 +86,27 @@ s2j-media-library-date-corrector/
 ### 各フォルダーの責務
 
 | フォルダー | 役割 |
-| ----------- | ----------------------- |
+| --- | --- |
 | `admin/` | UI ロジック |
 | `api/` | API 通信 (副作用) |
-| `schema/` | runtime validation (zod) |
-| `types/` | 型定義 (OpenAPI 由来) |
+| `types/` | データ辞書を手で写した型 |
 
 #### 依存関係
 
 ```mermaid
 flowchart TD
-  A["types: 純粋な型 (最下層)"] --> B["schema: validation"]
-  B --> C["api: 通信"]
-  C --> D["admin: UI ロジック"]
+  A["types: データ辞書を手で写した型"] --> B["api: 通信"]
+  B --> C["admin: UI ロジック"]
 ```
 
 ### 主要ファイルの責務
 
 | 領域 | 役割 |
-|------|------|
+| --- | --- |
 | メインプラグインファイル | 定数・バージョン・ファイルパス、`plugins_loaded` でコアクラスを起動し、翻訳をロードします。 |
 | `Media_Date_Service` (想定クラス名) | `_wp_attached_file` から `yyyy/mm` を抽出し、`post_date` と比較し、単体/一括の DB 更新を行います。副作用をここに集約します。 |
-| REST コントローラ | 管理画面・将来の WP-CLI からコール可能な API です。入力検証、権限、`service` の呼び出しを担います。 |
-| 管理画面 JS (`src/admin`) | 一覧の操作 UI、ローディング、REST との通信 (`api-fetch` 等) を扱います。見た目の状態遷移は [管理画面 UI 仕様](./admin_ui_spec.md) に従います。 |
-| Gutenberg/Classic/Frontend | [ブロック仕様](./block_spec.md) に従います。本プラグインの主機能は管理画面にあるため、ブロックは補助的に扱い、将来拡張も許容します。 |
+| REST コントローラ | 管理画面から呼ぶ API です。補正処理は画面の表示から切り離し、入力検証、権限、`service` の呼び出しを担います。WP-CLI コマンドは、初期リリースでは置きません。 |
+| 管理画面 JS (`src/admin`) | `upload.php` の List View 上で、補正の実行、処理中の表示、REST 通信 (`api-fetch`) を扱います。一覧テーブルは再構築しません。状態遷移は [管理画面 UI 仕様](./admin_ui_spec.md) に従います。スクリプトは `admin_enqueue_scripts` で、`upload.php` のときだけ読みます。 |
 
 ### レイヤー責務
 
@@ -190,7 +164,7 @@ flowchart TD
 
 ### 実装 - How
 
-本ドキュメントでは、以下を定義します。
+本ドキュメントでは、下記を定義します。
 
 * API コール方法 (`api-fetch`)
 * state 管理方式
@@ -201,64 +175,30 @@ flowchart TD
 ### 境界ルール
 
 | 項目 | 記述先 |
-| ---------------------- | ---------------- |
+| --- | --- |
 | UI の見た目・動き | [管理画面の UI 仕様](./admin_ui_spec.md) |
 | データ取得方法 | [アーキテクチャー](./architecture.md) |
 | state の型・構造 | [アーキテクチャー](./architecture.md) |
-| UX 要件 (ページ跨ぎ選択など) | [管理画面の UI 仕様](./admin_ui_spec.md) |
-| 実装方法 (sessionStorage 等) | [アーキテクチャー](./architecture.md) |
+| UX 要件 (現在ページの選択、All の対象範囲) | [管理画面の UI 仕様](./admin_ui_spec.md) |
+| 実装方法 (リストテーブルのフック、REST) | [アーキテクチャー](./architecture.md) |
 
 ### ソース・オブ・トゥルース (Source of Truth)
 
-本プロジェクトでは、データ構造および API 契約の「単一の正」(SSoT: Single Source of Truth) を、明確に定義します。
+初期リリースのフィールドの契約は、[データ辞書](./data_dictionary.md#typescript-型定義-完全版) の型です。管理画面の TypeScript は、この型を手で写します。
 
-#### 設計意図 (ゴール)
+権限、ステータス、`nextOffset` などの振る舞いは、[REST 仕様](./rest_api_spec.md) に書きます。フィールド名と型は、データ辞書を指します。
 
-* API、UI、実装間の、不整合の防止
-* 型安全性と、実行時の安全性の両立
-* 変更の「影響範囲」の最小化
+サーバーの実行時チェックは、`register_rest_route` の `args` です。PHP は zod を実行しません。
 
-#### 設計方針 (規約)
+OpenAPI、zod、生成スクリプトは、初期リリースに置きません。`openapi.json` も置きません。
 
-* OpenAPI を、最上位の契約とします。
-* 型は、手動で二重定義しません。
-* validation は、契約に従属させます。
-* 仕様変更は、OpenAPI から開始します。
+後から機械可読な契約を足すときは、向きは1つです。データ辞書と REST 仕様から OpenAPI を作り、そこからクライアントの型を生成します。zod は、ブラウザが応答を確かめる任意の層です。書き込みの正本にはしません。
 
-#### 採用方針
-
-本プロジェクトは、以下の順序でデータ定義を管理します。
-
-```mermaid
-flowchart TD
-  A["OpenAPI"] --> B["TypeScript 型"]
-  B --> C["runtime スキーマ (zod)"]
-```
-
-#### 禁止事項
-
-* TypeScript 型を直接編集して、契約を変更すること
-* スキーマのみを変更して API 仕様と乖離させること
-
-#### 各レイヤーの役割
-
-| レイヤー | 役割 |
-| ------------ | ------------------ |
-| OpenAPI | API 契約の正 |
-| TypeScript 型 | 実装用の型定義 |
-| zod スキーマ | runtime validation |
-
-#### 生成フロー
-
-```mermaid
-flowchart TD
-  A["OpenAPI"] --> B["TypeScript 型 (自動生成)"]
-  B --> C["zod スキーマ (必要に応じて、生成または補完)"]
-```
+仕様変更は、データ辞書の型と REST 仕様から始めます。実装側の型だけを変えて、契約を変えることはしません。
 
 ## 権限設計 (Capabilities)
 
-本プラグインは、WordPress の権限モデルにもとづき、操作画面と設定画面で異なる権限を適用します。
+本プラグインは、WordPress の権限モデルにもとづき、メディアの日付補正では `upload_files` を適用します。設定画面の保存は `manage_options` です。カスタム capability は置きません。
 
 ### 設計方針 (規約)
 
@@ -272,13 +212,6 @@ flowchart TD
 * 理由:
   * メディア操作権限と整合しているためです。
   * 既存のメディア管理フローに準拠するためです。
-
-### 設定画面
-
-* capability: `manage_options`
-* 対象ユーザー: 管理者のみ
-* 理由:
-  * システム全体に影響し得る設定を扱うためです。
 
 ### REST API
 
@@ -318,7 +251,8 @@ REST API コールは、WordPress の nonce による認証が必須です。
 #### 検証
 
 * WordPress REST API の標準機構により検証されます。
-* nonce が無効な場合は、`401` を返します。
+* `X-WP-Nonce` が `wp_rest` と合わないとき、コアの `rest_cookie_check_errors` が `permission_callback` より先に `403` を返します。コードは `rest_cookie_invalid_nonce` です。
+* プラグインは、無効な nonce に対して `401` を返す処理を置きません。
 
 ### capability の粒度設計
 
@@ -337,13 +271,13 @@ REST API コールは、WordPress の nonce による認証が必須です。
 #### 採用する capability
 
 | 機能 | capability |
-| ------ | ---------------- |
+| --- | --- |
 | メディア補正 | `upload_files` |
-| 設定変更 | `manage_options` |
+| 設定画面の保存 | `manage_options` |
 
 #### 粒度の考え方
 
-本プラグインは、以下の理由により、細分化を行いません。
+本プラグインは、下記の理由により、細分化を行いません。
 
 * 機能が、単一責務 (日時補正) にとどまるためです。
 * WordPress の既存権限モデルと整合しているためです。
@@ -351,112 +285,25 @@ REST API コールは、WordPress の nonce による認証が必須です。
 
 #### 将来的な拡張
 
-必要に応じて、以下のカスタム capability 名の導入を検討します。
+初期リリースでは、カスタム capability は登録しません。ルートの権限は `upload_files` のままです。
 
-* `s2j_correct_media_date`
-* `s2j_manage_settings`
-
-ただし、その導入検討は、次の条件をすべて満たす場合に限ります。
+`s2j_correct_media_date` は、初期リリースでは作りません。あとから足すのは、次をすべて満たすときだけです。
 
 * 機能が増加し、責務が分離されていること。
 * 権限分離の要件が、明確になっていること。
 
 #### REST API における適用
 
-* 各リクエストごとに `current_user_can` を実行します。
-* ID 単位で権限チェックを行います。
+* `permission_callback` では、`upload_files` だけを見ます。
+* 各 ID の `edit_post` は、処理ループの中で見ます。不足した件は `ResultItem` の `error` とし、他の件は続けます。
 
-### Runtime Validation (zod / io-ts)
+### リクエストの実行時チェック
 
-本プラグインでは、REST API の入出力に対して「runtime validation」を実施します。
+サーバーは、`register_rest_route` の `args` でリクエストの形を確かめます。フィールドの正は、データ辞書です。
 
-#### 設計意図 (ゴール)
+PHP は zod を実行しません。初期リリースでは、zod スキーマも置きません。
 
-* 型安全性の強化 (TypeScript だけに依存しない)
-* 外部入力 (REST) の信頼性確保
-* 不正データの早期検出
-
-#### 設計方針 (規約)
-
-* 型 (TypeScript) と実行時検証 (zod) を分離しません。
-* 「信頼できる境界」でのみ、validation を行います。
-
-#### 対象
-
-* API レスポンス: サーバー → クライアント
-* API リクエスト: クライアント → サーバー
-
-#### 実装方針
-
-* スキーマ定義ライブラリ (たとえば、zod) を使用します。
-* TypeScript 型とスキーマは、対応させます。
-
-```ts
-const ApiResponseSchema = z.object({
-  status: z.enum(['success', 'partial', 'error']),
-  summary: SummarySchema,
-  results: z.array(ResultItemSchema),
-});
-```
-
-#### 適用タイミング
-
-* `api-fetch` のレスポンス受信時に検証します。
-* 必要に応じて、送信前にも検証します。
-
-#### エラー時の挙動
-
-* validation エラーは、`error` 状態として扱います。
-* UI にエラーメッセージを表示します。
-
-### スキーマ定義 (完全実装)
-
-runtime validation は、すべての主要データ構造に対して zod スキーマを定義します。
-
-#### 設計方針 (規約)
-
-* 「型 → スキーマ」ではなく「スキーマ → 型」を、正とします。
-* runtime validation を、単一の source of truth とします。
-
-#### スキーマ一覧
-
-```ts
-const MismatchStatusSchema = z.enum(['match', 'mismatch', 'unknown']);
-
-const ResultStatusSchema = z.enum(['success', 'skipped', 'error']);
-
-const ResultItemSchema = z.object({
-  id: z.number(),
-  status: ResultStatusSchema,
-  message: z.string().optional(),
-  error: z
-    .enum(['permission_denied', 'invalid_path', 'not_found', 'internal_error'])
-    .optional(),
-});
-
-const SummarySchema = z.object({
-  total: z.number(),
-  processed: z.number(),
-  success: z.number(),
-  skipped: z.number(),
-  failed: z.number(),
-});
-
-const APIResponseSchema = z.object({
-  status: z.enum(['success', 'partial', 'error']),
-  summary: SummarySchema,
-  results: z.array(ResultItemSchema),
-});
-```
-
-#### 型との関係
-
-* TypeScript 型は、スキーマから導出します。
-* 手動で型を二重定義しません。
-
-```ts id="k92mdv"
-type APIResponse = z.infer<typeof APIResponseSchema>;
-```
+クライアントは、データ辞書の型を手で写します。応答の形が契約と違うときは、完了通知で失敗として扱います。
 
 ### 適用レイヤー
 
@@ -475,19 +322,22 @@ REST API の各エンドポイントでは、`permission_callback` により、�
 
 #### 設計ポイント
 
-* capability は、「操作単位」と「対象単位」の2段階でチェックします。
-* エラーは、`WP_Error` で統一します。
-* ステータスコードは `403` を返します。
+* `permission_callback` は、このルートを呼んでよいかだけを見ます。ID では全体を拒否しません。
+* `permission_callback` が見るのは `upload_files` だけです。不足したときのステータスは `rest_authorization_required_code()` に任せます。ログインしていなければ `401`、ログイン済みなら `403` です。
+* nonce が無効なときは、コアの `rest_cookie_check_errors` が先に `403` を返します。プラグインはこの判定を置きません。
+* 受理後の `edit_post` 不足は、その1件を `status` `error` にし、`message` に人間が読める文を入れます。HTTP は `200` のまま、他の件は続けます。
 
 #### 基本実装
 
+名前空間は、定数 `S2J_MLDC_REST_NAMESPACE` (`s2j-mldc/v1`) だけを使います。`correct-query` も同じ定数で登録します。
+
 ```php
 register_rest_route(
-  's2j/v1',
-  '/media/date-correct',
+  S2J_MLDC_REST_NAMESPACE,
+  '/attachments/correct',
   [
-    'methods'  => 'POST',
-    'callback' => [ $this, 'handle_date_correct' ],
+    'methods'             => 'POST',
+    'callback'            => [ $this, 'handle_date_correct' ],
     'permission_callback' => [ $this, 'can_correct_media' ],
   ]
 );
@@ -497,31 +347,28 @@ register_rest_route(
 
 ```php
 public function can_correct_media( WP_REST_Request $request ) {
-  // 基本権限チェック
   if ( ! current_user_can( 'upload_files' ) ) {
     return new WP_Error(
       'rest_forbidden',
-      __( 'You do not have permission to correct media.', 's2j-media-library-date-corrector' ),
-      [ 'status' => 403 ]
+      __( 'メディアの日付を補正する権限がありません。', 's2j-media-library-date-corrector' ),
+      [ 'status' => rest_authorization_required_code() ]
     );
   }
 
-  // ID 単位の追加チェック (任意)
-  $ids = $request->get_param( 'ids' );
-
-  if ( is_array( $ids ) ) {
-    foreach ( $ids as $id ) {
-      if ( ! current_user_can( 'edit_post', $id ) ) {
-        return new WP_Error(
-          'rest_forbidden',
-          __( 'You cannot edit one or more items.', 's2j-media-library-date-corrector' ),
-          [ 'status' => 403 ]
-        );
-      }
-    }
-  }
-
   return true;
+}
+```
+
+#### 件別の `edit_post`
+
+```php
+if ( ! current_user_can( 'edit_post', $id ) ) {
+  $results[] = [
+    'id'      => $id,
+    'status'  => 'error',
+    'message' => __( 'この項目を編集する権限がありません。', 's2j-media-library-date-corrector' ),
+  ];
+  continue;
 }
 ```
 
@@ -532,8 +379,7 @@ public function can_correct_media( WP_REST_Request $request ) {
 #### 設計意図 (ゴール)
 
 * nonce の自動付与
-* エラーハンドリングの統一
-* ログ・デバッグの一元化
+* 応答本文がないときの自動再送
 
 #### 設計方針 (規約)
 
@@ -554,30 +400,22 @@ import apiFetch from '@wordpress/api-fetch';
 apiFetch.use( apiFetch.createNonceMiddleware( wpApiSettings.nonce ) );
 ```
 
-#### カスタムミドルウェア
+#### 初期リリース
 
-```ts
-apiFetch.use( ( options, next ) => {
-  return next( options ).catch( ( error ) => {
-    console.error( 'API Error:', error );
+ミドルウェアが行うのは、次です。
 
-    // 共通エラーハンドリング
-    if ( error.code === 'rest_forbidden' ) {
-      alert( '権限がありません' );
-    }
+* nonce の付与。`apiFetch.createNonceMiddleware` を、グローバルに1回だけ登録します。
+* 応答本文がないときの自動再送。同じチャンクを最大3回です。対象は、ネットワーク失敗、タイムアウト、HTTP `408`、`429`、`500`、`502`、`503`、`504` です。
 
-    throw error;
-  });
-});
-```
+Retry Failed は、ミドルウェアの自動再送ではありません。`HTTP 200` の `status === "error"` の ID だけを `/attachments/correct` に再送します。
+
+処理中は、ローディング、操作ボタンの無効化、「N 件を処理中」を出します。プログレスバーは作りません。
+
+完了は、画面上部の通知1つです。見出しは `summary` の件数です。失敗が混ざるときと、`processed < total` のときは警告です。同じ通知にサーバーの `message` を足すのは、`error` の件と、`message` がある `skipped` の件です。`success` の `message` は足しません。行の中には出しません。`results` はデバッグ出力にしません。Toast、共通の Message コンポーネント、`window.alert` は使いません。
 
 #### 拡張ポイント
 
-将来的に、以下の機能追加を検討します。
-
-* リトライ処理
-* ローディング管理
-* 通信ログ収集
+通信ログの収集は、初期リリースでは作りません。ミドルウェアは、nonce の付与と、応答本文がないときの自動再送だけです。
 
 ### フロント状態管理 (error / success / retry)
 
@@ -595,9 +433,9 @@ UI 状態は、REST API の `status` と一致させます。
 
 * idle: 初期状態
 * loading: API ロード中
-* success: 全件成功
-* partial: 一部成功
-* error: 全体失敗
+* success: 失敗がなく、処理が最後まで終わった状態です。`skipped` だけも含みます
+* partial: 失敗が混ざる、または未処理が残る状態です
+* error: 処理した件がすべて失敗です
 
 #### 状態遷移
 
@@ -609,29 +447,43 @@ flowchart TD
 
 #### state 構造 (例)
 
+`summary` は、[データ辞書](./data_dictionary.md) の `Summary` です。フィールドは、`total`、`processed`、`success`、`skipped`、`failed` です。
+
+未処理の件数は、`total - processed` として画面が計算します。`summary` に6つ目のフィールドは足しません。
+
 ```ts
 {
   status: 'idle' | 'loading' | 'success' | 'partial' | 'error',
-  message: string | null,
   summary: {
+    total: number,
+    processed: number,
     success: number,
-    failed: number,
-    skipped: number
-  }
+    skipped: number,
+    failed: number
+  } | null,
+  results: ResultItem[]
 }
 ```
+
+`results` も残します。完了の通知が、`error` の `message` と、`message` がある `skipped` をここから取るためです。見出し用の `message` 文字列1本にはまとめません。`idle` と `loading` の間は、`summary` は `null`、`results` は空配列です。
 
 #### UI 挙動
 
 * success:
-  * 「成功メッセージ」を表示します。
-  * 一覧を再ロードします。
+  * 画面上部の通知を成功にします。`summary.success` が1件以上なら「{success} 件の補正が完了しました」です。`skipped` があれば「{skipped} 件は更新しませんでした」を足します。`summary.success` が0で残りが `skipped` なら「更新した項目はありません」です。
 * partial:
-  * 「警告メッセージ」を表示します。
-  * エラー件数を明示します。
+  * 画面上部の通知を警告にします。成功、失敗、スキップの件数です。未処理が残るときは「一部未処理の項目があります」を足します。
+  * `skipped` だけでは、この状態にしません。
 * error:
-  * 「エラーメッセージ」を表示します。
+  * 画面上部の通知をエラーにします。文は「処理に失敗しました」です。
   * 再試行可能な状態にします。
+
+一覧は PHP のリストテーブルです。日付列と差分列を更新後の値にするには、いまの `upload.php` を読み直します。読み直すのは、一連の補正が終わって、その中の `summary.success` が1件でもあるときだけです。回数は1回です。検索、フィルター、表示中のページは維持します。読み直す前に、完了通知の内容を、そのタブの `sessionStorage` に置きます。読み直したあと、画面上部に1つ出して、そのキーは消します。再読込のたびに同じ通知は出しません。option、Transient、ユーザーメタには書きません。
+
+読み直さないのは、次のときです。
+
+* 100件の途中です。`nextOffset` がある間と、ID を分割してまだ送っている間は、画面にとどまります。
+* 更新が1件もないときです。スキップと失敗だけ、または `HTTP 400` だけのときは、日付列が変わっていないので読み直しません。
 
 #### リトライ処理の設計
 
@@ -639,9 +491,11 @@ flowchart TD
 
 #### 基本動作
 
-* API レスポンスの `results` を解析し、`error` のみを抽出します。
-* 抽出した ID を、同一エンドポイントに再送信します。
-* ユーザー操作により、再送信します。
+* 応答本文が得られなかったときは、同じチャンクを最大3回まで自動再送します。対象はネットワーク失敗、タイムアウト、HTTP `408`、`429`、`500`、`502`、`503`、`504` です。
+* HTTP `200` の `APIResponse` が返ったあとは、自動再送しません。
+* 手動の再送は、`results` の `error` だけを抽出します。
+* 抽出した ID を、`/attachments/correct` に再送信します。
+* 手動の再送は、ユーザー操作により行います。
 
 #### 状態管理
 
@@ -681,9 +535,11 @@ interface State {
   status: Status;
   summary: Summary | null;
   results: ResultItem[];
-  message: string | null;
+  requestError: string | null;
 }
 ```
+
+`requestError` は、`APIResponse` が返らなかったときの文です。完了の見出しには使いません。
 
 #### Action 定義
 
@@ -701,7 +557,7 @@ type Action =
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'START':
-      return { ...state, status: 'loading', message: null };
+      return { ...state, status: 'loading', summary: null, results: [], requestError: null };
 
     case 'SUCCESS':
       return {
@@ -709,13 +565,16 @@ function reducer(state: State, action: Action): State {
         status: action.payload.status,
         summary: action.payload.summary,
         results: action.payload.results,
+        requestError: null,
       };
 
     case 'ERROR':
       return {
         ...state,
         status: 'error',
-        message: action.error,
+        summary: null,
+        results: [],
+        requestError: action.error,
       };
 
     case 'RESET':
@@ -723,7 +582,7 @@ function reducer(state: State, action: Action): State {
         status: 'idle',
         summary: null,
         results: [],
-        message: null,
+        requestError: null,
       };
 
     default:
@@ -804,17 +663,17 @@ flowchart TD
     {
       "id": 123,
       "status": "success",
-      "message": "updated"
+      "message": "日付を補正しました。"
     },
     {
       "id": 124,
       "status": "skipped",
-      "message": "already_correct"
+      "message": "すでにパスの年月と一致しています。"
     },
     {
       "id": 125,
       "status": "error",
-      "message": "permission_denied"
+      "message": "この項目を編集する権限がありません。"
     }
   ]
 }
@@ -823,18 +682,20 @@ flowchart TD
 #### ステータス定義
 
 | status | 意味 |
-| ------- | ---- |
-| success | 全件成功 |
-| partial | 一部成功 |
-| error | 全件失敗 |
+| --- | --- |
+| success | 失敗がなく、処理が最後まで終わった状態です。`skipped` だけも含みます |
+| partial | 失敗が混ざる、または未処理が残る状態です |
+| error | 処理した件がすべて失敗です |
 
 #### HTTP ステータス
 
 | ケース | HTTP |
-| --------------------- | ---- |
-| 正常 (success/partial) | `200` |
-| 認可エラー | `403` |
-| 入力エラー | `400` |
+| --- | --- |
+| 正常 (success/partial/件別の権限不足を含む) | `200` |
+| 未ログインで `upload_files` がない | `401` |
+| nonce が無効 | `403` |
+| ログイン済みで `upload_files` がない | `403` |
+| 入力エラー (`ids` が101件以上を含む) | `400` (`rest_invalid_param`) |
 | サーバーエラー | `500` |
 
 ## 冪等性 (べきとうせい)
@@ -843,13 +704,15 @@ flowchart TD
 
 ### 実現方法
 
-* `match` の場合は、更新しません。
-* `mismatch` のみ更新します。
+* `match` の場合は、更新せず `skipped` とします。
+* パスから年月を読めない場合も、更新せず `skipped` とします。`error` にはしません。
+* `pathYm` があり、年月が一致しない場合は更新します。`post_date` が読めなくても、パスの年月が取れるときは更新します。
+* 更新は `wp_update_post` の1回です。`post_modified` と `post_modified_gmt` には、取得済みの値を渡します。
 
 ## 技術スタック
 
 | 層 | 採用技術 | 備考 |
-|----|----------|------|
+| --- | --- | --- |
 | 基盤 | WordPress 6.3+ (README の下限に準拠) | メディアは `attachment` 投稿タイプです。 |
 | サーバー | PHP (WordPress 要件に準拠) | 直接 SQL は `wpdb` 経由に限定します。 |
 | 管理 UI | React、TypeScript、`@wordpress/element`、`components`、`i18n` 等 | README 記載の方針。 |
@@ -860,122 +723,15 @@ flowchart TD
 
 ### ビルドターゲット
 
-`vite.config.ts` の `npm_lifecycle_event` から対象を判定します。
+初期リリースのターゲットは `admin` だけです。エントリは `src/admin/index.tsx` です。メディアライブラリ一覧の拡張 UI を出力します。
 
-| ターゲット | エントリ (想定) | 用途 |
-|------------|------------------|------|
-| `admin` | `src/admin/index.tsx` | メディアライブラリ一覧の拡張 UI です。 |
-| `gutenberg` | `src/gutenberg/index.tsx` | ブロックの登録とエディター UI です。 |
-| `classic` | `src/classic/index.ts` | Classic エディター側の補助処理です。 |
-| `frontend` | `src/frontend/media-library-date-corrector.tsx` | ブロックのフロント表示です。 |
+`src/gutenberg`、`src/classic`、`src/frontend` と、対応する SCSS は置きません。`register_block_type` とショートコードも置きません。ブロックを後から足すときは、そのときに `block.json` と `gutenberg` ターゲットを追加します。`frontend` バンドルは、`viewScript` が必要になったときだけです。詳細は [ブロック仕様](./block_spec.md) です。
 
-`gutenberg` ビルド時は `src/gutenberg/media-library-date-corrector/block.json` を `dist/blocks/...` にコピーします (`vite-plugin-static-copy`)。
+### 型の置き場所
 
-### 自動生成スクリプト (型・スキーマ)
+初期リリースのクライアント型は、データ辞書を `src/types/api.ts` に手で写します。OpenAPI、zod、生成スクリプトは置きません。
 
-本プロジェクトでは、API 契約から型およびスキーマを自動生成します。
-
-#### 設計方針 (規約)
-
-* 手動で型を編集しません。
-* 生成物は常に再生成可能とします。
-* 差分は OpenAPI に集約します。
-
-#### 生成対象
-
-* TypeScript 型 (OpenAPI → types)
-* zod スキーマ (OpenAPI または型から生成)
-
-#### 実行タイミング
-
-* API 仕様変更時
-* CI/CD パイプライン
-* 開発開始前 (初期セットアップ)
-
-#### 生成フロー
-
-```mermaid
-flowchart TD
-  A["OpenAPI"] --> B["TypeScript 型生成"]
-  B --> C["zod スキーマ生成"]
-```
-
-* TypeScript 型生成: `openapi-typescript`
-* zod スキーマ生成: `openapi-zod-client` 等
-
-#### npm scripts 例
-
-```json
-{
-  "scripts": {
-    "generate:types": "openapi-typescript ./openapi.json -o src/types/api.ts",
-    "generate:schema": "openapi-zod-client ./openapi.json -o src/schema/api.ts",
-    "generate": "npm run generate:types && npm run generate:schema"
-  }
-}
-```
-
-### OpenAPI 生成
-
-OpenAPI 定義は、TypeScript 型および validation スキーマから生成します。
-
-#### 設計方針 (規約)
-
-* 手動編集は、行いません。
-* 型定義を、単一のソースとします。
-
-#### 利用用途
-
-* API ドキュメント表示
-* クライアント生成
-* テスト自動化
-
-#### 生成方法
-
-下記のいずれかの方法を、採用します。
-
-* zod → OpenAPI 変換
-* TypeScript 型 → OpenAPI 生成ツール
-
-#### 出力
-
-* `openapi.json` として生成します。
-* 開発およびテストに利用します。
-
-### 型生成 (OpenAPI → TypeScript)
-
-OpenAPI 定義から TypeScript 型を生成します。
-
-#### 設計意図 (ゴール)
-
-* API 契約と型の完全一致
-* 手動型定義の排除
-* クライアント実装の安全性向上
-
-#### 設計方針 (規約)
-
-* 型は OpenAPI から生成します (手書きしない)。
-* スキーマは、必要に応じて、生成または手動補完します。
-* API 契約を、最上位の source of truth とします。
-
-#### 適用範囲
-
-* APIResponse
-* ResultItem
-* Summary
-
-#### 生成フロー
-
-```mermaid
-flowchart TD
-  A["OpenAPI"] --> B["TypeScript 型"]
-  B --> C["(必要に応じて) zod スキーマ"]
-```
-
-#### 使用ツール例
-
-* `openapi-typescript`
-* `openapi-zod-client`
+後から足すときの向きは、[ソース・オブ・トゥルース](#ソースオブトゥルース-source-of-truth) に従います。
 
 ### 外部化
 
@@ -983,104 +739,60 @@ Rollup の `external` に `@wordpress/*`、`react`、`react-dom`、`jquery` を�
 
 ### 出力
 
-* 出力先は、ディストリビューションのルートの `dist` にします。`emptyOutDir: false` により、ターゲット間の連続ビルドを想定します。
+* 出力先は、ディストリビューションのルートの `dist` にします。初期リリースの成果物は、管理画面の JS と CSS です。
 * `FLUSH_DIST=true` の場合、ビルド前に `dist` を削除できます。
 * 本番時は、`NODE_ENV=production` を設定します。成果物を縮小 `minify` します。
 
-> **実装上の注意:** 現行 `vite.config.ts` の成果物ファイル名に別プロジェクト由来の接頭辞が含まれる場合は、リリース前にプラグインスラッグへ統一することを推奨します。
+> **実装上の注意:** 現行 `vite.config.ts` の成果物ファイル名に別プロジェクト由来の接頭辞が含まれる場合は、リリース前にプラグインスラッグに統一することを推奨します。
 
 ## 実行ロジック (エンドツーエンド)
 
-以下は [コンセプト](./concept.md) の「補正ロジック」と [管理画面 UI 仕様](./admin_ui_spec.md) の操作をサーバー/クライアントに分割した流れです。
+下記は [コンセプト](./concept.md) の「補正ロジック」と [管理画面 UI 仕様](./admin_ui_spec.md) の操作をサーバー/クライアントに分割した流れです。
 
 ```mermaid
 sequenceDiagram
   participant User as 管理者
   participant WP as WordPress (一覧・権限)
-  participant UI as 管理 UI (React)
+  participant UI as メディアライブラリ (List View)
   participant REST as REST API
   participant Svc as Media_Date_Service
   participant DB as wp_posts / postmeta
 
   User->>WP: メディア一覧の表示
   WP->>UI: スクリプト・データの初期化
-  UI->>REST: 差分確認・補正対象 ID (任意でプレビュー)
+  UI->>REST: 補正 (correct または correct-query)
   REST->>Svc: 権限チェック後に処理を委譲
   Svc->>DB: _wp_attached_file を取得し post_date を比較・更新
   Svc-->>REST: 結果 (成功、スキップ、エラーの集計)
   REST-->>UI: JSON レスポンス
-  UI-->>User: メッセージと一覧の再描画
+  UI-->>User: 完了通知。更新があれば upload.php を1回読み直す
 ```
 
 1. **表示**:
-  * メディア一覧で標準カラムに加え、「年月 (パス)」「差分」を表示します (PHP フィルターまたは初期データと REST の組み合わせです。実装方針は一覧のデータ取得コストに応じて選択します)。
+  * メディア一覧で標準カラムに加え、「年月 (パス)」「差分」を表示します。行の取得はメディアライブラリ標準のクエリーです。列の中身は PHP のカラムフィルターで出します。
 2. **選択**:
-  * ユーザーがチェックボックスで対象を選ぶか、「差分のみ選択」等を行います。
+  * 行の Date Correct は、その行の ID を送ります。チェックは不要です。
+  * 一括の Date Correct は、チェックした ID だけを送ります。チェックがなければ実行しません。
+  * Date Correct (All) は、一括メニューの外です。いまの検索とフィルターを送ります。
+  * 「差分のみ選択」と「補正実行」は置きません。
 3. **実行**:
-  * UI が REST へ補正リクエストを送ります。サーバー側で **各添付ファイルごと** に `current_user_can` を検証します。
+  * UI が REST に補正リクエストを送ります。サーバー側で **各添付ファイルごと** に `current_user_can` を検証します。
 4. **更新**:
-  * `Media_Date_Service` が `yyyy/mm-01 00:00:00` (サイトのタイムゾーン) へ `post_date` をそろえ、必要に応じて `post_date_gmt` も整合させます (詳細は [データ辞書 > 日付正規化とタイムゾーン](./data_dictionary.md#日付正規化とタイムゾーン) を参照します)。
+  * `Media_Date_Service` は、`post_date` をサイトのタイムゾーンの `yyyy-mm-01 00:00:00` にします。`post_date_gmt` は、その文字列を `get_gmt_from_date` に渡した値です。両方を同じ `wp_update_post` で書きます。詳細は [データ辞書 > 日付正規化とタイムゾーン](./data_dictionary.md#日付正規化とタイムゾーン) です。
 5. **完了**:
-  * UI が成功/失敗を表示し、一覧を更新します。
+  * UI が画面上部に完了の通知を出します。一覧の読み直しは、[UI 挙動](#ui-挙動) に従います。
 
-バッチ件数が大きい場合は、REST でチャンク処理を行うか、バックグラウンドキュー (将来拡張) を検討します。
-初期実装では、「1リクエスト = 限定件数」としてタイムアウトを避けます。
+件数が多い補正は、クライアントが100件ずつ送ります。ID の一括は、クライアントが分割します。Date Correct (All) は `correct-query` です。続きは、返ってきた `nextOffset` を次の `offset` に入れます。
+
+バックグラウンドキュー、Action Scheduler、WP-Cron は置きません。処理は、管理画面を開いている間だけ進みます。1リクエストの上限は100件です。`ids` が101件以上の `POST /attachments/correct` は、1件も更新せず `HTTP 400` の `rest_invalid_param` です。先頭の100件だけを残す応答にはしません。
 
 ### 参考実装 - WP-CLI による一括補正
 
-本プラグインのコア処理は、以下のような単純なロジックで実現可能です。
-なお、これは、WordPress CLI を用いた最小構成の参考実装です。
+WP-CLI コマンドは、初期リリースでは置きません。補正処理は、管理画面の表示から切り離したサービスに置きます。
 
-#### 設計意図 (ゴール)
+旧サンプルは、契約にしません。非アンカーの `(\d{4})/(\d{2})` と、`post_date_gmt` にローカル時刻と同じ文字列を入れる例は、採用しません。
 
-* コアロジックの単純さを明示します。
-* 本プラグインの付加価値 (安全性、UX) を明確化します。
-
-#### 注意点 (本コードの制約)
-
-* タイムゾーン考慮が不十分です (`post_date_gmt` が固定値)。
-* エラーハンドリングが、ありません。
-* `_wp_attached_file` が不正な場合の考慮が、ありません。
-* バッチサイズ制御が、ありません。
-
-#### 本実装との違い
-
-本プラグインの実装では、以下の点を追加・改善します。
-
-* 権限チェック (`upload_files`, `edit_post`)
-* 差分判定 (match / mismatch / unknown)
-* 部分成功 (partial) 対応
-* retry 機構
-* REST API 経由の処理
-* UI による選択的実行
-
-#### 本プラグインとの対応関係
-
-| 処理 | 本プラグインでの責務 |
-| ---------------------- | ------------ |
-| `_wp_attached_file` 取得 | Data Layer |
-| 正規表現で年月抽出 | Normalize 処理 |
-| `post_date` 更新 | Write 処理 |
-| 全件ループ | Batch 処理 |
-
-#### サンプルコード
-
-```bash
-wp eval '
-$attachments = get_posts(["post_type"=>"attachment","posts_per_page"=>-1]);
-
-foreach($attachments as $a){
-  $file = get_post_meta($a->ID, "_wp_attached_file", true);
-  if(preg_match("#(\d{4})/(\d{2})#", $file, $m)){
-    wp_update_post([
-      "ID"=>$a->ID,
-      "post_date"=>"{$m[1]}-{$m[2]}-01 00:00:00",
-      "post_date_gmt"=>"{$m[1]}-{$m[2]}-01 00:00:00"
-    ]);
-  }
-}
-'
-```
+年月の切り出し、`post_date`、`post_date_gmt` は、[データ辞書](./data_dictionary.md) に従います。
 
 ## 共通仕様との関係
 

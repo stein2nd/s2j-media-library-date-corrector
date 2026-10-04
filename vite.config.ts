@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import { rmSync } from 'fs';
-import { viteStaticCopy } from 'vite-plugin-static-copy';
 import autoprefixer from 'autoprefixer';
 
 // FLUSH_DIST 環境変数が true の場合、dist ディレクトリを削除
@@ -15,56 +14,14 @@ if (process.env.FLUSH_DIST === 'true') {
   );
 }
 
-// ビルド対象の設定を取得 (npm スクリプト名から推測)
-const getBuildTarget = () => {
-  const npmScript = process.env.npm_lifecycle_event;
-  if (npmScript?.includes('admin')) return 'admin';
-  if (npmScript?.includes('gutenberg')) return 'gutenberg';
-  if (npmScript?.includes('classic')) return 'classic';
-  if (npmScript?.includes('frontend')) return 'frontend';
-  return 'gutenberg'; // デフォルト
+// 初期リリースのビルド対象は admin だけです。
+const buildTarget = 'admin';
+
+const buildConfig = {
+  entry: resolve(__dirname, 'src/admin/index.tsx'),
+  name: 'S2JMediaLibraryDateCorrectorAdmin',
+  scss: resolve(__dirname, 'src/styles/admin.scss'),
 };
-
-const buildTarget = getBuildTarget();
-
-// エントリーポイントとライブラリ名、SCSS ファイルを設定
-const getBuildConfig = (target: string) => {
-  switch (target) {
-      case 'admin':
-          return {
-              entry: resolve(__dirname, 'src/admin/index.tsx'),
-              name: 'S2JMediaLibraryDateCorrectorAdmin',
-              scss: resolve(__dirname, 'src/styles/admin.scss')
-          };
-      case 'gutenberg':
-          return {
-              entry: resolve(__dirname, 'src/gutenberg/index.tsx'),
-              name: 'S2JMediaLibraryDateCorrectorGutenberg',
-              scss: resolve(__dirname, 'src/styles/gutenberg.scss'),
-              blocks: ['media-library-date-corrector'] // block.json ファイルからブロックタイプを取得
-          };
-      case 'classic':
-          return {
-              entry: resolve(__dirname, 'src/classic/index.ts'),
-              name: 'S2JMediaLibraryDateCorrectorClassic',
-              scss: resolve(__dirname, 'src/styles/classic.scss')
-          };
-      case 'frontend':
-          return {
-              entry: resolve(__dirname, 'src/frontend/media-library-date-corrector.tsx'),
-              name: 'S2JMediaLibraryDateCorrectorFrontend',
-              scss: resolve(__dirname, 'src/styles/gutenberg.scss')
-          };
-      default:
-          return {
-              entry: resolve(__dirname, 'src/gutenberg/index.tsx'),
-              name: 'S2JMediaLibraryDateCorrectorGutenberg',
-              scss: resolve(__dirname, 'src/styles/gutenberg.scss')
-          };
-  }
-};
-
-const buildConfig = getBuildConfig(buildTarget);
 
 export default defineConfig({
   logLevel: (process.env.VITE_LOG_LEVEL as 'info' | 'warn' | 'error' | 'silent') || 'warn',
@@ -142,23 +99,14 @@ export default defineConfig({
       }
     },
     outDir: 'dist',
-    emptyOutDir: false, // 連続ビルドのため false
+    emptyOutDir: false,
     minify: process.env.NODE_ENV === 'production',
     sourcemap: process.env.NODE_ENV !== 'production',
     cssCodeSplit: false,
     reportCompressedSize: false, // 圧縮サイズレポートを無効化
     chunkSizeWarningLimit: 1000, // チャンクサイズ警告の閾値を1MBに設定
   },
-  plugins: [
-    ...(buildTarget === 'gutenberg' && buildConfig.blocks ? [
-      viteStaticCopy({
-        targets: buildConfig.blocks.map((block: string) => ({
-          src: `src/gutenberg/${block}/block.json`,
-          dest: `blocks/${block}`  // dist/blocks ディレクトリにコピー
-        }))
-      })
-    ] : [])
-  ],
+  plugins: [],
   css: {
     preprocessorOptions: {
       scss: {

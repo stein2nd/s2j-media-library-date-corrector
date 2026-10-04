@@ -2,6 +2,18 @@
 
 ## unreleased
 
+## 1.0.6 - 2026-10-04
+
+### Changed
+
+* 仕様を、メディアライブラリ一覧 (List View) の拡張にそろえた。ルートは `POST /attachments/correct` と `POST /attachments/correct-query`。1リクエストは最大100件。`ids` が101件以上のときは更新せず `HTTP 400`。
+* `post_date` と `post_date_gmt` は、同じ `wp_update_post` で書く。`post_modified` は維持する。
+* 完了通知は画面上部の1つ。`upload.php` の読み直しは、一連の補正が終わり `summary.success` が1件でもあるときだけ。通知は `sessionStorage` に残す。
+* 設定画面を初期リリースに置く。List View の表示中ページに「不一致」があるとき、補正を促す案内を出す。
+* ビルド対象を admin だけにした。TypeScript の `baseUrl` を削除し、`paths` を相対パスにした。
+* 依存 npm モジュールを更新 (`@s2j/docs-linter` v1.0.27)。
+* 開発依存の `braces` v3.0.3 (GHSA-vfj7-8cjw-p6xm: 深くネストしたパターンで Node.js プロセスが終了する) は修正版が未公開のため、深刻度 high の指摘12件 (CVE-2026-93687) は残す。
+
 ## 1.0.5 - 2026-10-03
 
 ### Changed
