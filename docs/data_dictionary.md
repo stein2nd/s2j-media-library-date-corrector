@@ -34,13 +34,13 @@
 
 #### 設計方針 (規約)
 
-* パスから年月を読めない場合は、エラーではなく一覧の `unknown` とします。デフォルトの一括補正と Date Correct (All) には入れません。補正リクエストに入ったときは `skipped` とし、`error` にはしません。
+* パスから年月を読めない場合は、エラーではなく一覧の `unknown` とします。デフォルトの一括補正と Date Correct (All) には入れません。補正リクエストに入った場合は `skipped` とし、`error` にはしません。
 
 #### パス形式の前提と例外
 
 本プラグインは、`_wp_attached_file` の先頭が `yyyy/mm/` であることを前提とします。値は、アップロード基準ディレクトリからの相対パスです。例は `2017/12/file.jpg` です。
 
-切り出しは、次の正規表現だけを使います。
+切り出しは、下記の正規表現だけを使います。
 
 ```text
 ^(\d{4})/(0[1-9]|1[0-2])/
@@ -52,7 +52,7 @@
 
 #### 非対応ケース
 
-下記の場合は、一覧を `unknown` とします。補正リクエストに入ったときは、更新せず `skipped` とします。
+下記の場合は、一覧を `unknown` とします。補正リクエストに入った場合は、更新せず `skipped` とします。
 
 * 先頭が、上記の正規表現に合わない
 * 年が1000未満、または9999を超える
@@ -61,7 +61,7 @@
 
 ## 更新ルール
 
-補正で変更する/しないフィールドの方針を、次の **更新ポリシー** に集約します。
+補正で変更する/しないフィールドの方針を、下記の **更新ポリシー** に集約します。
 
 ## 更新ポリシー
 
@@ -88,9 +88,9 @@
 
 ## 設定配列・オプション (options)
 
-初期リリースでは、option を1つ定義します。キーは `s2j_mldc_mismatch_notice` です。型は真偽値です。未保存のときは、案内を出します。
+初期リリースでは、option を1つ定義します。キーは `s2j_mldc_mismatch_notice` です。型は真偽値です。未保存の場合は、案内を出します。
 
-意味は、メディアライブラリの List View で、表示中のページに「不一致」が1件でもあるとき、補正を促す案内を出すことです。一括取り込みのあとも、同じ案内です。見るのはそのページの attachment だけで、ライブラリ全体は数えません。保存は Settings API で、`manage_options` です。
+意味は、メディアライブラリの List View で、表示中のページに「不一致」が1件でもある場合、補正を促す案内を出すことです。一括取り込みのあとも、同じ案内です。見るのはそのページの attachment だけで、ライブラリ全体は数えません。保存は Settings API で、`manage_options` です。
 
 列、行の Date Correct、一括の Date Correct、Date Correct (All) は、この option では切り替えません。補正 API は、この option では拒みません。
 
@@ -100,7 +100,7 @@
 
 ## モデルの型 - 論理/API での表現
 
-管理 UI と REST の間で受け渡す論理モデルを、次の型として置きます。初期リリースでは、この型がフィールドの契約です。管理画面の TypeScript は、これを手で写します。インターフェース名は、実装時に合わせてよいです。
+管理 UI と REST の間で受け渡す論理モデルを、下記の型として置きます。初期リリースでは、この型がフィールドの契約です。管理画面の TypeScript は、これを手で写します。インターフェース名は、実装時に合わせてよいです。
 
 ### `PathYearMonth`
 
@@ -114,7 +114,7 @@
 
 ### `MismatchStatus`
 
-[管理画面 UI 仕様](./admin_ui_spec.md) の差分列に対応します。値は `match`、`mismatch`、`unknown` です。画面に出す文字は、次のとおりです。
+[管理画面 UI 仕様](./admin_ui_spec.md) の差分列に対応します。値は `match`、`mismatch`、`unknown` です。画面に出す文字は、下記のとおりです。
 
 * `match` は「一致」です。
 * `mismatch` は「不一致」です。
@@ -137,7 +137,7 @@
 | `pathYm` | `string \| null` | パス由来の `yyyy/mm` (未設定またはパース不可の場合は、`null`) |
 | `status` | `MismatchStatus` | 差分状態 (`unknown` を含む) |
 
-一覧の列にも REST の応答にも、補正候補の日時フィールドは出しません。書く文字列は、更新のときにサービスが作ります。
+一覧の列にも REST の応答にも、補正候補の日時フィールドは出しません。書く文字列は、更新の際にサービスが作ります。
 
 ### 欠損データの扱い - nullable、unknown
 
@@ -153,7 +153,7 @@
 
 * パスが読めない欠損は、`null` または一覧の `unknown` として表現します。
 * 処理を中断せず、UI に状態として反映します。
-* パスが読めない件は、デフォルトの一括補正から外します。リクエストに入ったときは `skipped` です。
+* パスが読めない件は、デフォルトの一括補正から外します。リクエストに入った場合は `skipped` です。
 * `post_date` が読めなくても、パスの年月が取れる件は補正します。
 
 #### フィールド別定義
@@ -163,11 +163,11 @@
 | `_wp_attached_file` | `string` | 未設定または空の場合は、`null` |
 | `pathYm` | `string \| null` | パース不可の場合は、`null` |
 | `post_date` | `string` | 原則として存在します。不正値でも `pathYm` があれば、パスの年月で補正します |
-| `postDateYm` | `string \| null` | 抽出不可の場合は、`null` です。`pathYm` があるときは補正を続けます |
+| `postDateYm` | `string \| null` | 抽出不可の場合は、`null` です。`pathYm` がある場合は補正を続けます |
 
 #### ステータスとの関係
 
-欠損データが存在する場合、`MismatchStatus` は次のように扱います。
+欠損データが存在する場合、`MismatchStatus` は下記のように扱います。
 
 | 状態 | 条件 |
 | --- | --- |
@@ -185,10 +185,10 @@
 
 * `ResultItem.status` に `match`、`mismatch`、`unknown` は使いません。
 * パスから年月を読めない件は、HTTP `200` の `skipped` です。`error` にはせず、再試行の対象にもしません。
-* `message` を付けるときは、人間が読める文だけです。例は「ファイルパスから年月を読み取れないため、補正しません。」です。件別の機械可読コードは置きません。
+* `message` を付ける場合は、人間が読める文だけです。例は「ファイルパスから年月を読み取れないため、補正しません。」です。件別の機械可読コードは置きません。
 * `summary.skipped` に含めます。`summary.failed` には含めません。
 * 年月がすでに一致している件も `skipped` です。区別は `message` の文です。
-* `post_date` が読めなくても、パスの年月が取れるときは更新します。この件は `skipped` にしません。
+* `post_date` が読めなくても、パスの年月が取れる場合は更新します。この件は `skipped` にしません。
 
 ### TypeScript 型定義 (完全版)
 
@@ -206,7 +206,7 @@
 
 サーバーは、同じ形を `register_rest_route` の `args` で確かめます。PHP は zod を実行しません。
 
-OpenAPI と zod は、初期リリースに置きません。後から機械可読な契約を足すときは、本辞書と [REST 仕様](./rest_api_spec.md) から OpenAPI を作り、そこからクライアントの型を生成します。zod は、ブラウザが応答を確かめる任意の層です。書き込みの正本にはしません。
+OpenAPI と zod は、初期リリースに置きません。後から機械可読な契約を足す際は、本辞書と [REST 仕様](./rest_api_spec.md) から OpenAPI を作り、そこからクライアントの型を生成します。zod は、ブラウザが応答を確かめる任意の層です。書き込みの正本にはしません。
 
 #### MismatchStatus
 
@@ -236,7 +236,7 @@ type ResultStatus = 'success' | 'skipped' | 'error';
 補正 API の1件は、この型だけを使います。
 
 * `message` は、人間が読める文です。
-* `status` が `error` のときは、`message` を必ず付けます。
+* `status` が `error` の場合は、`message` を必ず付けます。
 * `success` と `skipped` では、`message` は任意です。
 * 件別結果に、機械可読の理由コードは置きません。
 
@@ -270,12 +270,12 @@ interface APIResponse {
 }
 ```
 
-トップレベル `status` は、次のとおりです。
+トップレベル `status` は、下記のとおりです。
 
-* `error` が1件もなく、`processed` が `total` と一致するときは `success` です。`skipped` だけでも同じです。
-* `error` と、`success` または `skipped` が混ざるときは `partial` です。
-* 処理した件がすべて `error` のときは `error` です。
-* `processed < total` のときも `partial` です。
+* `error` が1件もなく、`processed` が `total` と一致する場合は `success` です。`skipped` だけでも同じです。
+* `error` と、`success` または `skipped` が混ざる場合は `partial` です。
+* 処理した件がすべて `error` の場合は `error` です。
+* `processed < total` の場合も `partial` です。
 
 ## データフロー
 
@@ -303,14 +303,14 @@ flowchart LR
   * パス先頭だけを、`^(\d{4})/(0[1-9]|1[0-2])/` で抽出します。年は1000以上、9999以下です。先頭にサブディレクトリがある場合は、`unknown` とします。
   * 補足 (欠損データ)
     * `_wp_attached_file` が未設定、または先頭が `yyyy/mm` でない場合、`pathYm` は `null` です。一覧は `unknown` とします。
-    * `post_date` が不正な場合、`postDateYm` は `null` とします。`pathYm` があるときは `mismatch` とし、パスの年月で補正します。
+    * `post_date` が不正な場合、`postDateYm` は `null` とします。`pathYm` がある場合は `mismatch` とし、パスの年月で補正します。
     * `pathYm` が `null` の場合、比較は行わず `unknown` とします。
 3. **COMPARE**:
   * 日 (dd) と時刻は無視し、年月のみ比較します ([管理画面 UI 仕様](./admin_ui_spec.md))。
 4. **WRITE**:
-  * `mismatch` のときだけ、`wp_update_post` を1回呼びます。
+  * `mismatch` の場合だけ、`wp_update_post` を1回呼びます。
   * 同じ配列に、新しい `post_date`、`get_gmt_from_date` の `post_date_gmt`、取得済みの `post_modified` と `post_modified_gmt` を渡します。
-  * コアは、`post_modified` と `post_modified_gmt` が空のときだけ現在時刻を入れます。値を渡せば、その値が残ります。
+  * コアは、`post_modified` と `post_modified_gmt` が空の場合だけ、現在時刻を入れます。値を渡せば、その値が残ります。
   * 書いたあとにもう一度更新して戻すことはしません。
   * `skipped` の件は、`wp_update_post` を呼びません。
 
@@ -329,4 +329,4 @@ flowchart LR
 ## セキュリティ・整合性 (データ観点)
 
 * 更新対象 ID は、必ず **`attachment` かつ、権限のある投稿** に限定します。
-* パスから年月を読めない場合は、一覧では **`unknown`** と表示し、デフォルトの一括補正と Date Correct (All) から外します。補正リクエストに入ったときは **`skipped`** です。`post_date` が読めなくても、パスの年月が取れるときは補正します。
+* パスから年月を読めない場合は、一覧では **`unknown`** と表示し、デフォルトの一括補正と Date Correct (All) から外します。補正リクエストに入った場合は **`skipped`** です。`post_date` が読めなくても、パスの年月が取れる場合は補正します。

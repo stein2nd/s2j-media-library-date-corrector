@@ -13,11 +13,11 @@
 | Namespace | `s2j-mldc` |
 | Version | `v1` |
 
-完全パス例は、次のとおりです: `/wp-json/s2j-mldc/v1/...`
+完全パス例は、右記のとおりです: `/wp-json/s2j-mldc/v1/...`
 
 名前空間の文字列は、プラグイン定数 `S2J_MLDC_REST_NAMESPACE` の1ヵ所だけに置きます。値は `s2j-mldc/v1` です。
 
-初期リリースのルートは、次の2つです。
+初期リリースのルートは、下記の2つです。
 
 * `POST /wp-json/s2j-mldc/v1/attachments/correct`
 * `POST /wp-json/s2j-mldc/v1/attachments/correct-query`
@@ -28,7 +28,7 @@
 
 初期リリースのフィールドの形は、[データ辞書](./data_dictionary.md#typescript-型定義-完全版) の型です。管理画面の TypeScript は、この型を手で写します。
 
-対応する型は、次です。
+対応する型は、下記です。
 
 * `APIResponse`
 * `Summary`
@@ -40,7 +40,7 @@
 
 OpenAPI、zod、生成スクリプトは、初期リリースに置きません。`openapi.json` も置きません。
 
-後から機械可読な契約を足すときは、向きは1つです。データ辞書と本仕様から OpenAPI を作り、そこからクライアントの型を生成します。zod は、ブラウザが応答を確かめる任意の層です。書き込みの正本にはしません。
+後から機械可読な契約を足す場合は、向きは1つです。データ辞書と本仕様から OpenAPI を作り、そこからクライアントの型を生成します。zod は、ブラウザが応答を確かめる任意の層です。書き込みの正本にはしません。
 
 設計方針の置き場所は、[アーキテクチャー > ソース・オブ・トゥルース](./architecture.md#ソースオブトゥルース-source-of-truth) です。
 
@@ -49,7 +49,7 @@ OpenAPI、zod、生成スクリプトは、初期リリースに置きません�
 | ヘッダー | 必須 | 説明 |
 | --- | --- | --- |
 | `X-WP-Nonce` | ログインユーザー操作時は **必須** です。 | `wp_create_nonce('wp_rest')` の値です。`api-fetch` はデフォルトで付与します。 |
-| `Content-Type` | POST または PUT のとき **必須** です。 | `application/json` とします。 |
+| `Content-Type` | POST または PUT の場合 **必須** です。 | `application/json` とします。 |
 
 ### レスポンス形式
 
@@ -76,7 +76,7 @@ OpenAPI、zod、生成スクリプトは、初期リリースに置きません�
 * **`results`**
   * 添付 ID ごとの結果です。
   * 各要素は [データ辞書の `ResultItem`](./data_dictionary.md#resultitem) です。`id` と **`status`** (`success`、`skipped`、`error`) を持ちます。
-  * **`message`** は人間が読める文です。`status` が `error` のときは必須です。完了の通知に出すのは、この `error` の文と、`message` がある `skipped` です。`success` の `message` は出しません。
+  * **`message`** は人間が読める文です。`status` が `error` の場合は必須です。完了の通知に出すのは、この `error` の文と、`message` がある `skipped` です。`success` の `message` は出しません。
 
 HTTP ステータスと業務 `status` の対応は、[HTTP ステータスコード](#6-http-ステータスコード指針) に従います。
 
@@ -94,7 +94,7 @@ HTTP ステータスと業務 `status` の対応は、[HTTP ステータスコ�
 * 続きがあるかは `nextOffset` です。`summary.total` が100未満でも、ライブラリの次のページがあるとは限りません。
 * `processed < total` は、そのリクエストの途中で止まったことです。Date Correct (All) の次の100件とは別です。
 * Date Correct (All) の完了表示は、各応答の `summary` をクライアントが足します。その合計は補正した件数であり、一覧の全 N 件ではありません。
-* 初期リリースでは、「全体の何件中」は出しません。出すときは、`summary.total` とは別の名前で、補正できる件数を返します。ページ分割には使いません。
+* 初期リリースでは、「全体の何件中」は出しません。出す場合は、`summary.total` とは別の名前で、補正できる件数を返します。ページ分割には使いません。
 
 #### 件別メッセージ
 
@@ -104,11 +104,11 @@ HTTP ステータスと業務 `status` の対応は、[HTTP ステータスコ�
 * UI は、コードから文言に変換しません。完了の通知に出すのは、`error` の `message` と、`message` がある `skipped` です。`success` の `message` は出しません。
 * 再試行の判定は、文言ではなく `status === "error"` で行います。
 
-リクエスト全体が失敗するときの `WP_Error` は、WordPress 標準の `code` と `message` です。こちらも `message` は人間が読める文です。
+リクエスト全体が失敗する場合の `WP_Error` は、WordPress 標準の `code` と `message` です。こちらも `message` は人間が読める文です。
 
 ### 結果集計ルール (status、summary の算出)
 
-一括処理におけるトップレベル `status` および `summary` の算出ルールを、次のとおり定めます。
+一括処理におけるトップレベル `status` および `summary` の算出ルールを、下記のとおり定めます。
 
 #### 設計意図 (ゴール)
 
@@ -119,7 +119,7 @@ HTTP ステータスと業務 `status` の対応は、[HTTP ステータスコ�
 * [冪等性 (べきとうせい)](./architecture.md#冪等性-べきとうせい) を維持するため、成功済みデータは再処理しません。
 * `skipped` は、再処理しても結果が変わらないため、再試行しません。年月がすでに一致している場合と、パスから年月を読めない場合です。
 * 手動の再試行は、`error` のみを対象にします。パスが読めない件は `error` ではありません。
-* 自動再送は、応答本文が得られなかったときだけです。HTTP `200` の件別 `error` は、自動再送に入れません。
+* 自動再送は、応答本文が得られなかった場合だけです。HTTP `200` の件別 `error` は、自動再送に入れません。
 
 * 未処理は、`total - processed` で分かります。画面は警告だけ出します。
 
@@ -129,13 +129,13 @@ HTTP ステータスと業務 `status` の対応は、[HTTP ステータスコ�
 * 未処理の ID は、`results` に入れません。件数は `total - processed` です。
 * `not_processed` と `includeNotProcessed` は、初期リリースに置きません。
 
-* 件別の `error` は、ユーザーが再試行を選んだときだけ再送します。応答本文がないときの自動再送は、[チャンク再試行戦略](#チャンク再試行戦略-バックオフ) に従います。
+* 件別の `error` は、ユーザーが再試行を選んだ際だけ再送します。応答本文がない場合の自動再送は、[チャンク再試行戦略](#チャンク再試行戦略-バックオフ) に従います。
 * [冪等性 (べきとうせい)](./architecture.md#冪等性-べきとうせい) を前提とします (安全に再実行可能です)。
 * UI の見出しは `summary` です。`results` は、完了の通知に出す件別の `message` と、Retry Failed の ID に使います。デバッグ出力にはしません。
 
 #### `status` の決定ルール
 
-トップレベル `status` は、件別結果 (`results[].status`) にもとづき、次の優先順位で決定します。
+トップレベル `status` は、件別結果 (`results[].status`) にもとづき、下記の優先順位で決定します。
 
 1. **`processed < total` の場合**
 
@@ -165,21 +165,21 @@ HTTP ステータスと業務 `status` の対応は、[HTTP ステータスコ�
 * `success`: 実際に更新が行われた件数
 * `skipped`: 更新しなかった件数です。年月がすでに一致している場合と、パスから年月を読めない場合です
 
-`error` が1件もなく、`processed` が `total` と一致するときは、トップレベル `status` を `success` とします。
+`error` が1件もなく、`processed` が `total` と一致する場合は、トップレベル `status` を `success` とします。
 
 #### `unknown` の扱い
 
 パスから年月を読めない要素の一覧状態は、`unknown` です。`ResultItem.status` には使いません。
 
 * デフォルトの一括補正と Date Correct (All) には、入れません。
-* 行操作などで補正リクエストに入ったときは、HTTP `200` の `skipped` です。更新しません。
-* `message` を付けるときは、人間が読める文だけです。例は「ファイルパスから年月を読み取れないため、補正しません。」です。件別の機械可読コードは置きません。
+* 行操作などで補正リクエストに入った場合は、HTTP `200` の `skipped` です。更新しません。
+* `message` を付ける場合は、人間が読める文だけです。例は「ファイルパスから年月を読み取れないため、補正しません。」です。件別の機械可読コードは置きません。
 * 再試行の対象にはしません。`summary.skipped` に含め、`summary.failed` には含めません。
-* `post_date` が読めなくても、パスの年月が取れるときは更新します。この件は `skipped` にしません。
+* `post_date` が読めなくても、パスの年月が取れる場合は更新します。この件は `skipped` にしません。
 
 #### `summary` の集計ルール
 
-`summary` は、次のように算出します。
+`summary` は、下記のように算出します。
 
 * `total`: その1リクエストの対象件数です。一覧の全件数ではありません
 * `processed`: 実行の試行件数です。通常は `total` と一致します
@@ -189,19 +189,19 @@ HTTP ステータスと業務 `status` の対応は、[HTTP ステータスコ�
 
 #### 実行不完全ケース (`processed != total`) の扱い
 
-通常、`processed` は `total` と一致しますが、次のような場合に不一致が発生し得ます。
+通常、`processed` は `total` と一致しますが、下記のような場合に不一致が発生し得ます。
 
 * サーバー側で、(タイムアウトや例外などにより) 処理が途中で中断された
 * チャンク処理中に部分失敗の発生
 
-この場合、次のルールを適用します。
+この場合、下記のルールを適用します。
 
-* `processed < total` のとき、トップレベル `status` は必ず `partial` とします。
+* `processed < total` の場合、トップレベル `status` は必ず `partial` とします。
 * 未処理の件は、`results` に含まれません (つまり、未試行として扱います)。
 
 #### 未処理の件数
 
-未処理の件数は、`total - processed` です。`processed < total` のとき、全体の `status` は `partial` です。
+未処理の件数は、`total - processed` です。`processed < total` の場合、全体の `status` は `partial` です。
 
 未処理の ID は `results` に入りません。`not_processed` も `includeNotProcessed` も置きません。画面は警告だけ出します。自動再送の3回にも、Retry Failed にも入れません。続けるかは、警告を見たユーザーが決めます。
 
@@ -209,7 +209,7 @@ Date Correct (All) の次の100件は `nextOffset` です。`processed < total` 
 
 #### 補足
 
-`processed < total` の場合は、次のとおりです。
+`processed < total` の場合は、下記のとおりです。
 
 * 一部の要素が、まだ処理されていないことを意味します。
 * トップレベル `status` は、`partial` とします。
@@ -221,16 +221,16 @@ Date Correct (All) の次の100件は `nextOffset` です。`processed < total` 
 
 #### リトライの二種類
 
-再送は、次の2つに分けます。
+再送は、下記の2つに分けます。
 
-* 自動再送は、応答本文が得られなかったときだけです。同じチャンクを再実行します。詳細は [チャンク再試行戦略](#チャンク再試行戦略-バックオフ) です。
+* 自動再送は、応答本文が得られなかった場合だけです。同じチャンクを再実行します。詳細は [チャンク再試行戦略](#チャンク再試行戦略-バックオフ) です。
 * 手動の Retry Failed は、HTTP `200` の `results` のうち `status === "error"` の ID だけです。`/attachments/correct` に再送します。
 
 HTTP `200` で `APIResponse` が返った時点で、自動再送はやめます。
 
 #### リトライ対象の定義
 
-手動の再実行は、次の対象に対して行います。
+手動の再実行は、下記の対象に対して行います。
 
 * 対象は `results[].status === "error"` のみです。
 
@@ -259,7 +259,7 @@ HTTP `200` で `APIResponse` が返った時点で、自動再送はやめます
 
 #### チャンク再試行との関係
 
-* 応答本文がないときの自動再送は、[チャンク再試行戦略](#チャンク再試行戦略-バックオフ) に従います。
+* 応答本文がない場合の自動再送は、[チャンク再試行戦略](#チャンク再試行戦略-バックオフ) に従います。
 * HTTP `200` のあと、各チャンクで手動再送するのは `error` だけです。
 
 #### UI/クライアントとの関係
@@ -342,7 +342,7 @@ current_user_can('edit_post', $id)
 
 | レイヤー | 内容 |
 | --- | --- |
-| HTTP レベル | `upload_files` がないときは `rest_authorization_required_code()` です。未ログインは `401`、ログイン済みは `403` です。無効な nonce は、コアが先に `403` を返します。 |
+| HTTP レベル | `upload_files` がない場合は `rest_authorization_required_code()` です。未ログインは `401`、ログイン済みは `403` です。無効な nonce は、コアが先に `403` を返します。 |
 | 件別処理レベル | `edit_post` により、個別に判定します。 |
 
 ### 一括更新における権限の制御方針
@@ -357,11 +357,11 @@ current_user_can('edit_post', $id)
 
 #### HTTP レベルの扱い
 
-次のいずれかに該当する場合は、リクエスト全体を拒否します。件別の `results` は返しません。
+下記のいずれかに該当する場合は、リクエスト全体を拒否します。件別の `results` は返しません。
 
-* 未ログインで `upload_files` がないときは、`401` です。`permission_callback` が `rest_authorization_required_code()` を返します。
-* `X-WP-Nonce` が `wp_rest` と合わないときは、`403` です。コアの `rest_cookie_check_errors` が先に返します。コードは `rest_cookie_invalid_nonce` です。プラグインは、ここで `401` を返す処理を置きません。
-* ログイン済みで `upload_files` がないときは、`403` です。同じく `rest_authorization_required_code()` です。
+* 未ログインで `upload_files` がない場合は、`401` です。`permission_callback` が `rest_authorization_required_code()` を返します。
+* `X-WP-Nonce` が `wp_rest` と合わない場合は、`403` です。コアの `rest_cookie_check_errors` が先に返します。コードは `rest_cookie_invalid_nonce` です。プラグインは、ここで `401` を返す処理を置きません。
+* ログイン済みで `upload_files` がない場合は、`403` です。同じく `rest_authorization_required_code()` です。
 
 #### 件別処理の扱い (「部分成功」前提)
 
@@ -377,7 +377,7 @@ current_user_can('edit_post', $id)
 * HTTP ステータスは、`200` を返します。
 * 業務上の成否は、本文の `status` および `summary`、`results` で表現します。
 
-トップレベル `status` は、次のとおりです。
+トップレベル `status` は、下記のとおりです。
 
 | status  | 意味 |
 | --- | --- |
@@ -408,9 +408,9 @@ current_user_can('edit_post', $id)
 
 ## Nonce と `api-fetch`
 
-管理画面の JavaScript からは `@wordpress/api-fetch` を使用し、ルート URL が同一オリジンのとき **Nonce ミドルウェア** が `X-WP-Nonce` を付与します。
+管理画面の JavaScript からは `@wordpress/api-fetch` を使用し、ルート URL が同一オリジンの場合 **Nonce ミドルウェア** が `X-WP-Nonce` を付与します。
 
-手動で `fetch` する場合は、次のとおりです。
+手動で `fetch` する場合は、下記のとおりです。
 
 ```text
 X-WP-Nonce: <wpApiSettings.nonce または wp_create_nonce('wp_rest')>
@@ -432,13 +432,13 @@ Date Correct (All) の全件は、2つ目のクエリーが返す範囲です。
 
 * 1リクエストあたり、最大100件です。
 * 通常の操作は、クライアントが100件ずつ送ります。ID の一括は、クライアントが分割します。
-* `POST /attachments/correct` の `ids` が101件以上のときは、1件も更新せず `HTTP 400` を返します。`register_rest_route` の `args` に `maxItems: 100` を置き、コアの検証に任せます。コードは `rest_invalid_param` です。
-* この `400` は自動再送しません。自動再送は、応答本文がないときだけです。先頭の100件だけを処理して残りを捨てる応答にはしません。
+* `POST /attachments/correct` の `ids` が101件以上の場合は、1件も更新せず `HTTP 400` を返します。`register_rest_route` の `args` に `maxItems: 100` を置き、コアの検証に任せます。コードは `rest_invalid_param` です。
+* この `400` は自動再送しません。自動再送は、応答本文がない場合だけです。先頭の100件だけを処理して残りを捨てる応答にはしません。
 * Date Correct (All) は `correct-query` です。サーバーが100件ずつ処理し、続きは `nextOffset` です。
 
 ## チャンク再試行戦略 (バックオフ)
 
-大量件数の処理は、クライアント側でチャンク分割して実行します。自動再送は、応答本文が得られなかったときだけです。
+大量件数の処理は、クライアント側でチャンク分割して実行します。自動再送は、応答本文が得られなかった場合だけです。
 
 #### 設計方針 (規約)
 
@@ -453,13 +453,13 @@ Date Correct (All) の全件は、2つ目のクエリーが返す範囲です。
 
 #### 自動再送の対象
 
-同じチャンクを再実行します。補正は冪等ですので、すでに更新した件は次に `skipped` になります。
+同じチャンクを再実行します。補正は冪等 (べきとう) ですので、すでに更新した件は次に `skipped` になります。
 
 * ネットワーク失敗
 * タイムアウト
 * HTTP `408`、`429`、`500`、`502`、`503`、`504`
 
-次は自動再送に入れません。
+下記は自動再送に入れません。
 
 * HTTP `400`、`401`、`403`
 * HTTP `200` で `APIResponse` が返ったあとの件別 `error`
@@ -469,7 +469,7 @@ Date Correct (All) の全件は、2つ目のクエリーが返す範囲です。
 
 #### 再試行戦略
 
-応答本文が得られなかったチャンクは、次の待ち方で再送します。
+応答本文が得られなかったチャンクは、下記の待ち方で再送します。
 
 * 初回失敗後、一定の時間、待機して再試行します。
 * 待機時間は、(たとえば、1→2→4のように) 指数的に増加させます。
@@ -601,7 +601,7 @@ Date Correct (All) の全件は、2つ目のクエリーが返す範囲です。
 
 `m` はメディアライブラリと同じく、`post_date` の年月です。パスの年月では絞りません。
 
-応答は `APIResponse` に、次の開始位置 `nextOffset` (`number` または `null`) を加えたものです。`null` のときは完了です。続きがあるとき、クライアントは `nextOffset` の数値を次のリクエストの `offset` に入れます。続きの有無は `nextOffset` で判断します。`summary.total` では判断しません。各 ID の権限確認と更新は、`correct` と同じサービスが行います。件別の形は `ResultItem` のままです。
+応答は `APIResponse` に、次の開始位置 `nextOffset` (`number` または `null`) を加えたものです。`null` の場合は完了です。続きがある場合、クライアントは `nextOffset` の数値を次のリクエストの `offset` に入れます。続きの有無は `nextOffset` で判断します。`summary.total` では判断しません。各 ID の権限確認と更新は、`correct` と同じサービスが行います。件別の形は `ResultItem` のままです。
 
 #### 設計意図 (ゴール)
 
@@ -626,7 +626,7 @@ Date Correct (All) の全件は、2つ目のクエリーが返す範囲です。
 
 #### 実装方針
 
-* 現在ページの補正は、フォームの ID を `correct` に送ります。100件を超えるときは、クライアントが分割します。101件以上を1回で送ったときは、サーバーが `HTTP 400` を返し、1件も更新しません。
+* 現在ページの補正は、フォームの ID を `correct` に送ります。100件を超える場合は、クライアントが分割します。101件以上を1回で送った場合は、サーバーが `HTTP 400` を返し、1件も更新しません。
 * 「All」は、`correct-query` に許可したクエリー引数と `offset` を送ります。
 * サーバーは、その条件で `WP_Query` を再実行し、100件ずつ処理します。
 
@@ -639,7 +639,7 @@ Date Correct (All) の全件は、2つ目のクエリーが返す範囲です。
 
 #### 実装方式との関係
 
-クライアントは、いまのライブラリクエリーを `correct-query` に送ります。サーバーが一致する ID を解決し、100件ずつ更新します。パスから年月を読めない attachment は対象に入れません。続きがあれば、応答の `nextOffset` を次のリクエストの `offset` に入れて再送します。`nextOffset` が `null` のときは完了です。
+クライアントは、いまのライブラリクエリーを `correct-query` に送ります。サーバーが一致する ID を解決し、100件ずつ更新します。パスから年月を読めない attachment は対象に入れません。続きがあれば、応答の `nextOffset` を次のリクエストの `offset` に入れて再送します。`nextOffset` が `null` の場合は完了です。
 
 #### フィルター条件の再現性
 
@@ -654,15 +654,15 @@ Date Correct (All) の全件は、2つ目のクエリーが返す範囲です。
 | コード | 用途 |
 | --- | --- |
 | `200` | 処理完了です (件別に失敗が混在しても、`200` と `results` で返す運用を許容します) |
-| `400` | 入力が不正です。`ids` が101件以上のときも含みます。1件も更新しません。コードは `rest_invalid_param` です |
-| `401` | 未ログインで `upload_files` がないときです |
-| `403` | nonce が無効なとき、またはログイン済みで `upload_files` がないときです |
+| `400` | 入力が不正です。`ids` が101件以上の場合も含みます。1件も更新しません。コードは `rest_invalid_param` です |
+| `401` | 未ログインで `upload_files` がない場合です |
+| `403` | nonce が無効な場合、またはログイン済みで `upload_files` がない場合です |
 | `500` | 予期せぬサーバーエラーです |
 
 ## エラーコード
 
 * **REST エラー (`WP_Error` 相当)**
-  * レスポンス全体が失敗するときの `code` と `message` です。HTTP は `4xx` または `5xx` です。`message` は人間が読める文です。
+  * レスポンス全体が失敗する場合の `code` と `message` です。HTTP は `4xx` または `5xx` です。`message` は人間が読める文です。
 * **件別 `results[].message`**
   * `200` 応答の本文内で、ID 単位の理由を表す人間が読める文です。完了の通知に出すのは、`error` の `message` と、`message` がある `skipped` です。`success` の `message` は出しません。
 

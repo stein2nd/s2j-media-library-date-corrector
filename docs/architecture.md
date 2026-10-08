@@ -106,7 +106,7 @@ flowchart TD
 | メインプラグインファイル | 定数・バージョン・ファイルパス、`plugins_loaded` でコアクラスを起動し、翻訳をロードします。 |
 | `Media_Date_Service` (想定クラス名) | `_wp_attached_file` から `yyyy/mm` を抽出し、`post_date` と比較し、単体/一括の DB 更新を行います。副作用をここに集約します。 |
 | REST コントローラ | 管理画面から呼ぶ API です。補正処理は画面の表示から切り離し、入力検証、権限、`service` の呼び出しを担います。WP-CLI コマンドは、初期リリースでは置きません。 |
-| 管理画面 JS (`src/admin`) | `upload.php` の List View 上で、補正の実行、処理中の表示、REST 通信 (`api-fetch`) を扱います。一覧テーブルは再構築しません。状態遷移は [管理画面 UI 仕様](./admin_ui_spec.md) に従います。スクリプトは `admin_enqueue_scripts` で、`upload.php` のときだけ読みます。 |
+| 管理画面 JS (`src/admin`) | `upload.php` の List View 上で、補正の実行、処理中の表示、REST 通信 (`api-fetch`) を扱います。一覧テーブルは再構築しません。状態遷移は [管理画面 UI 仕様](./admin_ui_spec.md) に従います。スクリプトは `admin_enqueue_scripts` で、`upload.php` の場合だけ読みます。 |
 
 ### レイヤー責務
 
@@ -154,7 +154,7 @@ flowchart TD
 
 ### 仕様 - What
 
-[管理画面の UI 仕様](./admin_ui_spec.md) では、次の事項を定義します。
+[管理画面の UI 仕様](./admin_ui_spec.md) では、下記の事項を定義します。
 
 * UI の構造
 * 操作仕様
@@ -192,7 +192,7 @@ flowchart TD
 
 OpenAPI、zod、生成スクリプトは、初期リリースに置きません。`openapi.json` も置きません。
 
-後から機械可読な契約を足すときは、向きは1つです。データ辞書と REST 仕様から OpenAPI を作り、そこからクライアントの型を生成します。zod は、ブラウザが応答を確かめる任意の層です。書き込みの正本にはしません。
+後から機械可読な契約を足す場合は、向きは1つです。データ辞書と REST 仕様から OpenAPI を作り、そこからクライアントの型を生成します。zod は、ブラウザが応答を確かめる任意の層です。書き込みの正本にはしません。
 
 仕様変更は、データ辞書の型と REST 仕様から始めます。実装側の型だけを変えて、契約を変えることはしません。
 
@@ -251,7 +251,7 @@ REST API コールは、WordPress の nonce による認証が必須です。
 #### 検証
 
 * WordPress REST API の標準機構により検証されます。
-* `X-WP-Nonce` が `wp_rest` と合わないとき、コアの `rest_cookie_check_errors` が `permission_callback` より先に `403` を返します。コードは `rest_cookie_invalid_nonce` です。
+* `X-WP-Nonce` が `wp_rest` と合わない場合、コアの `rest_cookie_check_errors` が `permission_callback` より先に `403` を返します。コードは `rest_cookie_invalid_nonce` です。
 * プラグインは、無効な nonce に対して `401` を返す処理を置きません。
 
 ### capability の粒度設計
@@ -287,7 +287,7 @@ REST API コールは、WordPress の nonce による認証が必須です。
 
 初期リリースでは、カスタム capability は登録しません。ルートの権限は `upload_files` のままです。
 
-`s2j_correct_media_date` は、初期リリースでは作りません。あとから足すのは、次をすべて満たすときだけです。
+`s2j_correct_media_date` は、初期リリースでは作りません。あとから足すのは、下記をすべて満たす場合だけです。
 
 * 機能が増加し、責務が分離されていること。
 * 権限分離の要件が、明確になっていること。
@@ -303,7 +303,7 @@ REST API コールは、WordPress の nonce による認証が必須です。
 
 PHP は zod を実行しません。初期リリースでは、zod スキーマも置きません。
 
-クライアントは、データ辞書の型を手で写します。応答の形が契約と違うときは、完了通知で失敗として扱います。
+クライアントは、データ辞書の型を手で写します。応答の形が契約と違う場合は、完了通知で失敗として扱います。
 
 ### 適用レイヤー
 
@@ -323,8 +323,8 @@ REST API の各エンドポイントでは、`permission_callback` により、�
 #### 設計ポイント
 
 * `permission_callback` は、このルートを呼んでよいかだけを見ます。ID では全体を拒否しません。
-* `permission_callback` が見るのは `upload_files` だけです。不足したときのステータスは `rest_authorization_required_code()` に任せます。ログインしていなければ `401`、ログイン済みなら `403` です。
-* nonce が無効なときは、コアの `rest_cookie_check_errors` が先に `403` を返します。プラグインはこの判定を置きません。
+* `permission_callback` が見るのは `upload_files` だけです。不足した場合のステータスは `rest_authorization_required_code()` に任せます。ログインしていなければ `401`、ログイン済みなら `403` です。
+* nonce が無効な場合は、コアの `rest_cookie_check_errors` が先に `403` を返します。プラグインはこの判定を置きません。
 * 受理後の `edit_post` 不足は、その1件を `status` `error` にし、`message` に人間が読める文を入れます。HTTP は `200` のまま、他の件は続けます。
 
 #### 基本実装
@@ -379,7 +379,7 @@ if ( ! current_user_can( 'edit_post', $id ) ) {
 #### 設計意図 (ゴール)
 
 * nonce の自動付与
-* 応答本文がないときの自動再送
+* 応答本文がない場合の自動再送
 
 #### 設計方針 (規約)
 
@@ -402,20 +402,20 @@ apiFetch.use( apiFetch.createNonceMiddleware( wpApiSettings.nonce ) );
 
 #### 初期リリース
 
-ミドルウェアが行うのは、次です。
+ミドルウェアが行うのは、下記です。
 
 * nonce の付与。`apiFetch.createNonceMiddleware` を、グローバルに1回だけ登録します。
-* 応答本文がないときの自動再送。同じチャンクを最大3回です。対象は、ネットワーク失敗、タイムアウト、HTTP `408`、`429`、`500`、`502`、`503`、`504` です。
+* 応答本文がない場合の自動再送。同じチャンクを最大3回です。対象は、ネットワーク失敗、タイムアウト、HTTP `408`、`429`、`500`、`502`、`503`、`504` です。
 
 Retry Failed は、ミドルウェアの自動再送ではありません。`HTTP 200` の `status === "error"` の ID だけを `/attachments/correct` に再送します。
 
 処理中は、ローディング、操作ボタンの無効化、「N 件を処理中」を出します。プログレスバーは作りません。
 
-完了は、画面上部の通知1つです。見出しは `summary` の件数です。失敗が混ざるときと、`processed < total` のときは警告です。同じ通知にサーバーの `message` を足すのは、`error` の件と、`message` がある `skipped` の件です。`success` の `message` は足しません。行の中には出しません。`results` はデバッグ出力にしません。Toast、共通の Message コンポーネント、`window.alert` は使いません。
+完了は、画面上部の通知1つです。見出しは `summary` の件数です。失敗が混ざる場合と、`processed < total` の場合は警告です。同じ通知にサーバーの `message` を足すのは、`error` の件と、`message` がある `skipped` の件です。`success` の `message` は足しません。行の中には出しません。`results` はデバッグ出力にしません。Toast、共通の Message コンポーネント、`window.alert` は使いません。
 
 #### 拡張ポイント
 
-通信ログの収集は、初期リリースでは作りません。ミドルウェアは、nonce の付与と、応答本文がないときの自動再送だけです。
+通信ログの収集は、初期リリースでは作りません。ミドルウェアは、nonce の付与と、応答本文がない場合の自動再送だけです。
 
 ### フロント状態管理 (error / success / retry)
 
@@ -472,18 +472,18 @@ flowchart TD
 * success:
   * 画面上部の通知を成功にします。`summary.success` が1件以上なら「{success} 件の補正が完了しました」です。`skipped` があれば「{skipped} 件は更新しませんでした」を足します。`summary.success` が0で残りが `skipped` なら「更新した項目はありません」です。
 * partial:
-  * 画面上部の通知を警告にします。成功、失敗、スキップの件数です。未処理が残るときは「一部未処理の項目があります」を足します。
+  * 画面上部の通知を警告にします。成功、失敗、スキップの件数です。未処理が残る場合は「一部未処理の項目があります」を足します。
   * `skipped` だけでは、この状態にしません。
 * error:
   * 画面上部の通知をエラーにします。文は「処理に失敗しました」です。
   * 再試行可能な状態にします。
 
-一覧は PHP のリストテーブルです。日付列と差分列を更新後の値にするには、いまの `upload.php` を読み直します。読み直すのは、一連の補正が終わって、その中の `summary.success` が1件でもあるときだけです。回数は1回です。検索、フィルター、表示中のページは維持します。読み直す前に、完了通知の内容を、そのタブの `sessionStorage` に置きます。読み直したあと、画面上部に1つ出して、そのキーは消します。再読込のたびに同じ通知は出しません。option、Transient、ユーザーメタには書きません。
+一覧は PHP のリストテーブルです。日付列と差分列を更新後の値にするには、いまの `upload.php` を読み直します。読み直すのは、一連の補正が終わって、その中の `summary.success` が1件でもある場合だけです。回数は1回です。検索、フィルター、表示中のページは維持します。読み直す前に、完了通知の内容を、そのタブの `sessionStorage` に置きます。読み直したあと、画面上部に1つ出して、そのキーは消します。再読込のたびに同じ通知は出しません。option、Transient、ユーザーメタには書きません。
 
-読み直さないのは、次のときです。
+読み直さないのは、下記の場合です。
 
 * 100件の途中です。`nextOffset` がある間と、ID を分割してまだ送っている間は、画面にとどまります。
-* 更新が1件もないときです。スキップと失敗だけ、または `HTTP 400` だけのときは、日付列が変わっていないので読み直しません。
+* 更新が1件もない場合です。スキップと失敗だけ、または `HTTP 400` だけの場合は、日付列が変わっていないので読み直しません。
 
 #### リトライ処理の設計
 
@@ -491,7 +491,7 @@ flowchart TD
 
 #### 基本動作
 
-* 応答本文が得られなかったときは、同じチャンクを最大3回まで自動再送します。対象はネットワーク失敗、タイムアウト、HTTP `408`、`429`、`500`、`502`、`503`、`504` です。
+* 応答本文が得られなかった場合は、同じチャンクを最大3回まで自動再送します。対象はネットワーク失敗、タイムアウト、HTTP `408`、`429`、`500`、`502`、`503`、`504` です。
 * HTTP `200` の `APIResponse` が返ったあとは、自動再送しません。
 * 手動の再送は、`results` の `error` だけを抽出します。
 * 抽出した ID を、`/attachments/correct` に再送信します。
@@ -539,7 +539,7 @@ interface State {
 }
 ```
 
-`requestError` は、`APIResponse` が返らなかったときの文です。完了の見出しには使いません。
+`requestError` は、`APIResponse` が返らなかった場合の文です。完了の見出しには使いません。
 
 #### Action 定義
 
@@ -706,7 +706,7 @@ flowchart TD
 
 * `match` の場合は、更新せず `skipped` とします。
 * パスから年月を読めない場合も、更新せず `skipped` とします。`error` にはしません。
-* `pathYm` があり、年月が一致しない場合は更新します。`post_date` が読めなくても、パスの年月が取れるときは更新します。
+* `pathYm` があり、年月が一致しない場合は更新します。`post_date` が読めなくても、パスの年月が取れる場合は更新します。
 * 更新は `wp_update_post` の1回です。`post_modified` と `post_modified_gmt` には、取得済みの値を渡します。
 
 ## 技術スタック
@@ -725,13 +725,13 @@ flowchart TD
 
 初期リリースのターゲットは `admin` だけです。エントリは `src/admin/index.tsx` です。メディアライブラリ一覧の拡張 UI を出力します。
 
-`src/gutenberg`、`src/classic`、`src/frontend` と、対応する SCSS は置きません。`register_block_type` とショートコードも置きません。ブロックを後から足すときは、そのときに `block.json` と `gutenberg` ターゲットを追加します。`frontend` バンドルは、`viewScript` が必要になったときだけです。詳細は [ブロック仕様](./block_spec.md) です。
+`src/gutenberg`、`src/classic`、`src/frontend` と、対応する SCSS は置きません。`register_block_type` とショートコードも置きません。ブロックを後から足す場合は、その際に `block.json` と `gutenberg` ターゲットを追加します。`frontend` バンドルは、`viewScript` が必要になった場合だけです。詳細は [ブロック仕様](./block_spec.md) です。
 
 ### 型の置き場所
 
 初期リリースのクライアント型は、データ辞書を `src/types/api.ts` に手で写します。OpenAPI、zod、生成スクリプトは置きません。
 
-後から足すときの向きは、[ソース・オブ・トゥルース](#ソースオブトゥルース-source-of-truth) に従います。
+後から足す際の向きは、[ソース・オブ・トゥルース](#ソースオブトゥルース-source-of-truth) に従います。
 
 ### 外部化
 

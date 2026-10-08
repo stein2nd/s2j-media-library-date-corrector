@@ -51,7 +51,7 @@ WordPress のメディアライブラリは、下記の2つの情報を独立し
 
 ## 3. 本プラグインのスコープ外
 
-本プラグインは、「パスにもとづく `post_date` 補正」に限定します。次のような処理は、対象外です。
+本プラグインは、「パスにもとづく `post_date` 補正」に限定します。下記のような処理は、対象外です。
 
 * ファイルの物理移動
 * EXIF ベースの日時補正
@@ -117,7 +117,7 @@ A3 -.-> B1
 1. `_wp_attached_file` からファイルパスを取得します。
 2. パス先頭の `yyyy/mm` を抽出します。先頭でなければ補正しません。
 3. `post_date` をサイトのローカル時刻 `yyyy-mm-01 00:00:00` にします。`post_date_gmt` は、その文字列を `get_gmt_from_date` に渡した値です。両方を同じ `wp_update_post` で書きます。`post_modified` と `post_modified_gmt` には、取得済みの値を渡します。
-4. 次のいずれかで更新します。行の Date Correct、チェックした ID の一括 Date Correct、または Date Correct (All) です。
+4. 右記のいずれかで更新します。行の Date Correct、チェックした ID の一括 Date Correct、または Date Correct (All) です。
 
 ```mermaid
 flowchart TD
