@@ -275,7 +275,7 @@ UI 状態名は `loading` です (「Processing」とは書かない)。
 
 * 表示は警告である。
 * 「{success} 件成功、{failed} 件失敗、{skipped} 件スキップされました」
-* 未処理またはフォールバック打ち切りのときは、[完了の表示](#完了の表示) どおり「一部未処理の項目があります」を足す。
+* 未処理またはフォールバック打ち切りの場合は、[完了の表示](#完了の表示) どおり「一部未処理の項目があります」を足す。
 
 #### Error (全体失敗)
 
@@ -713,7 +713,7 @@ Bulk Action は、WordPress 標準の位置です。
 
 完了後は、画面上部の通知1つです。Date Correct (All) では、一連の終了時だけ出します (走査窓ごとには出しません)。`processed < total` でやめた場合も、それまでの集約結果で警告を出します。
 
-* 失敗がなく、かつ (集約後) `processed === total` のとき、成功の表示にする ([REST API 仕様 > 複数走査窓の集約 - Date Correct (All)](./rest_api_spec.md#複数走査窓の集約---date-correct-all) の表どおりの **正常終了** のみ。フォールバック打ち切り時は [自動再送が尽きた場合](#自動再送が尽きた場合-応答本文なし) のとおり `partial` 警告)。未処理 (`processed < total`) は成功扱いにしない。文は一連で加算した `summary` の件数で変える。
+* 失敗がなく、かつ (集約後) `processed === total` の場合、成功の表示にする ([REST API 仕様 > 複数走査窓の集約 - Date Correct (All)](./rest_api_spec.md#複数走査窓の集約---date-correct-all) の表どおりの **正常終了** のみ。フォールバック打ち切り時は [自動再送が尽きた場合](#自動再送が尽きた場合-応答本文なし) のとおり `partial` 警告)。未処理 (`processed < total`) は成功扱いにしない。文は一連で加算した `summary` の件数で変える。
 * 失敗が混ざる、または未処理が残る場合は、警告にする。完了時の UI `status` は加算後から再計算する。再計算の優先順位 (自動再送 [フォールバック](./rest_api_spec.md#フォールバック) による打ち切りを含む) は [REST API 仕様 > 複数走査窓の集約 - Date Correct (All)](./rest_api_spec.md#複数走査窓の集約---date-correct-all) の表に従う。
 * 件別の `message` は、連結した `results` から、`error` と、`message` がある `skipped` だけを、その通知にサーバーの文のまま出す。`success` の `message` は足さない。行の中には出さない。
 * Retry Failed は、連結後の `results` のうち `status === "error"` の ID である。
