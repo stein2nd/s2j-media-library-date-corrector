@@ -11,21 +11,22 @@
 
 ## Description
 
-本『S2J MediaLibrary Date Corrector』は、WordPress におけるメディア一括登録後のメタデータ不整合を解消するための補正ツールです。
+本『S2J MediaLibrary Date Corrector』は、WordPress におけるメディア一括登録後のメタデータ不一致を解消するための補正ツールです。
 
 [Bulk Media Register](https://ja.wordpress.org/plugins/bulk-media-register/) 等で登録されたメディアは、ファイルが `uploads/yyyy/mm` 配下に配置されていても、データベース上の `post_date` が現在日時となる場合があります。この状態では、メディアライブラリの年月フィルターと実際のファイル構造が一致しません。
 
-本プラグインは、`_wp_attached_file` に格納されたパス情報をもとに年月を抽出し、`post_date` を適切な値に補正します。差分の可視化および選択的な一括更新を、メディアライブラリ画面上で実行可能です。
+本プラグインは、`_wp_attached_file` に格納されたパス情報をもとに年月を抽出し、`post_date` / `post_date_gmt` を適切な値に補正します。差分の可視化および選択的な一括更新を、メディアライブラリ画面上で実行可能です。
 
 実装には React + TypeScript + Vite を採用し、`@wordpress/element` を介して WordPress 管理画面に統合します。
 
 ## クイックスタート
 
 1. プラグインを有効化します。
-2. 「メディア > ライブラリ」を開きます。
-3. 「差分」列を確認します。
-4. 「Bulk Actions」から「Date Correct」を選択します。
-5. 補正処理を実行します。
+2. 「メディア > ライブラリ」(List View) を開きます。
+3. 「差分」列で一致 / 不一致 / 不明を確認します。
+4. 行の「Date Correct」、またはチェック選択後に Bulk Actions の「Date Correct」で補正します。
+5. 現在の検索・フィルター全体を直す場合は「Date Correct (All)」を使います。
+6. 表示中ページに不一致がある場合の案内は、設定画面で消せます。
 
 ## ユースケース
 

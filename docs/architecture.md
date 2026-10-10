@@ -10,9 +10,9 @@
 
 ### 設計方針 (規約)
 
-* 責務ごとにディレクトリを分離します。
-* 副作用 (API) は、`api/` に閉じ込めます。
-* 型は、データ辞書を手で写します。初期リリースでは自動生成しません。
+* 責務ごとにディレクトリを分離する。
+* 副作用 (API) は、`api/` に閉じ込める。
+* 型は、データ辞書を手で写す。初期リリースでは自動生成しない。
 
 #### 副作用 (API) の扱い
 
@@ -29,27 +29,27 @@
 
 ```text
 s2j-media-library-date-corrector/
-├──── `README.md`
-├──── `README.txt`
-├──── `LICENSE`
-├──── `package.json`  # ビルド設定
-├──── node_modules/  # 依存 npm モジュール
-├──── `vite.config.ts`
-├──── `tsconfig.json`
-├──── `eslint.config.js`  # ESLint 設定
-├──── docs/  # 仕様・設計ドキュメント
-├──── `s2j-media-library-date-corrector.php`  # プラグイン本体・フック登録
-├──── `uninstall.php`  # プラグイン削除時の処理
-├┬─── languages/  # 翻訳ファイル
-│├─── `s2j-media-library-date-corrector.pot`
-│├─── `s2j-media-library-date-corrector-[ロケール名].po`
-│└─── `s2j-media-library-date-corrector-[ロケール名].mo`  # WordPress 表示用バイナリ
-├┬─── includes/  # PHP クラス群 (REST API、一覧拡張。オートロード対象)
-│├─── `class-plugin.php`                    # 初期化・依存登録
-│├─── `class-rest-controller.php`           # REST の登録と権限
-│├─── `class-media-date-service.php`        # 年月抽出・比較・更新の核
-│├─── `class-media-library-list-table.php`  # 一覧カラム・一括操作 (※)
-│└─── ...
+├── `README.md`
+├── `README.txt`
+├── `LICENSE`
+├── `package.json`  # ビルド設定
+├── node_modules/  # 依存 npm モジュール
+├── `vite.config.ts`
+├── `tsconfig.json`
+├── `eslint.config.js`  # ESLint 設定
+├── docs/  # 仕様・設計ドキュメント
+├── `s2j-media-library-date-corrector.php`  # プラグイン本体・フック登録
+├── `uninstall.php`  # プラグイン削除時の処理
+├┬─ languages/  # 翻訳ファイル
+│├─ `s2j-media-library-date-corrector.pot`
+│├─ `s2j-media-library-date-corrector-{ロケール名}.po`
+│└─ `s2j-media-library-date-corrector-{ロケール名}.mo`  # WordPress 表示用バイナリ
+├┬─ includes/  # PHP クラス群 (REST API、一覧拡張。オートロード対象)
+│├─ `class-plugin.php`                    # 初期化・依存登録
+│├─ `class-rest-controller.php`           # REST の登録と権限
+│├─ `class-media-date-service.php`        # 年月抽出・比較・更新の核
+│├─ `class-media-library-list-table.php`  # 一覧カラム・一括操作 (※)
+│└─ ...
 ├┬─── src/  # TypeScript/React (管理画面) /SCSS ソース
 │├┬── admin/  # メディアライブラリ拡張 UI
 ││├── `index.tsx`  # 管理画面メイン・エントリーポイント
@@ -63,22 +63,22 @@ s2j-media-library-date-corrector/
 ││└┬─ utils/  # ユーティリティ
 ││　├─ `errorHandler.ts`  # エラー・ハンドリング
 ││　└─ ...
-│├┬── api/  # API 通信
-││├── `client.ts`  # API コール (`api-fetch` ラッパー)
-││└── `endpoints.ts`  # エンドポイント定義
-│├┬── styles/  # プラグイン用のスタイル定義
-││├── `admin.scss`  # 操作画面用
-││└── `variables.scss`  # SCSS 変数定義
-│└┬── types/  # プラグイン用のグローバル型定義
-│　├── `index.ts`
-│　├── `api.ts`  # TypeScript 型 (データ辞書を手で写す)
-│　├── `wordpress.d.ts`  # WordPress
-│　└── `dom.d.ts`  # DOM
-└┬─── dist/  # Vite ビルド成果物 (Git 管理外)、アイコン
-　├┬── css/  # プラグイン用のスタイル定義
-　│└── `s2j-media-library-date-corrector-admin.css`
-　└┬── js/  # 管理画面
-　　└── `s2j-media-library-date-corrector-admin.js`
+│├┬─ api/  # API 通信
+││├─ `client.ts`  # API コール (`api-fetch` ラッパー)
+││└─ `endpoints.ts`  # エンドポイント定義
+│├┬─ styles/  # プラグイン用のスタイル定義
+││├─ `admin.scss`  # 操作画面用
+││└─ `variables.scss`  # SCSS 変数定義
+│└┬─ types/  # プラグイン用のグローバル型定義
+│　├─ `index.ts`
+│　├─ `api.ts`  # TypeScript 型 (データ辞書を手で写す)
+│　├─ `wordpress.d.ts`  # WordPress
+│　└─ `dom.d.ts`  # DOM
+└┬── dist/  # Vite ビルド成果物 (Git 管理外)、アイコン
+　├┬─ css/  # プラグイン用のスタイル定義
+　│└─ `s2j-media-library-date-corrector-admin.css`
+　└┬─ js/  # 管理画面
+　　└─ `s2j-media-library-date-corrector-admin.js`
 ```
 
 **注記:** `WP_List_Table` を直接継承するのではなく、`manage_media_custom_column` 等のフィルターと `bulk_actions-upload` 等で拡張する想定です。ファイル名は実装時に確定します。
@@ -103,18 +103,18 @@ flowchart TD
 
 | 領域 | 役割 |
 | --- | --- |
-| メインプラグインファイル | 定数・バージョン・ファイルパス、`plugins_loaded` でコアクラスを起動し、翻訳をロードします。 |
-| `Media_Date_Service` (想定クラス名) | `_wp_attached_file` から `yyyy/mm` を抽出し、`post_date` と比較し、単体/一括の DB 更新を行います。副作用をここに集約します。 |
-| REST コントローラ | 管理画面から呼ぶ API です。補正処理は画面の表示から切り離し、入力検証、権限、`service` の呼び出しを担います。WP-CLI コマンドは、初期リリースでは置きません。 |
-| 管理画面 JS (`src/admin`) | `upload.php` の List View 上で、補正の実行、処理中の表示、REST 通信 (`api-fetch`) を扱います。一覧テーブルは再構築しません。状態遷移は [管理画面 UI 仕様](./admin_ui_spec.md) に従います。スクリプトは `admin_enqueue_scripts` で、`upload.php` の場合だけ読みます。 |
+| メインプラグインファイル | 定数・バージョン・ファイルパス、`plugins_loaded` でコアクラスを起動し、翻訳をロードする。 |
+| `Media_Date_Service` (想定クラス名) | `_wp_attached_file` から `yyyy/mm` を抽出し、`post_date` と比較し、単体/一括の DB 更新を行う。副作用をここに集約する。 |
+| REST コントローラ | 管理画面から呼ぶ API である。補正処理は画面の表示から切り離し、入力検証、権限、`service` の呼び出しを担う。WP-CLI コマンドは、初期リリースでは置かない。 |
+| 管理画面 JS (`src/admin`) | `upload.php` の List View 上で、補正の実行、処理中の表示、REST 通信 (`api-fetch`) を扱う。一覧テーブルは再構築しない。状態遷移は [管理画面 UI 仕様](./admin_ui_spec.md) に従う。スクリプトは `admin_enqueue_scripts` で、`upload.php` の場合だけ読む。 |
 
 ### レイヤー責務
 
 #### 設計意図 (ゴール)
 
-* ロジック (features) を純粋関数として保ちます。
-* テスト容易性を向上させます。
-* 実装変更 (API 変更等) の影響範囲を限定します。
+* サービス層の判定ロジックを、副作用から切り離して保つ (`features/` ディレクトリは置かない)。
+* テスト容易性を向上させる。
+* 実装変更 (API 変更等) の影響範囲を限定する。
 
 #### 方針 (規約)
 
@@ -134,10 +134,12 @@ flowchart TD
 
 #### サービスレイヤー
 
-* 日付補正を担います。
-* 差分を判定します。
+* 日付補正を担う。
+* 差分を判定する。
 
 #### データレイヤー
+
+Service 内の DB 読み書きを指す概念です。Repository クラスは置きません。
 
 * `post_date` の更新
 * meta の取得
@@ -148,9 +150,9 @@ flowchart TD
 
 ### 設計方針 (規約)
 
-* UI 仕様は、技術に依存しない形で記述します。
-* 実装詳細は、すべて [アーキテクチャー](./architecture.md) に集約します。
-* 両者は、参照関係を持ちますが、重複しません。
+* UI 仕様は、技術に依存しない形で記述する。
+* 実装詳細は、すべて [アーキテクチャー](./architecture.md) に集約する。
+* 両者は、参照関係を持つが、重複しない。
 
 ### 仕様 - What
 
@@ -210,13 +212,13 @@ OpenAPI、zod、生成スクリプトは、初期リリースに置きません�
 * capability: `upload_files`
 * 対象ユーザー: 投稿者以上
 * 理由:
-  * メディア操作権限と整合しているためです。
-  * 既存のメディア管理フローに準拠するためです。
+  * メディア操作権限と整合しているためである。
+  * 既存のメディア管理フローに準拠するためである。
 
 ### REST API
 
-* nonce による認証が必須です。
-* capability のチェックを、必ず行います。
+* nonce による認証が必須である。
+* capability のチェックを、必ず行う。
 
 ### REST API における前提 capability
 
@@ -230,29 +232,29 @@ REST API コールは、WordPress の nonce による認証が必須です。
 
 #### 設計方針 (規約)
 
-* Cookie 認証と nonce による、CSRF 対策を採用します。
-* 独自トークンは導入しません。WordPress 標準に準拠します。
+* Cookie 認証と nonce による、CSRF 対策を採用する。
+* 独自トークンは導入しない。WordPress 標準に準拠する。
 
 #### 注意点
 
-* nonce は、「認証」ではなく「CSRF 対策」です。
-* capability チェックとの組み合わせが必須です。
+* nonce は、「認証」ではなく「CSRF 対策」である。
+* capability チェックとの組み合わせが必須である。
 
 #### 使用方式
 
-* `wp_create_nonce('wp_rest')` を使用します。
-* クライアントは `X-WP-Nonce` ヘッダーとして送信します。
+* `wp_create_nonce('wp_rest')` を使用する。
+* クライアントは `X-WP-Nonce` ヘッダーとして送信する。
 
 #### フロントエンド実装
 
-* `wpApiSettings.nonce` を利用します。
-* `@wordpress/api-fetch` により自動付与されます。
+* `wpApiSettings.nonce` を利用する。
+* `@wordpress/api-fetch` により自動付与される。
 
 #### 検証
 
-* WordPress REST API の標準機構により検証されます。
-* `X-WP-Nonce` が `wp_rest` と合わない場合、コアの `rest_cookie_check_errors` が `permission_callback` より先に `403` を返します。コードは `rest_cookie_invalid_nonce` です。
-* プラグインは、無効な nonce に対して `401` を返す処理を置きません。
+* WordPress REST API の標準機構により検証される。
+* `X-WP-Nonce` が `wp_rest` と合わない場合、コアの `rest_cookie_check_errors` が `permission_callback` より先に `403` を返す。コードは `rest_cookie_invalid_nonce` である。
+* プラグインは、無効な nonce に対して `401` を返す処理を置かない。
 
 ### capability の粒度設計
 
@@ -260,13 +262,13 @@ REST API コールは、WordPress の nonce による認証が必須です。
 
 #### 設計方針 (規約)
 
-* 「最小権限の原則」を維持します。
-* UI と API の権限を一致させます。
+* 「最小権限の原則」を維持する。
+* UI と API の権限を一致させる。
 
 #### 基本方針
 
-* 既存 capability を優先して使用します。
-* (初期リリースでは) カスタム capability は、導入しません。
+* 既存 capability を優先して使用する。
+* (初期リリースでは) カスタム capability は、導入しない。
 
 #### 採用する capability
 
@@ -279,9 +281,9 @@ REST API コールは、WordPress の nonce による認証が必須です。
 
 本プラグインは、下記の理由により、細分化を行いません。
 
-* 機能が、単一責務 (日時補正) にとどまるためです。
-* WordPress の既存権限モデルと整合しているためです。
-* 権限管理の「複雑化の回避」を維持するためです。
+* 機能が、単一責務 (日時補正) にとどまるためである。
+* WordPress の既存権限モデルと整合しているためである。
+* 権限管理の「複雑化の回避」を維持するためである。
 
 #### 将来的な拡張
 
@@ -294,8 +296,8 @@ REST API コールは、WordPress の nonce による認証が必須です。
 
 #### REST API における適用
 
-* `permission_callback` では、`upload_files` だけを見ます。
-* 各 ID の `edit_post` は、処理ループの中で見ます。不足した件は `ResultItem` の `error` とし、他の件は続けます。
+* `permission_callback` では、`upload_files` だけを見る。
+* 各 ID の `edit_post` は、処理ループの中で見る。不足した件は `ResultItem` の `error` とし、他の件は続ける。
 
 ### リクエストの実行時チェック
 
@@ -317,15 +319,15 @@ REST API の各エンドポイントでは、`permission_callback` により、�
 
 #### 方針
 
-* `permission_callback` を省略することはしません。必ず定義します。
-* ロジックは、Controller に集約します。
+* `permission_callback` を省略することはしない。必ず定義する。
+* ロジックは、Controller に集約する。
 
 #### 設計ポイント
 
-* `permission_callback` は、このルートを呼んでよいかだけを見ます。ID では全体を拒否しません。
-* `permission_callback` が見るのは `upload_files` だけです。不足した場合のステータスは `rest_authorization_required_code()` に任せます。ログインしていなければ `401`、ログイン済みなら `403` です。
-* nonce が無効な場合は、コアの `rest_cookie_check_errors` が先に `403` を返します。プラグインはこの判定を置きません。
-* 受理後の `edit_post` 不足は、その1件を `status` `error` にし、`message` に人間が読める文を入れます。HTTP は `200` のまま、他の件は続けます。
+* `permission_callback` は、このルートを呼んでよいかだけを見る。ID では全体を拒否しない。
+* `permission_callback` が見るのは `upload_files` だけである。不足した場合のステータスは `rest_authorization_required_code()` に任せる。ログインしていなければ `401`、ログイン済みなら `403` である。
+* nonce が無効な場合は、コアの `rest_cookie_check_errors` が先に `403` を返す。プラグインはこの判定を置かない。
+* 受理後の `edit_post` 不足は、その1件を `status` `error` にし、`message` に人間が読める文を入れる。HTTP は `200` のまま、他の件は続ける。
 
 #### 基本実装
 
@@ -383,14 +385,14 @@ if ( ! current_user_can( 'edit_post', $id ) ) {
 
 #### 設計方針 (規約)
 
-* nonce は、middleware で一元管理します。
-* 各コンポーネントで、個別付与しません。
-* エラーハンドリングは、共通化します。
+* nonce は、middleware で一元管理する。
+* 各コンポーネントで、個別付与しない。
+* エラーハンドリングは、共通化する。
 
 #### 注意点
 
-* middleware は、グローバルに1回だけ登録します。
-* 多重登録を防ぎます。
+* middleware は、グローバルに1回だけ登録する。
+* 多重登録を防ぐ。
 
 #### 基本設定
 
@@ -404,12 +406,12 @@ apiFetch.use( apiFetch.createNonceMiddleware( wpApiSettings.nonce ) );
 
 ミドルウェアが行うのは、下記です。
 
-* nonce の付与。`apiFetch.createNonceMiddleware` を、グローバルに1回だけ登録します。
-* 応答本文がない場合の自動再送。同じチャンクを最大3回です。対象は、ネットワーク失敗、タイムアウト、HTTP `408`、`429`、`500`、`502`、`503`、`504` です。
+* nonce の付与。`apiFetch.createNonceMiddleware` を、グローバルに1回だけ登録する。
+* 応答本文がない場合の自動再送。同じチャンクを最大3回である。対象は、ネットワーク失敗、タイムアウト、HTTP `408`、`429`、`500`、`502`、`503`、`504` である。
 
 Retry Failed は、ミドルウェアの自動再送ではありません。`HTTP 200` の `status === "error"` の ID だけを `/attachments/correct` に再送します。
 
-処理中は、ローディング、操作ボタンの無効化、「N 件を処理中」を出します。プログレスバーは作りません。
+処理中は、ローディング、操作ボタンの無効化、および処理中メッセージを出します。初回応答前は「処理中です…」、直近の `summary.total` がある場合は「{count} 件を処理中です…」です (一連の累計ではありません。上限100の暫定表示は使いません。文言の正本は [管理画面 UI 仕様](./admin_ui_spec.md))。プログレスバーは作りません。
 
 完了は、画面上部の通知1つです。見出しは `summary` の件数です。失敗が混ざる場合と、`processed < total` の場合は警告です。同じ通知にサーバーの `message` を足すのは、`error` の件と、`message` がある `skipped` の件です。`success` の `message` は足しません。行の中には出しません。`results` はデバッグ出力にしません。Toast、共通の Message コンポーネント、`window.alert` は使いません。
 
@@ -423,9 +425,9 @@ Retry Failed は、ミドルウェアの自動再送ではありません。`HTT
 
 #### 設計方針 (規約)
 
-* 状態は、単一の「state machine」として扱います。
-* 表示と状態を分離します。
-* API レスポンスを、そのまま UI 状態にマッピングします。
+* 状態は、単一の「state machine」として扱う。
+* 表示と状態を分離する。
+* API レスポンスを、そのまま UI 状態にマッピングする。
 
 #### 状態定義
 
@@ -433,9 +435,9 @@ UI 状態は、REST API の `status` と一致させます。
 
 * idle: 初期状態
 * loading: API ロード中
-* success: 失敗がなく、処理が最後まで終わった状態です。`skipped` だけも含みます
-* partial: 失敗が混ざる、または未処理が残る状態です
-* error: 処理した件がすべて失敗です
+* success: 失敗がなく、処理が最後まで終わった状態である。`skipped` だけも含む
+* partial: 失敗が混ざる、または未処理が残る状態である
+* error: 処理した件がすべて失敗である
 
 #### 状態遷移
 
@@ -470,20 +472,22 @@ flowchart TD
 #### UI 挙動
 
 * success:
-  * 画面上部の通知を成功にします。`summary.success` が1件以上なら「{success} 件の補正が完了しました」です。`skipped` があれば「{skipped} 件は更新しませんでした」を足します。`summary.success` が0で残りが `skipped` なら「更新した項目はありません」です。
+  * 画面上部の通知を成功にする。`summary.success` が1件以上なら「{success} 件の補正が完了しました」である。`skipped` があれば「{skipped} 件は更新しませんでした」を足す。`summary.success` が0で残りが `skipped` なら「更新した項目はありません」である。
 * partial:
-  * 画面上部の通知を警告にします。成功、失敗、スキップの件数です。未処理が残る場合は「一部未処理の項目があります」を足します。
-  * `skipped` だけでは、この状態にしません。
+  * 画面上部の通知を警告にする。成功、失敗、スキップの件数である。未処理が残る場合は「一部未処理の項目があります」を足す。
+  * `skipped` だけでは、この状態にしない。
 * error:
-  * 画面上部の通知をエラーにします。文は「処理に失敗しました」です。
-  * 再試行可能な状態にします。
+  * 画面上部の通知をエラーにする。文は「処理に失敗しました」である。
+  * 再試行可能な状態にする。
 
-一覧は PHP のリストテーブルです。日付列と差分列を更新後の値にするには、いまの `upload.php` を読み直します。読み直すのは、一連の補正が終わって、その中の `summary.success` が1件でもある場合だけです。回数は1回です。検索、フィルター、表示中のページは維持します。読み直す前に、完了通知の内容を、そのタブの `sessionStorage` に置きます。読み直したあと、画面上部に1つ出して、そのキーは消します。再読込のたびに同じ通知は出しません。option、Transient、ユーザーメタには書きません。
+一覧は PHP のリストテーブルです。日付列と差分列を更新後の値にするには、いまの `upload.php` を再読み込みします。再読み込みするのは、一連の補正が終わって、その中の加算後 `summary.success` が1件でもある場合だけです。回数は1回です。検索、フィルター、表示中のページは維持します。再読み込み前に、完了通知の内容を、そのタブの `sessionStorage` に置きます。再読み込みしたあと、画面上部に1つ出して、そのキーは消します。再読み込みのたびに同じ通知は出しません。option、Transient、ユーザーメタには書きません。
 
-読み直さないのは、下記の場合です。
+再読み込みしないのは、下記の場合です。
 
-* 100件の途中です。`nextOffset` がある間と、ID を分割してまだ送っている間は、画面にとどまります。
-* 更新が1件もない場合です。スキップと失敗だけ、または `HTTP 400` だけの場合は、日付列が変わっていないので読み直しません。
+* 走査窓または ID 分割の途中です。`processed === total` かつ `nextOffset !== null` の間と、ID を分割してまだ送っている間は、画面にとどまる。
+* 更新が1件もない場合です。スキップと失敗だけ、または `HTTP 400` だけの場合は、日付列が変わっていないので再読み込みしない。
+
+Date Correct (All) では、一連の終了まで `summary` を加算し、`results` を連結します。次窓に進むのは `processed === total` かつ `nextOffset !== null` の場合だけです。`processed < total` の場合は一連をやめ、集約結果で警告します。完了時の UI `status` と Retry Failed は、その集約結果から決めます。
 
 #### リトライ処理の設計
 
@@ -491,22 +495,22 @@ flowchart TD
 
 #### 基本動作
 
-* 応答本文が得られなかった場合は、同じチャンクを最大3回まで自動再送します。対象はネットワーク失敗、タイムアウト、HTTP `408`、`429`、`500`、`502`、`503`、`504` です。
-* HTTP `200` の `APIResponse` が返ったあとは、自動再送しません。
-* 手動の再送は、`results` の `error` だけを抽出します。
-* 抽出した ID を、`/attachments/correct` に再送信します。
-* 手動の再送は、ユーザー操作により行います。
+* 応答本文が得られなかった場合は、同じチャンクを最大3回まで自動再送する。対象はネットワーク失敗、タイムアウト、HTTP `408`、`429`、`500`、`502`、`503`、`504` である。
+* HTTP `200` の `APIResponse` が返ったあとは、自動再送しない。
+* 手動の再送は、`results` の `error` だけを抽出する。
+* 抽出した ID を、`/attachments/correct` に再送信する。
+* 手動の再送は、ユーザー操作により行う。
 
 #### 状態管理
 
-* `failed > 0` の場合は、再試行可能な状態にします。
-* 再試行後は、レスポンスにもとづき状態を更新します。
+* `failed > 0` の場合は、再試行可能な状態にする。
+* 再試行後は、レスポンスにもとづき状態を更新する。
 
 #### リトライ仕様
 
 リトライ対象および挙動の詳細は、REST API 仕様に従います。
 
-* 詳細は、[REST API 仕様 > リトライ仕様 (統一定義)](./rest_api_spec.md#リトライ仕様-統一定義) をご覧ください。
+詳細は、[REST API 仕様 > リトライ仕様 (統一定義)](./rest_api_spec.md#リトライ仕様-統一定義) をご覧ください。
 
 ### reducer 設計 - 状態遷移
 
@@ -514,9 +518,9 @@ flowchart TD
 
 #### 設計方針 (規約)
 
-* REST API の `status` を、そのまま state に反映します。
-* 状態は、単一の source of truth です。
-* 副作用は、reducer 外で処理します (`api-fetch`)。
+* REST API の `status` を、そのまま state に反映する。
+* 状態は、単一の source of truth である。
+* 副作用は、reducer 外で処理する (`api-fetch`)。
 
 #### 状態遷移
 
@@ -527,6 +531,8 @@ flowchart TD
 ```
 
 #### State 定義
+
+`requestError` は、`APIResponse` が返らなかった場合の文です。完了の見出しには使いません。
 
 ```ts
 type Status = 'idle' | 'loading' | 'success' | 'partial' | 'error';
@@ -539,19 +545,19 @@ interface State {
 }
 ```
 
-`requestError` は、`APIResponse` が返らなかった場合の文です。完了の見出しには使いません。
-
 #### Action 定義
 
 ```ts
 type Action =
   | { type: 'START' }
-  | { type: 'SUCCESS'; payload: APIResponse }
+  | { type: 'SUCCESS'; payload: APIResponse | CorrectQueryResponse }
   | { type: 'ERROR'; error: string }
   | { type: 'RESET' };
 ```
 
 #### reducer
+
+Date Correct (All) では、走査窓のたびに `SUCCESS` を投げません。呼び出し側が各応答の `summary` を加算し、`results` を連結してから、一連が終わった場合にだけ集約結果を `SUCCESS` (または警告用の完了状態) に載せます。次窓に進むのは `processed === total` かつ `nextOffset !== null` の場合だけです。`processed < total` なら一連をやめます。完了時の `status` は加算後の件数から再計算します。ID 一括の分割送信も同じです。
 
 ```ts
 function reducer(state: State, action: Action): State {
@@ -604,18 +610,16 @@ flowchart TD
 
 ## 処理フロー (レイヤー横断)
 
+* UI: 選択と実行
+* REST: 認証とバリデーション
+* Service: 補正ロジックの実行と DB 更新 (`wp_update_post`)。Repository 層は置かない
+
 ```mermaid
 flowchart TD
   A["UI"] --> B["REST API"]
   B --> C["Service"]
-  C --> D["Repository"]
-  D --> E["DB"]
+  C --> D["DB"]
 ```
-
-* UI: 選択と実行
-* REST: 認証とバリデーション
-* Service: 補正ロジックの実行
-* Repository: 更新処理
 
 ### トランザクション境界
 
@@ -623,18 +627,18 @@ flowchart TD
 
 #### 設計方針 (規約)
 
-* partial を前提とした、バッチ処理とします。
-* 「長時間トランザクション」を回避します。
+* partial を前提とした、バッチ処理とする。
+* 「長時間トランザクション」を回避する。
 
 #### 実行モデル
 
-* 各 attachment は、個別に更新します。
-* トランザクションは、ID 単位で完結します。
+* 各 attachment は、個別に更新する。
+* トランザクションは、ID 単位で完結する。
 
 #### 失敗時の挙動
 
-* 他 ID の処理には、影響しません。
-* ロールバックは、行いません。
+* 他 ID の処理には、影響しない。
+* ロールバックは、行わない。
 
 ### REST API レスポンス仕様
 
@@ -643,9 +647,9 @@ flowchart TD
 
 #### 設計方針 (規約)
 
-* HTTP ステータスとは別に、業務ステータスを持ちます。
-* 部分成功を許容します。
-* UI は、summary を主に参照します。
+* HTTP ステータスとは別に、業務ステータスを持つ。
+* 部分成功を許容する。
+* UI は、summary を主に参照する。
 
 #### レスポンス構造
 
@@ -683,9 +687,9 @@ flowchart TD
 
 | status | 意味 |
 | --- | --- |
-| success | 失敗がなく、処理が最後まで終わった状態です。`skipped` だけも含みます |
-| partial | 失敗が混ざる、または未処理が残る状態です |
-| error | 処理した件がすべて失敗です |
+| success | 失敗がなく、処理が最後まで終わった状態である。`skipped` だけも含む |
+| partial | 失敗が混ざる、または未処理が残る状態である |
+| error | 処理した件がすべて失敗である |
 
 #### HTTP ステータス
 
@@ -704,20 +708,20 @@ flowchart TD
 
 ### 実現方法
 
-* `match` の場合は、更新せず `skipped` とします。
-* パスから年月を読めない場合も、更新せず `skipped` とします。`error` にはしません。
-* `pathYm` があり、年月が一致しない場合は更新します。`post_date` が読めなくても、パスの年月が取れる場合は更新します。
-* 更新は `wp_update_post` の1回です。`post_modified` と `post_modified_gmt` には、取得済みの値を渡します。
+* `match` の場合は、更新せず `skipped` とする。
+* パスから年月を読めない場合、`correct` では更新せず `skipped` とする。`correct-query` では補正対象にも `results` にも入れない。いずれも `error` にはしない。
+* `pathYm` があり、年月が一致しない場合は更新する。`post_date` が読めなくても、パスの年月が取れる場合は更新する。
+* 更新は `wp_update_post` の1回である。`post_modified` と `post_modified_gmt` には、取得済みの値を **必ず** 渡す (キー省略禁止。省略するとコアが now にする)。
 
 ## 技術スタック
 
 | 層 | 採用技術 | 備考 |
 | --- | --- | --- |
-| 基盤 | WordPress 6.3+ (README の下限に準拠) | メディアは `attachment` 投稿タイプです。 |
-| サーバー | PHP (WordPress 要件に準拠) | 直接 SQL は `wpdb` 経由に限定します。 |
+| 基盤 | WordPress 6.9+ (README の下限に準拠) | メディアは `attachment` 投稿タイプである。 |
+| サーバー | PHP (WordPress 要件に準拠) | 直接 SQL は `wpdb` 経由に限定する。 |
 | 管理 UI | React、TypeScript、`@wordpress/element`、`components`、`i18n` 等 | README 記載の方針。 |
-| ビルド | Vite、Dart Sass、PostCSS (Autoprefixer) | ビルドの定義は、`vite.config.ts` にあります。 |
-| スタイル | SCSS | スタイルのソースは、`src/styles/*.scss` です。 |
+| ビルド | Vite、Dart Sass、PostCSS (Autoprefixer) | ビルドの定義は、`vite.config.ts` にある。 |
+| スタイル | SCSS | スタイルのソースは、`src/styles/*.scss` である。 |
 
 ## ビルド
 
@@ -739,9 +743,9 @@ Rollup の `external` に `@wordpress/*`、`react`、`react-dom`、`jquery` を�
 
 ### 出力
 
-* 出力先は、ディストリビューションのルートの `dist` にします。初期リリースの成果物は、管理画面の JS と CSS です。
-* `FLUSH_DIST=true` の場合、ビルド前に `dist` を削除できます。
-* 本番時は、`NODE_ENV=production` を設定します。成果物を縮小 `minify` します。
+* 出力先は、ディストリビューションのルートの `dist` にする。初期リリースの成果物は、管理画面の JS と CSS である。
+* `FLUSH_DIST=true` の場合、ビルド前に `dist` を削除できる。
+* 本番時は、`NODE_ENV=production` を設定する。成果物を縮小 `minify` する。
 
 > **実装上の注意:** 現行 `vite.config.ts` の成果物ファイル名に別プロジェクト由来の接頭辞が含まれる場合は、リリース前にプラグインスラッグに統一することを推奨します。
 
@@ -765,24 +769,24 @@ sequenceDiagram
   Svc->>DB: _wp_attached_file を取得し post_date を比較・更新
   Svc-->>REST: 結果 (成功、スキップ、エラーの集計)
   REST-->>UI: JSON レスポンス
-  UI-->>User: 完了通知。更新があれば upload.php を1回読み直す
+  UI-->>User: 完了通知。更新があれば upload.php を1回再読み込み
 ```
 
 1. **表示**:
-  * メディア一覧で標準カラムに加え、「年月 (パス)」「差分」を表示します。行の取得はメディアライブラリ標準のクエリーです。列の中身は PHP のカラムフィルターで出します。
+  * メディア一覧で標準カラムに加え、「年月 (パス)」「差分」を表示する。行の取得はメディアライブラリ標準のクエリーである。列の中身は PHP のカラムフィルターで出す。
 2. **選択**:
-  * 行の Date Correct は、その行の ID を送ります。チェックは不要です。
-  * 一括の Date Correct は、チェックした ID だけを送ります。チェックがなければ実行しません。
-  * Date Correct (All) は、一括メニューの外です。いまの検索とフィルターを送ります。
-  * 「差分のみ選択」と「補正実行」は置きません。
+  * 行の Date Correct は、その行の ID を送る。チェックは不要である。
+  * 一括の Date Correct は、チェックした ID だけを送る。チェックがなければ実行しない。
+  * Date Correct (All) は、一括メニューの外である。いまの検索とフィルターを送る。
+  * 「差分のみ選択」と「補正実行」は置かない。
 3. **実行**:
-  * UI が REST に補正リクエストを送ります。サーバー側で **各添付ファイルごと** に `current_user_can` を検証します。
+  * UI が REST に補正リクエストを送る。サーバー側で **各添付ファイルごと** に `current_user_can` を検証する。
 4. **更新**:
-  * `Media_Date_Service` は、`post_date` をサイトのタイムゾーンの `yyyy-mm-01 00:00:00` にします。`post_date_gmt` は、その文字列を `get_gmt_from_date` に渡した値です。両方を同じ `wp_update_post` で書きます。詳細は [データ辞書 > 日付正規化とタイムゾーン](./data_dictionary.md#日付正規化とタイムゾーン) です。
+  * `Media_Date_Service` は、`post_date` をサイトのタイムゾーンの `yyyy-mm-01 00:00:00` にする。`post_date_gmt` は、その文字列を `get_gmt_from_date` に渡した値である。両方を同じ `wp_update_post` で書く。詳細は [データ辞書 > 日付正規化とタイムゾーン](./data_dictionary.md#日付正規化とタイムゾーン)。
 5. **完了**:
-  * UI が画面上部に完了の通知を出します。一覧の読み直しは、[UI 挙動](#ui-挙動) に従います。
+  * UI が画面上部に完了の通知を出す。一覧の再読み込みは、[UI 挙動](#ui-挙動) に従う。
 
-件数が多い補正は、クライアントが100件ずつ送ります。ID の一括は、クライアントが分割します。Date Correct (All) は `correct-query` です。続きは、返ってきた `nextOffset` を次の `offset` に入れます。
+件数が多い補正は、クライアントが100件ずつ送ります。ID の一括は、クライアントが分割します。Date Correct (All) は `correct-query` です。`offset` / `nextOffset` は WP_Query 結果上の走査位置です。1リクエストは最大100件を走査し、パスから年月を読める件だけを補正します。続きは、`processed === total` かつ `nextOffset !== null` の場合だけ、返ってきた `nextOffset` (`offset + 今回走査した件数`) を次の `offset` に入れます。`processed < total` なら一連をやめます。一連では各応答の `summary` を加算し、`results` を連結します。完了通知は一連の終了時だけです。詳細は [REST API 仕様](./rest_api_spec.md) です。
 
 バックグラウンドキュー、Action Scheduler、WP-Cron は置きません。処理は、管理画面を開いている間だけ進みます。1リクエストの上限は100件です。`ids` が101件以上の `POST /attachments/correct` は、1件も更新せず `HTTP 400` の `rest_invalid_param` です。先頭の100件だけを残す応答にはしません。
 
@@ -796,4 +800,4 @@ WP-CLI コマンドは、初期リリースでは置きません。補正処理�
 
 ## 共通仕様との関係
 
-プラグイン全体の規約・品質・セキュリティの共通ルールは、[WP_PLUGIN_SPEC.md](https://github.com/stein2nd/wp-plugin-spec/blob/main/docs/WP_PLUGIN_SPEC.md) に従います。
+プラグイン全体の規約・品質・セキュリティの共通ルールは、[SPECS.md](https://github.com/stein2nd/wp-plugin-spec/blob/main/docs/SPECS.md) に従います。

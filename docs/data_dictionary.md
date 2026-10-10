@@ -10,7 +10,17 @@
 
 | 投稿タイプ | 用途 |
 | --- | --- |
-| `attachment` | メディアライブラリの各行に相当し、`post_date` の補正対象です |
+| `attachment` | メディアライブラリの各行に相当し、`post_date` の補正対象である |
+
+## 用語 (本キット内)
+
+| 用語 | 意味 |
+| --- | --- |
+| 差分 | 一覧の列名。セル値は「一致」「不一致」「不明」 |
+| 不一致 | セル値および案内バナーのトリガー。コードは `mismatch` |
+| 不整合 | 課題説明でパスと `post_date` のずれを指す語。UI の「不一致」と同義 |
+| Date Correct | 行またはチェック選択の補正操作 (`POST …/attachments/correct`) |
+| Date Correct (All) | 現在の検索・フィルター全ページの補正 (`POST …/attachments/correct-query`) |
 
 ## データベース上の主要フィールド
 
@@ -18,23 +28,23 @@
 
 | カラム | 説明 | 本プラグインでの扱い |
 | --- | --- | --- |
-| `ID` | 添付ファイルの ID です | 補正対象のキーです |
-| `post_type` | 常に `attachment` です | フィルター条件です |
-| `post_date` | メディアの「日付」として、UI や年月フィルターに使用されます | **補正の主対象です** (コンセプトの「不整合」の一方です) |
-| `post_date_gmt` | UTC の日時です | `post_date` を変更する際、コアの慣例に合わせ **整合を取ります** (サイトのタイムゾーン設定を考慮します) |
-| `post_modified` / `post_modified_gmt` | 本文や添付の中身を編集した時刻です | **変更しません**。補正は内容の編集ではないためです |
+| `ID` | 添付ファイルの ID | 補正対象のキーである |
+| `post_type` | 常に `attachment` | フィルター条件である |
+| `post_date` | メディアの「日付」として、UI や年月フィルターに使用される | **補正の主対象である** (パスとの不一致の一方である) |
+| `post_date_gmt` | UTC の日時 | `post_date` を変更する際、コアの慣例に合わせ **整合を取る** (サイトのタイムゾーン設定を考慮する) |
+| `post_modified` / `post_modified_gmt` | 本文や添付の中身を編集した時刻 | **意図は維持**。取得済みの値を `wp_update_post` 配列に **必ず渡す** (キー省略禁止。省略するとコアが now にする) |
 
 ### `wp_postmeta`
 
 | メタキー | 説明 | 本プラグインでの扱い |
 | --- | --- | --- |
-| `_wp_attached_file` | アップロード相対パスです (例: `2017/12/bnr_nec.jpg`) | **年月抽出の「Source Truth」です** (コンセプトの「不整合」の他方です) |
+| `_wp_attached_file` | アップロード相対パス (例: `2017/12/bnr_nec.jpg`) | **年月抽出の Source of Truth** (パスとの不一致の他方) |
 
 その他のメタ (`_wp_attachment_metadata` 等) は、本プラグインの **初期スコープでは読み取り専用** とします。寸法・サムネイルパスと日付の矛盾を直す要件が出た場合は、別タスクで拡張します。
 
 #### 設計方針 (規約)
 
-* パスから年月を読めない場合は、エラーではなく一覧の `unknown` とします。デフォルトの一括補正と Date Correct (All) には入れません。補正リクエストに入った場合は `skipped` とし、`error` にはしません。
+* パスから年月を読めない場合は、エラーではなく一覧の `unknown` とする。`correct-query` では補正対象にも `results` にも入れない。`correct` に送られた場合だけ `skipped` とし、`error` にはしない。
 
 #### パス形式の前提と例外
 
@@ -52,7 +62,7 @@
 
 #### 非対応ケース
 
-下記の場合は、一覧を `unknown` とします。補正リクエストに入った場合は、更新せず `skipped` とします。
+下記の場合は、一覧を `unknown` とします。`correct` に入った場合は、更新せず `skipped` とします。`correct-query` では補正対象にしません。
 
 * 先頭が、上記の正規表現に合わない
 * 年が1000未満、または9999を超える
@@ -66,14 +76,14 @@
 ## 更新ポリシー
 
 * `_wp_attached_file`:
-  * 読み取り専用です (変更しません)。
+  * 読み取り専用である (変更しない)。
 
 * `post_date`:
-  * サイトのタイムゾーンで、`yyyy-mm-01 00:00:00` 形式に補正します。
-  * パスに日も時刻もないので、1日の0時に固定します。
+  * サイトのタイムゾーンで、`yyyy-mm-01 00:00:00` 形式に補正する。
+  * パスに日も時刻もないので、1日の0時に固定する。
 * `post_date_gmt`:
-  * 上記のローカル時刻を `get_gmt_from_date` に渡した値です。
-  * ローカル時刻と同じ文字列は入れません。
+  * 上記のローカル時刻を `get_gmt_from_date` に渡した値である。
+  * ローカル時刻と同じ文字列は入れない。
 
 ### 日付正規化とタイムゾーン
 
@@ -83,8 +93,8 @@
 
 #### 注意点
 
-* UTC は直接計算しません。
-* サマータイムやオフセットは、WordPress の内部関数に委譲します。
+* UTC は直接計算しない。
+* サマータイムやオフセットは、WordPress の内部関数に委譲する。
 
 ## 設定配列・オプション (options)
 
@@ -116,9 +126,9 @@
 
 [管理画面 UI 仕様](./admin_ui_spec.md) の差分列に対応します。値は `match`、`mismatch`、`unknown` です。画面に出す文字は、下記のとおりです。
 
-* `match` は「一致」です。
-* `mismatch` は「不一致」です。
-* `unknown` は「不明」です。
+* `match` は「一致」である。
+* `mismatch` は「不一致」である。
+* `unknown` は「不明」である。
 
 この3つの文字は、PHP の差分列が gettext で出します。値そのものは翻訳しません。REST の `ResultItem.status` には、この3値を使いません。
 
@@ -126,9 +136,11 @@
 | --- | --- | --- |
 | `match` | 一致 | `post_date` の年月とパス年月が一致 |
 | `mismatch` | 不一致 | 年月が一致しておらず、補正候補 |
-| `unknown` | 不明 | `_wp_attached_file` がない、または先頭が `yyyy/mm` でない状態です。`post_date` が読めなくても、パスの年月が取れる場合は含めません |
+| `unknown` | 不明 | `_wp_attached_file` がない、または先頭が `yyyy/mm` でない状態である。`post_date` が読めなくても、パスの年月が取れる場合は含めない |
 
 ### `AttachmentDateRow` - 一覧列の論理モデル
+
+一覧の列にも REST の応答にも、補正候補の日時フィールドは出しません。書く文字列は、更新の際にサービスが作ります。
 
 | フィールド | 型 | 説明 |
 | --- | --- | --- |
@@ -137,24 +149,22 @@
 | `pathYm` | `string \| null` | パス由来の `yyyy/mm` (未設定またはパース不可の場合は、`null`) |
 | `status` | `MismatchStatus` | 差分状態 (`unknown` を含む) |
 
-一覧の列にも REST の応答にも、補正候補の日時フィールドは出しません。書く文字列は、更新の際にサービスが作ります。
-
 ### 欠損データの扱い - nullable、unknown
 
 本プラグインでは、`_wp_attached_file`、`post_date`、およびそれらから導出される値が取得できない場合を、**例外ではなく通常状態として扱います**。
 
 #### 設計意図 (ゴール)
 
-* データ不整合を「例外」ではなく「状態」として扱います。
-* バッチ処理における停止を防ぎます。
-* UI、API、サービス間の分岐を、単純化します。
+* パスと日付の不一致を「例外」ではなく「状態」として扱う。
+* バッチ処理における停止を防ぐ。
+* UI、API、サービス間の分岐を、単純化する。
 
 #### 基本方針
 
-* パスが読めない欠損は、`null` または一覧の `unknown` として表現します。
-* 処理を中断せず、UI に状態として反映します。
-* パスが読めない件は、デフォルトの一括補正から外します。リクエストに入った場合は `skipped` です。
-* `post_date` が読めなくても、パスの年月が取れる件は補正します。
+* パスが読めない欠損は、`null` または一覧の `unknown` として表現する。
+* 処理を中断せず、UI に状態として反映する。
+* パスが読めない件は、`correct-query` では補正対象外である (`results` に出さない)。`correct` に入った場合だけ `skipped` である。
+* `post_date` が読めなくても、パスの年月が取れる件は補正する。
 
 #### フィールド別定義
 
@@ -162,8 +172,8 @@
 | --- | --- | --- |
 | `_wp_attached_file` | `string` | 未設定または空の場合は、`null` |
 | `pathYm` | `string \| null` | パース不可の場合は、`null` |
-| `post_date` | `string` | 原則として存在します。不正値でも `pathYm` があれば、パスの年月で補正します |
-| `postDateYm` | `string \| null` | 抽出不可の場合は、`null` です。`pathYm` がある場合は補正を続けます |
+| `post_date` | `string` | 原則として存在する。不正値でも `pathYm` があれば、パスの年月で補正する |
+| `postDateYm` | `string \| null` | 抽出不可の場合は、`null` である。`pathYm` がある場合は補正を続ける |
 
 #### ステータスとの関係
 
@@ -177,18 +187,18 @@
 
 #### UI との関係
 
-* `unknown` は、差分列で「不明」と表示します。これは一覧の `MismatchStatus` です。
-* デフォルトの一括補正と Date Correct (All) には、含めません。
-* 行操作などで補正リクエストに入っても、更新しません。
+* `unknown` は、差分列で「不明」と表示する。これは一覧の `MismatchStatus` である。
+* `correct-query` では補正対象にも `results` にも含めない。`correct` に送られた場合は `skipped` である。
+* 行操作などで `correct` に入っても、更新しない。
 
 #### REST API との関係
 
-* `ResultItem.status` に `match`、`mismatch`、`unknown` は使いません。
-* パスから年月を読めない件は、HTTP `200` の `skipped` です。`error` にはせず、再試行の対象にもしません。
-* `message` を付ける場合は、人間が読める文だけです。例は「ファイルパスから年月を読み取れないため、補正しません。」です。件別の機械可読コードは置きません。
-* `summary.skipped` に含めます。`summary.failed` には含めません。
-* 年月がすでに一致している件も `skipped` です。区別は `message` の文です。
-* `post_date` が読めなくても、パスの年月が取れる場合は更新します。この件は `skipped` にしません。
+* `ResultItem.status` に `match`、`mismatch`、`unknown` は使わない。
+* パスから年月を読めない件を `skipped` にするのは **`correct` のみ** である。`correct-query` では走査だけ進め、`results` に出さない。
+* `correct` で `message` を付ける場合は、人間が読める文だけである。例は「ファイルパスから年月を読み取れないため、補正しません。」です。件別の機械可読コードは置かない。
+* `correct` では `summary.skipped` に含める。`summary.failed` には含めない。
+* 年月がすでに一致している件も `skipped` である。区別は `message` の文である。
+* `post_date` が読めなくても、パスの年月が取れる場合は更新する。この件は `skipped` にしない。
 
 ### TypeScript 型定義 (完全版)
 
@@ -196,9 +206,9 @@
 
 #### 設計方針 (規約)
 
-* API レスポンスと UI 状態は、「同一構造」を共有します。
-* `nullable` は、明示的に扱います。
-* `unknown` を、「状態」として保持します。
+* API レスポンスと UI 状態は、「同一構造」を共有する。
+* `nullable` は、明示的に扱う。
+* `unknown` を、「状態」として保持する。
 
 #### 契約としての位置
 
@@ -235,10 +245,10 @@ type ResultStatus = 'success' | 'skipped' | 'error';
 
 補正 API の1件は、この型だけを使います。
 
-* `message` は、人間が読める文です。
-* `status` が `error` の場合は、`message` を必ず付けます。
-* `success` と `skipped` では、`message` は任意です。
-* 件別結果に、機械可読の理由コードは置きません。
+* `message` は、人間が読める文である。
+* `status` が `error` の場合は、`message` を必ず付ける。
+* `success` と `skipped` では、`message` は任意である。
+* 件別結果に、機械可読の理由コードは置かない。
 
 ```ts
 interface ResultItem {
@@ -262,6 +272,8 @@ interface Summary {
 
 #### APIResponse
 
+`POST …/attachments/correct` の応答形です。
+
 ```ts
 interface APIResponse {
   status: 'success' | 'partial' | 'error';
@@ -270,12 +282,29 @@ interface APIResponse {
 }
 ```
 
+#### CorrectQueryResponse
+
+Date Correct (All) 用の `POST …/attachments/correct-query` の応答形です。`APIResponse` に続き位置を足します。
+
+```ts
+interface CorrectQueryResponse extends APIResponse {
+  // WP_Query 結果上の次の走査位置。null の場合は完了。続きがある場合は次リクエストの offset に入れる
+  nextOffset: number | null;
+}
+```
+
+`offset` / `nextOffset` は WP_Query 結果上の走査位置です (パスから年月を読めない件も含みます)。1リクエストは `offset` から最大100件を走査し、パスから年月を読める件だけを補正します。`nextOffset` は `offset + 今回走査した件数` です。
+`summary.total` はその回の補正の試行件数です (パスから年月を読めない件は含めません)。`processed === total` かつ `summary.total` が100未満でも `nextOffset !== null` の場合は続きがあります。
+補正対象0件の窓でも `processed === total` かつ `nextOffset !== null` なら続きます。`processed < total` の場合は一連をやめます。
+Date Correct (All) の一連では、各応答の `summary` を加算し、`results` を連結します。
+詳細は [REST API 仕様](./rest_api_spec.md) です。
+
 トップレベル `status` は、下記のとおりです。
 
-* `error` が1件もなく、`processed` が `total` と一致する場合は `success` です。`skipped` だけでも同じです。
-* `error` と、`success` または `skipped` が混ざる場合は `partial` です。
-* 処理した件がすべて `error` の場合は `error` です。
-* `processed < total` の場合も `partial` です。
+* `error` が1件もなく、`processed` が `total` と一致する場合は `success` である。`skipped` だけでも同じである。
+* `error` と、`success` または `skipped` が混ざる場合は `partial` である。
+* 処理した件がすべて `error` の場合は `error` である。
+* `processed < total` の場合も `partial` である。
 
 ## データフロー
 
@@ -298,35 +327,35 @@ flowchart LR
 ```
 
 1. **READ**:
-  * 対象 `attachment` の `post_date` と `get_post_meta( ID, '_wp_attached_file', true )` を取得します。
+  * 対象 `attachment` の `post_date` と `get_post_meta( ID, '_wp_attached_file', true )` を取得する。
 2. **NORMALIZE**:
-  * パス先頭だけを、`^(\d{4})/(0[1-9]|1[0-2])/` で抽出します。年は1000以上、9999以下です。先頭にサブディレクトリがある場合は、`unknown` とします。
+  * パス先頭だけを、`^(\d{4})/(0[1-9]|1[0-2])/` で抽出する。年は1000以上、9999以下である。先頭にサブディレクトリがある場合は、`unknown` とする。
   * 補足 (欠損データ)
-    * `_wp_attached_file` が未設定、または先頭が `yyyy/mm` でない場合、`pathYm` は `null` です。一覧は `unknown` とします。
-    * `post_date` が不正な場合、`postDateYm` は `null` とします。`pathYm` がある場合は `mismatch` とし、パスの年月で補正します。
-    * `pathYm` が `null` の場合、比較は行わず `unknown` とします。
+    * `_wp_attached_file` が未設定、または先頭が `yyyy/mm` でない場合、`pathYm` は `null` である。一覧は `unknown` とする。
+    * `post_date` が不正な場合、`postDateYm` は `null` とする。`pathYm` がある場合は `mismatch` とし、パスの年月で補正する。
+    * `pathYm` が `null` の場合、比較は行わず `unknown` とする。
 3. **COMPARE**:
-  * 日 (dd) と時刻は無視し、年月のみ比較します ([管理画面 UI 仕様](./admin_ui_spec.md))。
+  * 日 (dd) と時刻は無視し、年月のみ比較する ([管理画面 UI 仕様](./admin_ui_spec.md))。
 4. **WRITE**:
-  * `mismatch` の場合だけ、`wp_update_post` を1回呼びます。
-  * 同じ配列に、新しい `post_date`、`get_gmt_from_date` の `post_date_gmt`、取得済みの `post_modified` と `post_modified_gmt` を渡します。
-  * コアは、`post_modified` と `post_modified_gmt` が空の場合だけ、現在時刻を入れます。値を渡せば、その値が残ります。
-  * 書いたあとにもう一度更新して戻すことはしません。
-  * `skipped` の件は、`wp_update_post` を呼びません。
+  * `mismatch` の場合だけ、`wp_update_post` を1回呼ぶ。
+  * 同じ配列に、新しい `post_date`、`get_gmt_from_date` の `post_date_gmt`、取得済みの `post_modified` と `post_modified_gmt` を **必ず渡す** (キー省略禁止)。
+  * コアは、`post_modified` と `post_modified_gmt` が空または省略の場合に現在時刻を入れる。取得値を渡せば、その値が残る。
+  * 書いたあとにもう一度更新して戻すことはしない。
+  * `skipped` の件は、`wp_update_post` を呼ばない。
 
 ## データ更新内容 (まとめ)
 
+[冪等性 (べきとうせい)](./architecture.md#冪等性-べきとうせい): `match` の項目を再実行しても、スキップまたは no-op にできるよう、サービス層で判定します。
+
 | 対象 | 更新内容 |
 | --- | --- |
-| `wp_posts.post_date` | パス上の `yyyy/mm` に対応する **`yyyy-mm-01 00:00:00`** (サイトのローカルタイム) に変更します |
-| `wp_posts.post_date_gmt` | 上記のローカル時刻を `get_gmt_from_date` に渡した値です。同じ文字列は入れません |
-| `wp_posts.post_modified` / `post_modified_gmt` | **変更しません**。`wp_update_post` には、取得済みの値を渡します |
-| `_wp_attached_file` | **変更しません** |
-| その他メタ | 初期スコープでは **変更しません** |
-
-[冪等性 (べきとうせい)](./architecture.md#冪等性-べきとうせい): `match` の項目を再実行しても、スキップまたは no-op にできるよう、サービス層で判定します。
+| `wp_posts.post_date` | パス上の `yyyy/mm` に対応する **`yyyy-mm-01 00:00:00`** (サイトのローカルタイム) に変更する |
+| `wp_posts.post_date_gmt` | 上記のローカル時刻を `get_gmt_from_date` に渡した値である。同じ文字列は入れない |
+| `wp_posts.post_modified` / `post_modified_gmt` | **意図は維持**。取得済みの値を配列に **必ず渡す** (省略禁止。省略するとコアが now にする) |
+| `_wp_attached_file` | **変更しない** |
+| その他メタ | 初期スコープでは **変更しない** |
 
 ## セキュリティ・整合性 (データ観点)
 
-* 更新対象 ID は、必ず **`attachment` かつ、権限のある投稿** に限定します。
-* パスから年月を読めない場合は、一覧では **`unknown`** と表示し、デフォルトの一括補正と Date Correct (All) から外します。補正リクエストに入った場合は **`skipped`** です。`post_date` が読めなくても、パスの年月が取れる場合は補正します。
+* 更新対象 ID は、必ず **`attachment` かつ、権限のある投稿** に限定する。
+* パスから年月を読めない場合は、一覧の値は **`unknown`**、画面では「不明」と表示する。`correct-query` では補正対象外である。`correct` に入った場合だけ **`skipped`** である。`post_date` が読めなくても、パスの年月が取れる場合は補正する。

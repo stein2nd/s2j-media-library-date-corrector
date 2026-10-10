@@ -2,6 +2,17 @@
 
 ## unreleased
 
+## 1.0.6 - 2026-10-10
+
+### Changed
+
+* `status.md` を機能一覧で埋めた。WordPress 下限を6.9+、共通リンクを `SPECS.md` に統一。README クイックスタートを三操作 + 案内に拡張
+* `CorrectQueryResponse` (`nextOffset`) をデータ辞書に追加。`offset` / `nextOffset` は WP_Query の走査位置。続きは `processed === total` かつ `nextOffset !== null` の場合だけ。`processed < total` なら一連をやめる
+* Date Correct (All) は走査窓をまたいで `summary` 加算・`results` 連結。完了時の status / Retry Failed は集約後から。補正対象0件の窓でも続きがあれば継続
+* パス不能の `skipped` は `correct` のみ。`correct-query` では対象外。`post_modified*` は取得した値を必ず渡すと明記
+* UI 状態を `loading` に一本化。処理中件数は `{count}` / 直近の `summary.total`。再読み込みは加算後 `summary.success` がある場合だけ
+* 「デフォルトの一括補正」を Date Correct / All に言い換え。一覧は値 `unknown` / 画面「不明」。architecture から Repository / `features/` を外し、Service 内の DB 更新と明記
+
 ## 1.0.6 - 2026-10-09
 
 ### Changed
@@ -86,7 +97,7 @@
 
 ### Changed
 
-* S2J Docs Linter の運用を Git submodule から npm パッケージ (`@s2j/docs-linter`) へ切り替え。
+* S2J Docs Linter の運用を Git submodule から npm パッケージ (`@s2j/docs-linter`) に切り替え。
 * 依存 npm モジュールを最新化 (`@wordpress/*`、`@s2j/docs-linter` ほか)。
 * 依存 npm モジュールを再更新 (`TypeScript` v7.0、`@wordpress/block-editor` v16.0、`@wordpress/scripts` v33.0、`Vite` v8.1、`Rollup` v4.62ほか)。
 * VS Code の textlint 設定パスを `${workspaceFolder}` 基準に修正。

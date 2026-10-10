@@ -1,7 +1,6 @@
 # S2J MediaLibrary Date Corrector - 仕様書の起点
 
-本プロジェクトの仕様は、下記のドキュメントに分散して定義しています。
-共通仕様に加え、プラグイン固有の仕様を参照してください。
+本プロジェクトの仕様は、下記のドキュメントに分散して定義しています。共通仕様に加え、プラグイン固有の仕様を参照してください。
 
 ## 読み方ガイド
 
@@ -15,7 +14,7 @@
 その後は、下表の [概要](./overview.md) や [データ辞書](./data_dictionary.md) など、必要なトピックから参照してください。
 
 * 各仕様で散見される「意図・方針」について:
-  * 「意図 = ゴール」、「方針 = 意図を実現するための規約」という関係にあります。
+  * 「意図 = ゴール」、「方針 = 意図を実現するための規約」という関係にある。
 
 ```mermaid
 flowchart TD
@@ -27,7 +26,7 @@ flowchart TD
 
 ## 共通仕様
 
-* [WP_PLUGIN_SPEC.md (共通仕様)](https://github.com/stein2nd/wp-plugin-spec/blob/main/docs/WP_PLUGIN_SPEC.md)
+* [SPECS.md (共通仕様)](https://github.com/stein2nd/wp-plugin-spec/blob/main/docs/SPECS.md)
 
 ## プラグイン固有の仕様
 
