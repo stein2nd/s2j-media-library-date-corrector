@@ -1,6 +1,6 @@
 {
   "name": "s2j-media-library-date-corrector",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "S2J MediaLibrary Date Corrector is a tool designed to resolve metadata inconsistencies that occur after bulk media uploads in WordPress.",
   "type": "module",
   "author": "Koutarou ISHIKAWA",
