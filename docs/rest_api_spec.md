@@ -52,7 +52,7 @@ OpenAPI、zod、生成スクリプトは、初期リリースに置きません�
 | ヘッダー | 必須 | 説明 |
 | --- | --- | --- |
 | `X-WP-Nonce` | ログインユーザー操作時は **必須** である。 | `wp_create_nonce('wp_rest')` の値である。`api-fetch` はデフォルトで付与する。 |
-| `Content-Type` | POST または PUT の場合 **必須** である。 | `application/json` とする。 |
+| `Content-Type` | POST の場合 **必須** である。 | `application/json` とする。 |
 
 ### レスポンス形式
 
@@ -374,9 +374,8 @@ current_user_can('edit_post', $id)
 
 リクエストが受理された場合 (`HTTP 200`)、対象 ID ごとに個別の権限チェックを行います。
 
-* 権限がある場合は、正常処理 (`success`) とする。
-* 権限がない場合は、当該件のみ `status` を `error` とし、`message` に人間が読める文を入れる。
-* すでに補正済みの場合は、`skipped` とする。
+* `edit_post` がない場合は、当該件のみ `status` を `error` とし、`message` に人間が読める文を入れる。
+* `edit_post` がある場合に限り、サービスが判定する。更新した場合は `success`、年月がすでに一致している場合は `skipped` とする。
 * `correct` でパスから年月を読めない場合も、当該件のみ `skipped` とする。`error` にはしない。`correct-query` では補正対象に入れない。
 
 #### レスポンス表現
@@ -436,9 +435,9 @@ Date Correct (All) の全件は、2つ目のクエリーが返す範囲です。
 
 ## 制限
 
-* 1リクエストあたり、最大100件である。
-* 通常の操作は、クライアントが100件ずつ送る。ID の一括は、クライアントが分割する。
-* `POST /attachments/correct` の `ids` が101件以上の場合は、1件も更新せず `HTTP 400` を返す。`register_rest_route` の `args` に `maxItems: 100` を置き、コアの検証に任せる。コードは `rest_invalid_param` である。
+* 1リクエストあたり、最大100件である (受信配列の長さ。重複込み)。
+* 通常の操作は、クライアントが100件ずつ送る。ID の一括は、クライアントが分割する。クライアントは同一 ID を重複して送らない。
+* `POST /attachments/correct` の `ids` が101件以上の場合は、1件も更新せず `HTTP 400` を返す。`register_rest_route` の `args` に `maxItems: 100` を置き、コアの検証に任せる。コードは `rest_invalid_param` である。受理後に重複を排除し、`summary.total` はユニーク化後である。
 * この `400` は自動再送しない。自動再送は、応答本文がない場合だけである。先頭の100件だけを処理して残りを捨てる応答にはしない。
 * Date Correct (All) は `correct-query` である。サーバーが最大100件ずつ走査し、続きに進むのは `processed === total` かつ `nextOffset !== null` の場合だけである。`processed < total` では次窓を自動送信しない。
 
@@ -514,7 +513,7 @@ Date Correct (All) の全件は、2つ目のクエリーが返す範囲です。
 
 | フィールド | 型 | 必須 | 説明 |
 | --- | --- | --- | --- |
-| `ids` | `number[]` | はい | 添付ファイルの ID である。最大100件である。行の Date Correct、一括の Date Correct、Retry Failed が送る。101件以上は `HTTP 400` の `rest_invalid_param` で、1件も更新しない。 |
+| `ids` | `number[]` | はい | 添付ファイルの ID である。最大100件である (受信配列の長さ。重複込み)。行の Date Correct、一括の Date Correct、Retry Failed が送る。101件以上は `HTTP 400` の `rest_invalid_param` で、1件も更新しない。受理後に重複を排除し、`summary.total` はユニーク化後である。 |
 
 **Response JSON (例)**
 
@@ -558,12 +557,14 @@ Date Correct (All) の全件は、2つ目のクエリーが返す範囲です。
 #### 件数
 
 * `args` の `maxItems` は100である。検証は、WordPress コアに任せる。
-* 101件以上は、`HTTP 400` の `rest_invalid_param` である。1件も更新しない。先頭の100件だけを残す応答にはしない。
+* 件数チェックの対象は、**受信した配列の長さ**である (重複を除く前)。101件以上は、`HTTP 400` の `rest_invalid_param` である。1件も更新しない。先頭の100件だけを残す応答にはしない。
+* ユニーク化後の件数が100以下でも、受信長が101以上なら `400` である。
 
 #### 一意性
 
-* 同一 ID の重複は、許容しない。
-* 重複が含まれる場合、サーバー側で排除する。
+* クライアントは、同一 ID を重複して送らない (クライアント規約)。
+* 受理後、サーバーは防御として重複を排除する。`summary.total` と `results` は、**ユニーク化後**の件数・件別結果である。
+* 重複排除は `400` の理由にはしない。件数超過だけが `400` である。
 
 #### 順序
 

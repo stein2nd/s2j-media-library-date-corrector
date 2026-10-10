@@ -6,6 +6,10 @@
 
 ### Changed
 
+* `ids` の `maxItems` は受信配列の長さ (重複込み)。受理後にユニーク化し、`summary.total` はユニーク化後。クライアントは重複を送らない
+* 補正の正本を `_wp_attached_file` と明記 (ディスクは読まない)。architecture の REST (PHP) と `src/api/` を分離。`edit_post` 後はサービス判定。一括 Date Correct と All のスコープ見出しを分離
+* Idle の「差分を確認してください」は常時ヒント。`Retry Failed` 表記と「ですある」を直し、Content-Type は POST のみにそろえた。`status.md` 最終更新を2026-10-10に
+
 * `status.md` を機能一覧で埋めた。WordPress 下限を6.9+、共通リンクを `SPECS.md` に統一。README クイックスタートを三操作 + 案内に拡張
 * `CorrectQueryResponse` (`nextOffset`) をデータ辞書に追加。`offset` / `nextOffset` は WP_Query の走査位置。続きは `processed === total` かつ `nextOffset !== null` の場合だけ。`processed < total` なら一連をやめる
 * Date Correct (All) は走査窓をまたいで `summary` 加算・`results` 連結。完了時の status / Retry Failed は集約後から。補正対象0件の窓でも続きがあれば継続
