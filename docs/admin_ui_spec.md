@@ -6,7 +6,7 @@
 
 ## 画面概要
 
-本プラグインは、WordPress の「メディア > ライブラリ」一覧画面を拡張し、メディアの「日付 (`post_date`)」とファイルパス由来の年月との不一致を可視化・補正する機能を提供します。
+本プラグインは、WordPress の「メディア > ライブラリ」一覧画面を拡張し、メディアの「日付 (`post_date`)」と `_wp_attached_file` 由来の年月 (UI ではファイルパスと表記) との不一致を可視化・補正する機能を提供します。
 
 既存の一覧テーブル (List View) に対して、下記を追加します。
 
@@ -35,9 +35,9 @@ WordPress 標準の UI 構造に準拠し、ユーザーの認知負荷を低減
 
 本プラグインは、既存の「メディア > ライブラリ」一覧に、列と一括操作を追加して操作します。
 
-初期リリースに、設定画面を1つ置きます。場所は「設定」メニューです。保存は Settings API で、`manage_options` です。option は `s2j_mldc_mismatch_notice` の1つです。未保存の場合は、案内を出します。
+初期リリースに、設定画面を1つ置きます。場所は「設定」メニューです。保存は Settings API で、`manage_options` です。option は `s2j_mldc_mismatch_notice` の1つです。真偽の意味は [データ辞書](./data_dictionary.md#設定配列オプション-options) に従います (未保存および `true` は案内を出す、`false` は出さない)。
 
-案内は、メディアライブラリの List View だけです。表示中のページに「不一致」が1件でもある場合、「ファイルパスの年月と日付が一致しない項目があります。差分列を確認し、Date Correct で補正してください。」と出します。一括取り込みのあとも、同じ案内です。見るのはそのページの attachment だけで、ライブラリ全体は数えません。
+案内は、メディアライブラリの List View だけです。表示中のページに差分列 `mismatch` (「不一致」) が1件でもある場合、「ファイルパスの年月と日付が一致しない項目があります。差分列を確認し、Date Correct で補正してください。」と出します (判定は `_wp_attached_file` と `post_date` の比較)。`unknown` (「不明」) だけでは案内を出しません。一括取り込みのあとも、同じ案内です。見るのはそのページの attachment だけで、ライブラリ全体は数えません。
 
 列、行の Date Correct、一括の Date Correct、Date Correct (All) は、常に有効です。この option では切り替えません。補正 API も、この option では拒みません。案内を出さないようにする手段は、設定画面でチェックを外すことです。補正そのものをやめる手段は、プラグインの無効化です。
 
@@ -61,7 +61,7 @@ WordPress 標準の UI 構造に準拠し、ユーザーの認知負荷を低減
 
 本画面は、下記の役割を担います。
 
-* メディアの `post_date` と、ファイルパス由来の年月の差分を可視化します。
+* メディアの `post_date` と、`_wp_attached_file` 由来の年月 (UI ではファイルパス) の差分を可視化します。
 * 選択的または一括で、補正処理を実行します。
 
 一覧の取得、検索、ページ分割、並び順は、WordPress 標準のメディアライブラリに任せます。
@@ -161,6 +161,13 @@ WordPress 標準の UI 構造に準拠し、ユーザーの認知負荷を低減
 * WordPress 標準のナビゲーションに、準拠する。
 * 設定画面は、`add_options_page` で「設定」メニューに足す。
 
+### 設定画面 (案内の表示)
+
+* 画面: 設定 > メディアの日付
+* フィールド: チェックボックス1つ。ラベル例: メディアライブラリで不一致の案内を表示する
+* 保存キー: `s2j_mldc_mismatch_notice` (`true` = 案内を出す、`false` = 出さない)。未保存は案内を出す。
+* help テキスト例: 表示中のページに不一致 (`mismatch`) がある場合だけ、List View 上部に案内を出します。補正操作そのものは切り替えません。
+
 ### メディアライブラリ (操作画面)
 
 * 画面: `upload.php` の List View
@@ -184,8 +191,8 @@ WordPress 標準の UI 構造に準拠し、ユーザーの認知負荷を低減
 | --- | --- |
 | idle | 初期状態 (未実行) |
 | loading | 処理実行中 |
-| success | 失敗がなく、処理が最後まで終わった状態である。`skipped` だけも含む |
-| partial | 失敗が混ざる、または未処理が残る状態である。表示は警告である |
+| success | 失敗がなく、処理が最後まで終わった状態である。`skipped` だけも含む (Date Correct (All) と ID 分割の **一連完了** は [複数走査窓の集約 - Date Correct (All)](./rest_api_spec.md#複数走査窓の集約---date-correct-all) の表どおりの正常終了時のみ) |
+| partial | 失敗が混ざる、または未処理が残る状態である (`summary` 上の `processed < total`、または未送信の走査窓／チャンクが残った [フォールバック](./rest_api_spec.md#フォールバック) 打ち切りを含む)。表示は警告である |
 | error | 処理した件がすべて失敗である |
 
 ### 状態遷移
@@ -204,11 +211,13 @@ flowchart TD
 | partial | partial |
 | error | error |
 
+単発の `POST …/attachments/correct` および **1チャンクだけ**で終わる完了時は、上表どおり最後の応答の REST `status` を UI に載せてよい。Date Correct (All) と ID 分割の **一連完了** では、各応答の `status` をそのまま使わず、`summary` 加算・`results` 連結後に UI `status` を再計算する。再計算の優先順位 (自動再送 [フォールバック](./rest_api_spec.md#フォールバック) による打ち切りを含む) は [REST API 仕様 > 複数走査窓の集約 - Date Correct (All)](./rest_api_spec.md#複数走査窓の集約---date-correct-all) の表に従う。
+
 #### 実装との関係
 
 UI 状態は、reducer により管理されます。
 
-詳細な実装は、[アーキテクチャー > reducer設計 - 状態遷移](./architecture.md#reducer-設計---状態遷移) をご覧ください。
+詳細な実装は、[アーキテクチャー > reducer 設計 - 状態遷移](./architecture.md#reducer-設計---状態遷移) をご覧ください。
 
 ## UI メッセージ
 
@@ -223,7 +232,7 @@ UI メッセージは、「UI 状態 (State)」および REST API のレスポ�
 * `results` は、完了の通知で使う。デバッグ出力にはしない。通知の見出しは `summary` の件数である。同じ通知にサーバーの `message` をそのまま足すのは、`status` が `error` の件と、`status` が `skipped` で `message` がある件である。`success` の `message` は足さない。
 * メッセージは、簡潔かつ行動指針 (次に何をすべきか) を含める。
 * UI は、派生情報を計算して表示する。
-* 未処理の件数は、`total - processed` である。画面は警告だけ出す。続けるかは、ユーザーが決める。
+* 未処理の件数は、`total - processed` である (加算後)。残走査窓／残チャンクは orchestrator が別途把握する ([未処理の件数](#未処理の件数))。画面は警告だけ出す。続けるかは、ユーザーが決める。
 
 ### 表示方針
 
@@ -266,6 +275,7 @@ UI 状態名は `loading` です (「Processing」とは書かない)。
 
 * 表示は警告である。
 * 「{success} 件成功、{failed} 件失敗、{skipped} 件スキップされました」
+* 未処理またはフォールバック打ち切りのときは、[完了の表示](#完了の表示) どおり「一部未処理の項目があります」を足す。
 
 #### Error (全体失敗)
 
@@ -277,7 +287,7 @@ UI 状態名は `loading` です (「Processing」とは書かない)。
 個別の理由は、完了の通知に出します。行の中には出しません。デバッグ出力にはしません。
 
 * `status` が `error` の `message` は、必ず出す。
-* `status` が `skipped` で `message` がある場合は、その文を出す。年月が一致している場合と、パスから年月を読めない場合の区別は、この文である。
+* `status` が `skipped` で `message` がある場合は、その文を出す。年月が一致している場合と、パスから年月を読めない場合の区別は、この件別文である (完了通知の **見出し** では [Success のとおり](#success-失敗がない) 区別しない)。
 * `success` の `message` は、通知に足さない。補正した件数の文で足りる。
 
 この文は人間が読める形でサーバーが返します。UI は、理由コードから文言に変換しません。Retry Failed が再送する ID は、`results` のうち `status === "error"` の件です。
@@ -288,12 +298,14 @@ UI 状態名は `loading` です (「Processing」とは書かない)。
 
 #### 表示条件
 
-* 警告は、`summary.failed > 0` または未処理が残る場合だけ出す。`skipped` だけでは出さない。
+* 警告は、`summary.failed > 0` または未処理が残る場合だけ出す。`skipped` だけでは出さない。未処理には、加算後 `processed < total` と、[フォールバック](./rest_api_spec.md#フォールバック) 打ち切り (残走査窓／残チャンク) の両方を含む。
 * `summary.failed > 0` の場合:
   * 「失敗した {failed} 件を再試行できます」と表示する。
 * `processed < total` の場合:
   * 「一部未処理の項目があります」と表示する。Retry Failed は出さない。
   * Date Correct (All) と ID 分割では、一連をやめる。`nextOffset` や残チャンクは自動送信しない。
+* orchestrator がフォールバック打ち切り (残 `nextOffset` または残チャンク) と判定した場合:
+  * 加算後 `total - processed` が0でも UI `status` は `partial` (警告) とし、「一部未処理の項目があります」を表示する。Retry Failed は、連結済み `results` に `status === "error"` がある場合だけ出す ([自動再送が尽きた場合](#自動再送が尽きた場合-応答本文なし) の Retry Failed ルール)。
 
 #### 操作
 
@@ -308,11 +320,12 @@ UI 状態名は `loading` です (「Processing」とは書かない)。
 
 ### 未処理の件数
 
-未処理の件数は、`total - processed` です。応答に `not_processed` はありません。
+未処理の件数は、`total - processed` です。応答に `not_processed` はありません。Date Correct (All) と ID 分割では、判定に使う `summary` は **加算後** の値です (単一応答だけを見ない)。
 
 #### 表示条件
 
-* `total - processed` が1以上の場合、「一部未処理の項目があります」と表示する。
+* (集約後) `total - processed` が1以上の場合、「一部未処理の項目があります」と表示する。
+* フォールバック打ち切りで残走査窓／残チャンクがある場合も、上記と同じ文を表示する (`total - processed` が0でも可)。UI `status` は `partial` である ([再試行 (リトライ) 誘導](#再試行-リトライ-誘導) および [REST API 仕様 > フォールバック](./rest_api_spec.md#フォールバック))。
 * 一覧テーブルには、未処理の行を足さない。
 * Retry Failed は出さない。Date Correct (All) / ID 分割では一連をやめる。続けるかは、警告を見たユーザーが決める。
 
@@ -373,7 +386,7 @@ sprintf(
 
 * 成功の場合は、補正件数とスキップ件数である。
 * 失敗が混ざる場合は警告である。成功、失敗、スキップの件数である。
-* 未処理が残る場合も警告である。「一部未処理の項目があります」を足す。
+* 未処理が残る場合も警告である (`processed < total`、またはフォールバック打ち切り)。「一部未処理の項目があります」を足す。
 * 処理した件がすべて失敗の場合は、エラーの文である。
 
 件別の `message` を同じ通知に足すのは、`error` の件と、`message` がある `skipped` の件です。`success` の `message` は足しません。行の中には出しません。
@@ -468,7 +481,7 @@ Toast は置きません。「補正が完了しました」は使いません�
 
 一覧テーブルは、下記の目的で使用します。
 
-* メディアの `post_date` と、ファイルパス由来の年月の差分の可視化
+* メディアの `post_date` と、`_wp_attached_file` 由来の年月 (UI ではファイルパス) の差分の可視化
 * 補正対象のメディアの選択
 * 一括または個別の補正操作の実行
 
@@ -700,8 +713,8 @@ Bulk Action は、WordPress 標準の位置です。
 
 完了後は、画面上部の通知1つです。Date Correct (All) では、一連の終了時だけ出します (走査窓ごとには出しません)。`processed < total` でやめた場合も、それまでの集約結果で警告を出します。
 
-* 失敗がなければ、成功の表示にする。文は一連で加算した `summary` の件数で変える。
-* 失敗が混ざる、または未処理が残る場合は、警告にする。完了時の UI `status` は加算後から再計算する。
+* 失敗がなく、かつ (集約後) `processed === total` のとき、成功の表示にする ([REST API 仕様 > 複数走査窓の集約 - Date Correct (All)](./rest_api_spec.md#複数走査窓の集約---date-correct-all) の表どおりの **正常終了** のみ。フォールバック打ち切り時は [自動再送が尽きた場合](#自動再送が尽きた場合-応答本文なし) のとおり `partial` 警告)。未処理 (`processed < total`) は成功扱いにしない。文は一連で加算した `summary` の件数で変える。
+* 失敗が混ざる、または未処理が残る場合は、警告にする。完了時の UI `status` は加算後から再計算する。再計算の優先順位 (自動再送 [フォールバック](./rest_api_spec.md#フォールバック) による打ち切りを含む) は [REST API 仕様 > 複数走査窓の集約 - Date Correct (All)](./rest_api_spec.md#複数走査窓の集約---date-correct-all) の表に従う。
 * 件別の `message` は、連結した `results` から、`error` と、`message` がある `skipped` だけを、その通知にサーバーの文のまま出す。`success` の `message` は足さない。行の中には出さない。
 * Retry Failed は、連結後の `results` のうち `status === "error"` の ID である。
 
@@ -726,7 +739,17 @@ Bulk Action は、WordPress 標準の位置です。
 * 入力の `400`。`ids` が101件以上の場合もこれである。1件も更新せず、自動再送しない。
 * 応答本文がない場合。ネットワーク失敗、タイムアウト、HTTP `408`、`429`、`500`、`502`、`503`、`504` である。自動再送は、この場合だけである。
 
-画面は、完了時に `summary` の件数を出します。失敗が混ざる場合と、`processed < total` の場合は警告です。未処理だけでは Retry Failed は出しません。
+#### 自動再送が尽きた場合 (応答本文なし)
+
+同一チャンクを最大3回まで自動再送したあとも `APIResponse` が得られない場合は、下記とします (REST の [フォールバック](./rest_api_spec.md#フォールバック) と同型)。
+
+* Date Correct (All) と ID 分割では **一連をやめる**。`nextOffset` や残チャンクは自動送信しない。
+* 送る予定だった残走査窓 (`nextOffset` が非 null のまま) または残チャンクがある状態で打ち切った場合は、加算後 `processed === total` かつ `failed === 0` でも UI `status` は **`partial`** (警告) とする ([REST API 仕様 > フォールバック](./rest_api_spec.md#フォールバック))。
+* それより前のチャンクで `HTTP 200` の応答があれば、`summary` を加算し `results` を連結してから、画面上部に **警告** の完了通知を1つ出す。UI `status` は加算後から再計算する ([実行中の UI 状態](#実行中の-ui-状態) の完了表示および [REST API 仕様 > 複数走査窓の集約 - Date Correct (All)](./rest_api_spec.md#複数走査窓の集約---date-correct-all) に従う)。
+* 当該チャンクから本文が一度も取れないため、件別 `results` は増えない。Retry Failed は、連結済み `results` に `status === "error"` がある場合だけ出す。
+* 単発の `correct` で1チャンクだけの場合は、通知は「処理に失敗しました」系の **error** 表示でよい (`summary` がない)。
+
+画面は、完了時に `summary` の件数を出します。失敗が混ざる場合、`processed < total` の場合、フォールバック打ち切り ([自動再送が尽きた場合](#自動再送が尽きた場合-応答本文なし)) の場合は警告です。未処理だけでは Retry Failed は出しません。
 
 ## 操作フロー
 

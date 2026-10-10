@@ -72,10 +72,10 @@ OpenAPI、zod、生成スクリプトは、初期リリースに置きません�
 
 * **トップレベル `status`**
   * 全体の結果区分である。
-  * 値は `success` (失敗がなく、処理が最後まで終わった)、`partial` (失敗とそれ以外が混ざる、または未処理が残る)、`error` (処理した件がすべて失敗) である。`skipped` だけでは `partial` にしない。
+  * 値は `success` (当該1リクエストで失敗がなく処理が最後まで終わった)、`partial` (失敗とそれ以外が混ざる、または未処理が残る)、`error` (処理した件がすべて失敗) である。`skipped` だけでは `partial` にしない。定義の詳細は [レスポンス表現](#レスポンス表現) の表 (クライアント集約 UI は [複数走査窓の集約 - Date Correct (All)](#複数走査窓の集約---date-correct-all) の表) である。
 * **`summary`**
   * UI やログ向けの統計である。
-  * `total` はその1リクエストの対象件数、`processed` は試行件数、ほかに `success`、`skipped`、`failed` を含む。一覧の全件数ではない。
+  * `total` はその1リクエストの対象件数、`processed` は試行件数、ほかに `success`、`skipped`、`failed` を含む。一覧の全件数ではない。エンドポイント別の定義は [summary.total の定義](#summarytotal-の定義) を正とする。
 * **`results`**
   * 添付 ID ごとの結果である。
   * 各要素は [データ辞書の `ResultItem`](./data_dictionary.md#resultitem) である。`id` と **`status`** (`success`、`skipped`、`error`) を持つ。
@@ -92,7 +92,7 @@ HTTP ステータスと業務 `status` の対応は、[HTTP ステータス・�
 
 `summary.total` は、その1リクエストが処理対象にした件数です。
 
-* `/attachments/correct` では、送った ID の件数である。行アクションやチェックで入った、パスから年月を読めない行も含まれる。結果は `skipped` である。
+* `/attachments/correct` では、**ユニーク化後**の ID 件数である (受理後に重複を排除したあとの試行件数)。行アクションやチェックで入った、パスから年月を読めない行も含まれる。結果は `skipped` である。通常、`processed` は `total` と一致する。
 * `/attachments/correct-query` では、その回の **補正の試行件数** である。パスから年月を読めない行は走査対象には入るが補正対象には入れないため、`summary.total` には含めない。
 * 続きに進むかは `processed === total` かつ `nextOffset !== null` である。`offset` / `nextOffset` は WP_Query 結果上の走査位置である。1リクエストは最大100件を走査し、パスから年月を読める件だけを補正する。`processed === total` かつ `summary.total` が100未満でも、`nextOffset !== null` の場合は続きがある。
 * `processed < total` は、そのリクエストの途中で止まったことである。Date Correct (All) では一連をやめ、次の走査窓は自動送信しない。
@@ -187,7 +187,7 @@ HTTP ステータスと業務 `status` の対応は、[HTTP ステータス・�
 
 #### `summary` の集計ルール
 
-`summary` は、下記のように算出します。
+`summary` は、下記のように算出します。`total` と `processed` のエンドポイント別の意味は、[summary.total の定義](#summarytotal-の定義) を正とします (`correct-query` では走査件数と一致しない場合がある)。
 
 * `total`: その1リクエストの対象件数である。一覧の全件数ではない。
 * `processed`: 実行の試行件数である。通常は `total` と一致する。
@@ -281,6 +281,7 @@ HTTP `200` で `APIResponse` が返った時点で、自動再送はやめます
 
 * UI は、`summary.failed` をもとに「再試行の対象件数」を表示する。
 * `processed < total` の場合は、「一部未処理」として警告表示を行う。
+* [フォールバック](#フォールバック) 打ち切り (残 `nextOffset` または残チャンク) の場合も UI `status` は `partial` 警告とし、加算後 `total - processed` が0でも「一部未処理の項目があります」を出す ([管理画面 UI 仕様 > 未処理の件数](./admin_ui_spec.md#未処理の件数))。
 
 #### リトライ UI 設計 (ボタン/UX)
 
@@ -372,9 +373,10 @@ current_user_can('edit_post', $id)
 
 #### 件別処理の扱い (「部分成功」前提)
 
-リクエストが受理された場合 (`HTTP 200`)、対象 ID ごとに個別の権限チェックを行います。
+リクエストが受理された場合 (`HTTP 200`)、対象 ID ごとに次の順で判定します。
 
-* `edit_post` がない場合は、当該件のみ `status` を `error` とし、`message` に人間が読める文を入れる。
+* 存在しない ID、または `post_type !== 'attachment'` の場合は、当該件のみ `status` を `error` とし、`message` に人間が読める文を入れる (例: 対象のメディアが見つかりません)。`skipped` にはしない。
+* 上記を満たしたあと、`edit_post` がない場合も、当該件のみ `error` とする。
 * `edit_post` がある場合に限り、サービスが判定する。更新した場合は `success`、年月がすでに一致している場合は `skipped` とする。
 * `correct` でパスから年月を読めない場合も、当該件のみ `skipped` とする。`error` にはしない。`correct-query` では補正対象に入れない。
 
@@ -387,8 +389,8 @@ current_user_can('edit_post', $id)
 
 | status  | 意味 |
 | --- | --- |
-| success | 失敗がなく、処理が最後まで終わった状態である。`skipped` だけも含む |
-| partial | 失敗と、`success` または `skipped` が混ざる状態である。未処理が残る場合も含む |
+| success | 失敗がなく、当該1リクエストの処理が最後まで終わった状態である。`skipped` だけも含む (クライアント集約 UI の `success` は [複数走査窓の集約 - Date Correct (All)](#複数走査窓の集約---date-correct-all) の表) |
+| partial | 失敗と、`success` または `skipped` が混ざる状態である。未処理が残る場合も含む (当該1リクエストの本文。クライアント集約 UI は同表) |
 | error | 処理した件がすべて失敗である |
 
 #### 採用方針
@@ -406,7 +408,7 @@ current_user_can('edit_post', $id)
 | 観点 | 対策 |
 | --- | --- |
 | CSRF | 認証済みリクエストでは、**REST nonce** (`wp_rest`) を検証する。 |
-| 認証 | ログインセッション (Cookie) とアプリケーションパスワード等の標準 REST 認証に準拠する。 |
+| 認証 | 初期リリースの想定は、管理画面からの Cookie セッションと REST nonce である。アプリケーションパスワード等の標準 REST 認証もコアに従えば動作しうるが、UI 仕様の検証対象外とする。 |
 | 入力検証 | `attachment` ID は、整数配列にキャストし、存在および `post_type === 'attachment'` を確認する。 |
 | エスケープ | レスポンス表示用の文字列は、管理者 UI 側でも適宜エスケープする。 |
 | レート制限 | コアに任せる。大量件数は、クライアントが100件ずつ送る。 |
@@ -486,7 +488,9 @@ Date Correct (All) の全件は、2つ目のクエリーが返す範囲です。
 
 #### フォールバック
 
-* 3回でも応答がなければ、そのチャンクを失敗として出す。続きは手動である。
+* 3回でも応答がなければ、そのチャンクを失敗として扱う。Date Correct (All) と ID 分割では **一連をやめる**。`nextOffset` や残チャンクは自動送信しない。それまでに `HTTP 200` の応答が得られていれば、`summary` を加算し `results` を連結してから警告通知を出す (UI の詳細は [管理画面 UI 仕様 > エラーハンドリング](./admin_ui_spec.md#エラーハンドリング))。
+* 送る予定だった残走査窓 (`nextOffset` が非 null のまま) または残チャンクがある状態で打ち切った場合は、加算後 `processed === total` かつ `failed === 0` でも UI `status` は **`partial`** (警告) とする。フィルター全体の走査／一連の完了ではない。
+* 当該チャンクから `APIResponse` が一度も得られない場合、Retry Failed は出せない (連結済み `results` に件別 `error` がある場合だけ、従来どおり Retry Failed 可)。
 * 手動の Retry Failed は、`results` のうち `status === "error"` の ID だけを `/attachments/correct` に再送する。
 
 ## エンドポイント一覧
@@ -633,7 +637,7 @@ Date Correct (All) の全件は、2つ目のクエリーが返す範囲です。
 | `processed < total` | **一連をやめる**。`nextOffset` が非 null でも次窓は自動送信しない。それまで加算・連結した結果で警告する。未処理は Retry Failed の対象外である。続けるかはユーザー判断である |
 | `summary` | 各応答の `total` / `processed` / `success` / `skipped` / `failed` を加算する |
 | `results` | 各応答の配列を **連結** する (上書きしない) |
-| 完了時の UI `status` | 加算後の件数から再計算する。`failed` 合計が1以上で success または skipped もある場合は `partial`。すべて失敗なら `error`。失敗がなければ `success` (`skipped` のみでも可) |
+| 完了時の UI `status` | 加算後の件数から再計算する。[フォールバック](#フォールバック) により残 `nextOffset` または残チャンクがある状態で打ち切った場合は **`partial`** (加算後 `processed === total` かつ `failed === 0` でも可)。加算後 `processed < total` の場合は `partial` (未処理。Retry Failed 対象外)。それ以外は、`failed` 合計が1以上で success または skipped もある場合は `partial`。すべて失敗なら `error`。上記以外で失敗がなければ `success` (`skipped` のみでも可) |
 | Retry Failed | 連結後の `results` のうち `status === "error"` の ID だけを `/attachments/correct` に再送する |
 | 件別 `message` | 連結後から、`error` と `message` がある `skipped` を完了通知に出す |
 
@@ -684,6 +688,8 @@ ID 一括のチャンク分割も同じです。あるチャンクが `processed
 `correct` は ID リストだけを受け取り、フィルター条件は解釈しません。
 
 `correct-query` は、許可リストにあるクエリー引数だけを解釈します。`paged` は対象範囲に使いません。
+
+サーバーは、`upload.php` のメディア一覧と同型の `WP_Query` を組み立てます。`post_type` は `attachment` に固定します。`post_status` など許可リストにない条件は、コアのメディアライブラリ一覧とそろえます (初期リリースでは `post_status` 用の独自クエリー引数は置きません)。`post_status` の具体値は本仕様では列挙しない。PHP 実装はコアのメディア一覧と同じ Query 組み立てに合わせ、一覧と `correct-query` の対象集合がずれないようにする。クライアントの `query` オブジェクトからは、許可キー (`s`、`m`、`post_mime_type`、`author`、`orderby`、`order`) だけをマージします。`paged` と `posts_per_page` は使わず、走査件数100と `offset` / `nextOffset` で対象集合を進めます。
 
 ## HTTP ステータス・コード (指針)
 

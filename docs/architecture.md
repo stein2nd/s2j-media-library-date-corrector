@@ -11,17 +11,16 @@
 ### 設計方針 (規約)
 
 * 責務ごとにディレクトリを分離する。
-* 副作用 (API) は、`api/` に閉じ込める。
+* クライアントの通信副作用は、`src/api/` に閉じ込める。
 * 型は、データ辞書を手で写す。初期リリースでは自動生成しない。
 
-#### 副作用 (API) の扱い
+#### クライアントの副作用の扱い
 
-本プロジェクトでは、外部との通信や状態変更を伴う処理を、関数型・アーキテクチャー文脈の用語を用いて「副作用」と定義します。
+本プロジェクトでは、管理画面 JavaScript が行う **外部通信** を、関数型文脈の用語「副作用」と呼びます (PHP の DB 更新は Service が担い、ここには含めません)。
 
-* 副作用の例:
-  * REST API 呼び出し
+* クライアント副作用の例:
+  * `@wordpress/api-fetch` による REST 呼び出し
   * ネットワーク通信
-  * ストレージ操作
 
 ### フォルダー構成 (想定)
 
@@ -48,7 +47,7 @@ s2j-media-library-date-corrector/
 │├─ `class-plugin.php`                    # 初期化・依存登録
 │├─ `class-rest-controller.php`           # REST の登録と権限
 │├─ `class-media-date-service.php`        # 年月抽出・比較・更新の核
-│├─ `class-media-library-list-table.php`  # 一覧カラム・一括操作 (※)
+│├─ `class-media-library-columns.php`  # 一覧カラム・一括操作 (仮称。フック拡張のみ) (※)
 │└─ ...
 ├┬─── src/  # TypeScript/React (管理画面) /SCSS ソース
 │├┬── admin/  # メディアライブラリ拡張 UI
@@ -63,7 +62,7 @@ s2j-media-library-date-corrector/
 ││└┬─ utils/  # ユーティリティ
 ││　├─ `errorHandler.ts`  # エラー・ハンドリング
 ││　└─ ...
-│├┬─ api/  # API 通信
+│├┬─ api/  # ディレクトリ `src/api/` — API 通信 (クライアント)
 ││├─ `client.ts`  # API コール (`api-fetch` ラッパー)
 ││└─ `endpoints.ts`  # エンドポイント定義
 │├┬─ styles/  # プラグイン用のスタイル定義
@@ -81,21 +80,21 @@ s2j-media-library-date-corrector/
 　　└─ `s2j-media-library-date-corrector-admin.js`
 ```
 
-**注記:** `WP_List_Table` を直接継承するのではなく、`manage_media_custom_column` 等のフィルターと `bulk_actions-upload` 等で拡張する想定です。ファイル名は実装時に確定します。
+**注記:** `WP_List_Table` を直接継承するのではなく、`manage_media_custom_column` 等のフィルターと `bulk_actions-upload` 等で拡張する想定です。上記 `class-media-library-columns.php` は仮称です。実装時に確定します。
 
 ### 各フォルダーの責務
 
 | フォルダー | 役割 |
 | --- | --- |
 | `admin/` | UI ロジック |
-| `api/` | API 通信 (副作用) |
+| `src/api/` | API 通信 (クライアントの副作用) |
 | `types/` | データ辞書を手で写した型 |
 
 #### 依存関係
 
 ```mermaid
 flowchart TD
-  A["types: データ辞書を手で写した型"] --> B["api: 通信"]
+  A["types: データ辞書を手で写した型"] --> B["src/api: 通信"]
   B --> C["admin: UI ロジック"]
 ```
 
@@ -104,15 +103,15 @@ flowchart TD
 | 領域 | 役割 |
 | --- | --- |
 | メインプラグインファイル | 定数・バージョン・ファイルパス、`plugins_loaded` でコアクラスを起動し、翻訳をロードする。 |
-| `Media_Date_Service` (想定クラス名) | `_wp_attached_file` から `yyyy/mm` を抽出し、`post_date` と比較し、単体/一括の DB 更新を行う。副作用をここに集約する。 |
-| REST コントローラ | 管理画面から呼ぶ API である。補正処理は画面の表示から切り離し、入力検証、権限、`service` の呼び出しを担う。WP-CLI コマンドは、初期リリースでは置かない。 |
+| `Media_Date_Service` (想定クラス名) | `_wp_attached_file` から `yyyy/mm` を抽出し、`post_date` と比較し、単体/一括の DB 更新を行う。PHP 側の更新ロジックをここに集約する。 |
+| REST コントローラ | 管理画面から呼ぶ API である。補正処理は画面の表示から切り離し、入力検証、権限、`service` の呼び出しを担う。`correct-query` の `WP_Query` 再構築は [REST API 仕様 > フィルター条件の再現性](./rest_api_spec.md#フィルター条件の再現性) に従う。WP-CLI コマンドは、初期リリースでは置かない。 |
 | 管理画面 JS (`src/admin`) | `upload.php` の List View 上で、補正の実行、処理中の表示、REST 通信 (`api-fetch`) を扱う。一覧テーブルは再構築しない。状態遷移は [管理画面 UI 仕様](./admin_ui_spec.md) に従う。スクリプトは `admin_enqueue_scripts` で、`upload.php` の場合だけ読む。 |
 
 ### レイヤー責務
 
 #### 設計意図 (ゴール)
 
-* サービス層の判定ロジックを、副作用から切り離して保つ (`features/` ディレクトリは置かない)。
+* サービス層の判定ロジックを、クライアントの通信 (`src/api/`) から切り離して保つ (`features/` ディレクトリは置かない)。
 * テスト容易性を向上させる。
 * 実装変更 (API 変更等) の影響範囲を限定する。
 
@@ -369,6 +368,8 @@ public function can_correct_media( WP_REST_Request $request ) {
 
 #### 件別の `edit_post`
 
+存在しない ID および `post_type !== 'attachment'` は、この前段で件別 `error` とする (詳細は [REST API 仕様 > 件別処理の扱い](./rest_api_spec.md#件別処理の扱い-部分成功前提))。
+
 ```php
 if ( ! current_user_can( 'edit_post', $id ) ) {
   $results[] = [
@@ -433,16 +434,17 @@ Retry Failed は、ミドルウェアの自動再送ではありません。`HTT
 
 * 状態は、単一の「state machine」として扱う。
 * 表示と状態を分離する。
-* API レスポンスを、そのまま UI 状態にマッピングする。
+* **単発** (1回の `correct` または1チャンクだけで終わる完了) では、API レスポンスの `status` を UI に載せてよい。
+* Date Correct (All) と ID 分割の **一連完了** では、最後の応答をそのまま UI `status` にしない。orchestrator (reducer 外) が `summary` 加算と UI `status` 再計算をし、その結果を state に反映する。実装の正本は [reducer 設計 - 状態遷移](#reducer-設計---状態遷移) および [REST API 仕様 > 複数走査窓の集約 - Date Correct (All)](./rest_api_spec.md#複数走査窓の集約---date-correct-all) である。
 
 #### 状態定義
 
-UI 状態は、REST API の `status` と一致させます。
+UI 状態の列挙値は REST API の `status` と同じ `success` / `partial` / `error` である。単発と一連完了では、その値の決め方が異なる (前項)。
 
 * idle: 初期状態
 * loading: API ロード中
-* success: 失敗がなく、処理が最後まで終わった状態である。`skipped` だけも含む
-* partial: 失敗が混ざる、または未処理が残る状態である
+* success: 失敗がなく、処理が最後まで終わった状態である。`skipped` だけも含む (Date Correct (All) と ID 分割の **一連完了** は [複数走査窓の集約 - Date Correct (All)](./rest_api_spec.md#複数走査窓の集約---date-correct-all) の表どおりの正常終了時のみ)
+* partial: 失敗が混ざる、または未処理が残る状態である (`summary` 上の `processed < total`、または未送信の走査窓／チャンクが残った [フォールバック](./rest_api_spec.md#フォールバック) 打ち切りを含む)
 * error: 処理した件がすべて失敗である
 
 #### 状態遷移
@@ -480,7 +482,7 @@ flowchart TD
 * success:
   * 画面上部の通知を成功にする。`summary.success` が1件以上なら「{success} 件の補正が完了しました」である。`skipped` があれば「{skipped} 件は更新しませんでした」を足す。`summary.success` が0で残りが `skipped` なら「更新した項目はありません」である。
 * partial:
-  * 画面上部の通知を警告にする。成功、失敗、スキップの件数である。未処理が残る場合は「一部未処理の項目があります」を足す。
+  * 画面上部の通知を警告にする。成功、失敗、スキップの件数である。未処理が残る場合 (加算後 `processed < total`、または [フォールバック](./rest_api_spec.md#フォールバック) 打ち切りで残走査窓／残チャンクがある場合を含む) は「一部未処理の項目があります」を足す。
   * `skipped` だけでは、この状態にしない。
 * error:
   * 画面上部の通知をエラーにする。文は「処理に失敗しました」である。
@@ -503,6 +505,7 @@ Date Correct (All) では、一連の終了まで `summary` を加算し、`resu
 
 * 応答本文が得られなかった場合は、同じチャンクを最大3回まで自動再送する。対象はネットワーク失敗、タイムアウト、HTTP `408`、`429`、`500`、`502`、`503`、`504` である。
 * HTTP `200` の `APIResponse` が返ったあとは、自動再送しない。
+* 再送3回でも応答がない場合の一連中止は、[REST API 仕様 > フォールバック](./rest_api_spec.md#フォールバック) に従う。
 * 手動の再送は、`results` の `error` だけを抽出する。
 * 抽出した ID を、`/attachments/correct` に再送信する。
 * 手動の再送は、ユーザー操作により行う。
@@ -524,7 +527,8 @@ Date Correct (All) では、一連の終了まで `summary` を加算し、`resu
 
 #### 設計方針 (規約)
 
-* REST API の `status` を、そのまま state に反映する。
+* **単一リクエスト** (1回の `correct` または1チャンクだけで終わる完了) では、payload の `status` を state に反映する。
+* Date Correct (All) と ID 分割の **一連完了** では、orchestrator (reducer 外) が `summary` 加算と UI `status` 再計算をし、その結果を `SUCCESS` に載せる ([REST API 仕様 > 複数走査窓の集約 - Date Correct (All)](./rest_api_spec.md#複数走査窓の集約---date-correct-all))。
 * 状態は、単一の source of truth である。
 * 副作用は、reducer 外で処理する (`api-fetch`)。
 
@@ -563,7 +567,7 @@ type Action =
 
 #### reducer
 
-Date Correct (All) では、走査窓のたびに `SUCCESS` を投げません。呼び出し側が各応答の `summary` を加算し、`results` を連結してから、一連が終わった場合にだけ集約結果を `SUCCESS` (または警告用の完了状態) に載せます。次窓に進むのは `processed === total` かつ `nextOffset !== null` の場合だけです。`processed < total` なら一連をやめます。完了時の `status` は加算後の件数から再計算します。ID 一括の分割送信も同じです。
+Date Correct (All) では、走査窓のたびに `SUCCESS` を投げません。呼び出し側が各応答の `summary` を加算し、`results` を連結してから、一連が終わった場合にだけ集約結果を `SUCCESS` (または警告用の完了状態) に載せます。次窓に進むのは `processed === total` かつ `nextOffset !== null` の場合だけです。`processed < total` なら一連をやめます。完了時の `status` は加算後の件数から再計算します (加算後 `processed < total` は `partial`。[フォールバック](./rest_api_spec.md#フォールバック) 打ち切り時の `partial` を含む。詳細は [REST API 仕様 > 複数走査窓の集約 - Date Correct (All)](./rest_api_spec.md#複数走査窓の集約---date-correct-all))。ID 一括の分割送信も同じです。
 
 ```ts
 function reducer(state: State, action: Action): State {
@@ -572,6 +576,7 @@ function reducer(state: State, action: Action): State {
       return { ...state, status: 'loading', summary: null, results: [], requestError: null };
 
     case 'SUCCESS':
+      // 一連完了時: orchestrator が加算後の status / summary / results を payload に載せて dispatch する。
       return {
         ...state,
         status: action.payload.status,
@@ -693,8 +698,8 @@ flowchart TD
 
 | status | 意味 |
 | --- | --- |
-| success | 失敗がなく、処理が最後まで終わった状態である。`skipped` だけも含む |
-| partial | 失敗が混ざる、または未処理が残る状態である |
+| success | 失敗がなく、当該1リクエストの処理が最後まで終わった状態である。`skipped` だけも含む (UI の一連完了 `success` は [複数走査窓の集約 - Date Correct (All)](./rest_api_spec.md#複数走査窓の集約---date-correct-all) の表) |
+| partial | 失敗と、`success` または `skipped` が混ざる状態である。未処理が残る場合も含む (当該1リクエストの本文。クライアント集約 UI は [複数走査窓の集約 - Date Correct (All)](./rest_api_spec.md#複数走査窓の集約---date-correct-all) の表) |
 | error | 処理した件がすべて失敗である |
 
 #### HTTP ステータス
@@ -714,6 +719,7 @@ flowchart TD
 
 ### 実現方法
 
+* 存在しない ID、または `post_type !== 'attachment'` の場合は、件別 `error` とする (`skipped` ではない)。詳細は [REST API 仕様 > 件別処理の扱い](./rest_api_spec.md#件別処理の扱い-部分成功前提) である。
 * `match` の場合は、更新せず `skipped` とする。
 * パスから年月を読めない場合、`correct` では更新せず `skipped` とする。`correct-query` では補正対象にも `results` にも入れない。いずれも `error` にはしない。
 * `pathYm` があり、年月が一致しない場合は更新する。`post_date` が読めなくても、パスの年月が取れる場合は更新する。

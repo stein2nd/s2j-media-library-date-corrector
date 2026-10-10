@@ -98,9 +98,15 @@
 
 ## 設定配列・オプション (options)
 
-初期リリースでは、option を1つ定義します。キーは `s2j_mldc_mismatch_notice` です。型は真偽値です。未保存の場合は、案内を出します。
+初期リリースでは、option を1つ定義します。キーは `s2j_mldc_mismatch_notice` です。型は真偽値です。保存は Settings API で、`manage_options` です。
 
-意味は、メディアライブラリの List View で、表示中のページに「不一致」が1件でもある場合、補正を促す案内を出すことです。一括取り込みのあとも、同じ案内です。見るのはそのページの attachment だけで、ライブラリ全体は数えません。保存は Settings API で、`manage_options` です。
+| 値 | 意味 |
+| --- | --- |
+| 未保存 (option なし) | 案内を **出す** (デフォルト) |
+| `true` | 案内を **出す** |
+| `false` | 案内を **出さない** (設定画面でチェックを外した状態) |
+
+意味は、メディアライブラリの List View で、表示中のページに差分列 `mismatch` (画面「不一致」) が1件でもある場合、補正を促す案内を出すことです。`unknown` (「不明」) だけでは案内を出しません。一括取り込みのあとも、同じ案内です。見るのはそのページの attachment だけで、ライブラリ全体は数えません。
 
 列、行の Date Correct、一括の Date Correct、Date Correct (All) は、この option では切り替えません。補正 API は、この option では拒みません。
 
@@ -199,6 +205,7 @@
 * `correct` では `summary.skipped` に含める。`summary.failed` には含めない。
 * 年月がすでに一致している件も `skipped` である。区別は `message` の文である。
 * `post_date` が読めなくても、パスの年月が取れる場合は更新する。この件は `skipped` にしない。
+* 存在しない ID、または `post_type !== 'attachment'` の場合は、件別 `error` である (`skipped` ではない)。判定順序は [REST API 仕様 > 件別処理の扱い](./rest_api_spec.md#件別処理の扱い-部分成功前提) に従う。
 
 ### TypeScript 型定義 (完全版)
 
@@ -262,13 +269,18 @@ interface ResultItem {
 
 ```ts
 interface Summary {
-  total: number; // その1リクエストの対象件数。一覧の全件数ではない
+  total: number; // その1リクエストの対象件数。一覧の全件数ではない (エンドポイント別の定義は下記)
   processed: number;
   success: number;
   skipped: number;
   failed: number;
 }
 ```
+
+`summary.total` と `processed` の意味は、エンドポイントごとに次のとおりです (詳細は [REST API 仕様 > summary.total の定義](./rest_api_spec.md#summarytotal-の定義))。
+
+* `POST …/attachments/correct`: `total` は **ユニーク化後**の ID 件数 (受理後に重複を排除したあとの試行件数)。通常、`processed` は `total` と一致する。
+* `POST …/attachments/correct-query`: `total` はその回の **補正の試行件数** (パスから年月を読めない行は含めない)。`processed` / `total` は走査件数 (最大100) ではなく、補正パイプラインに入った件数である。通常、`processed` は `total` と一致する。
 
 #### APIResponse
 
@@ -294,12 +306,13 @@ interface CorrectQueryResponse extends APIResponse {
 ```
 
 `offset` / `nextOffset` は WP_Query 結果上の走査位置です (パスから年月を読めない件も含みます)。1リクエストは `offset` から最大100件を走査し、パスから年月を読める件だけを補正します。`nextOffset` は `offset + 今回走査した件数` です。
-`summary.total` はその回の補正の試行件数です (パスから年月を読めない件は含めません)。`processed === total` かつ `summary.total` が100未満でも `nextOffset !== null` の場合は続きがあります。
+`summary.total` はその回の補正の試行件数です (パスから年月を読めない件は含めません)。`summary.processed` も同じく補正パイプラインの件数であり、走査100件そのものではない。`processed === total` かつ `summary.total` が100未満でも `nextOffset !== null` の場合は続きがあります。
 補正対象0件の窓でも `processed === total` かつ `nextOffset !== null` なら続きます。`processed < total` の場合は一連をやめます。
 Date Correct (All) の一連では、各応答の `summary` を加算し、`results` を連結します。
+一連完了時の UI `status` 再計算 (加算後 `processed < total` を含む。自動再送 [フォールバック](./rest_api_spec.md#フォールバック) による打ち切り時の `partial` も含む) は [REST API 仕様 > 複数走査窓の集約 - Date Correct (All)](./rest_api_spec.md#複数走査窓の集約---date-correct-all) の表を正とします。「一部未処理」の文言は [管理画面 UI 仕様 > 未処理の件数](./admin_ui_spec.md#未処理の件数) を正とします。
 詳細は [REST API 仕様](./rest_api_spec.md) です。
 
-トップレベル `status` は、下記のとおりです。
+トップレベル `status` は、**1リクエスト分の `APIResponse`** に対するルールです。Date Correct (All) など一連完了時の UI 再計算は、上記 [複数走査窓の集約 - Date Correct (All)](./rest_api_spec.md#複数走査窓の集約---date-correct-all) の表参照に従います。
 
 * `error` が1件もなく、`processed` が `total` と一致する場合は `success` である。`skipped` だけでも同じである。
 * `error` と、`success` または `skipped` が混ざる場合は `partial` である。
@@ -357,5 +370,6 @@ flowchart LR
 
 ## セキュリティ・整合性 (データ観点)
 
-* 更新対象 ID は、必ず **`attachment` かつ、権限のある投稿** に限定する。
+* 更新対象 ID は、存在する **`post_type === 'attachment'`** の投稿に限定する。ゴミ箱等の扱いは WordPress 標準の取得結果に従い、存在しない ID は件別 `error` である (初期リリースでは `post_status` による独自フィルターは置かない)。
+* 件別の権限は **`edit_post`** である。存在・種別チェックのあとに行う。
 * パスから年月を読めない場合は、一覧の値は **`unknown`**、画面では「不明」と表示する。`correct-query` では補正対象外である。`correct` に入った場合だけ **`skipped`** である。`post_date` が読めなくても、パスの年月が取れる場合は補正する。

@@ -6,6 +6,13 @@
 
 ### Changed
 
+* Date Correct (All) / ID 分割の一連完了: 各応答の `status` をそのまま使わず、`summary` 加算・`results` 連結後に UI `status` を REST 集約表どおり再計算する。orchestrator (reducer 外) を正本に、単発1リクエストとの success / partial 定義を分離
+* フォールバック (自動再送3回失敗、残走査窓 / 残チャンク): 加算後 `processed === total` でも UI は `partial` と「一部未処理」を REST / admin / architecture で統一
+* データ辞書に `summary.total` / `processed` のエンドポイント別定義 (`correct` はユニーク化後、`correct-query` は補正試行件数)。存在しない ID・非 attachment は件別 `error`
+* 不一致案内 (`s2j_mldc_mismatch_notice`): List View で表示中ページの差分 `mismatch` のみ (`unknown` 除外)。真偽意味をデータ辞書に追記
+* `correct-query` の `WP_Query` 再構築条件と、自動再送が尽きた場合の完了 UI を REST / admin に追記
+* concept の Before/After パス表記と `_wp_attached_file` 正本、status / overview / specs / architecture の監査 BP 表記・内部リンク (見出し参照) を整理
+
 * `ids` の `maxItems` は受信配列の長さ (重複込み)。受理後にユニーク化し、`summary.total` はユニーク化後。クライアントは重複を送らない
 * 補正の正本を `_wp_attached_file` と明記 (ディスクは読まない)。architecture の REST (PHP) と `src/api/` を分離。`edit_post` 後はサービス判定。一括 Date Correct と All のスコープ見出しを分離
 * Idle の「差分を確認してください」は常時ヒント。`Retry Failed` 表記と「ですある」を直し、Content-Type は POST のみにそろえた。`status.md` 最終更新を2026-10-10に
