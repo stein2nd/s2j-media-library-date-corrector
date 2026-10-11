@@ -2,6 +2,12 @@
 
 ## unreleased
 
+## 1.0.7 - 2026-10-11
+
+### Changed
+
+* devDependencies を更新 (`@wordpress/*`、`vite`、`rollup`、`@typescript-eslint/*`、`@types/node` ほか)。`package-lock.json` のルート `version` を v1.0.7 に同期
+
 ## 1.0.7 - 2026-10-10
 
 ### Changed
