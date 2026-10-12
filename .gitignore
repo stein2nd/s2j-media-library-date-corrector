@@ -2,8 +2,8 @@
 node_modules/
 vendor/
 
-# Build outputs
-dist/
+# Build outputs (root only; do not use bare `dist/` — it ignores tools/dist/)
+/dist/
 /release/
 .dist-tmp/
 
