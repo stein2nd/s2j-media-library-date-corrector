@@ -2,18 +2,31 @@
 
 ## unreleased
 
+## 1.0.7 - 2026-10-12
+
 ### Added
+
+* 段階2 (Studio) 再構築: `npm run test:smoke:studio:rebuild`、`tests/studio-rebuild.sh`、`studio/assets/` (スモーク用 JPEG)
 
 * v1 - プラグイン実装: PHP (`Media_Date_Service`、REST `attachments/correct`・`correct-query`、一覧列・設定) と管理画面 React (orchestrator / reducer / 上部通知)
 * `readme.txt`、`uninstall.php`。配布 zip (`npm run dist`) と `.github/workflows/dist-zip.yml`
 * PHPUnit スモーク (`tests/phpunit/`、`composer.json`、`phpunit.xml.dist`、`.wp-env.json`)、`npm run test:unit:php`、`.github/workflows/phpunit.yml`
 * 結合スモーク: WP-CLI `tests/smoke-local.sh` (`npm run test:smoke:local`)、Studio Blueprint `studio/smoke-test-blueprint.json`
 * 品質・記録: `eslint.config.js`、`phpstan.neon.dist`、`docs/test-results.md`
+* 翻訳: `languages/` (POT、日本語 `ja.po` / `ja.mo`)。`npm run makepot` (`wp i18n make-pot`)
 
 ### Changed
 
-* `README.md` のクイックスタートと `docs/status.md` の機能一覧を実装状況に更新
+* Date Correct (All) ボタンをコア `.tablenav` の `.button` に合わせ (`s2j-mldc-correct-all-wrap`、`admin.scss`)
+* PHPUnit 用 npm スクリプトを `phpunit` / `phpunit:wp-env` に整理。Actions は `phpunit:wp-env`。`composer.json` に platform PHP v8.2.34
+
+* `README.md` のクイックスタートを翻訳後の UI 表記 (「日付を修正」等) に合わせ、`docs/status.md` の機能一覧を実装状況に更新
 * `vite.config.ts` を管理画面アセットビルド向けに調整
+* `docs/test-results.md`: 段階2の Studio (`mldc-smoke`) の手動シナリオ PASS と `WP_PATH` 指定の `test:smoke:local` PASS を記録
+
+### テスト (既知)
+
+* `npm run test:smoke:local` 実行時、WP-CLI v2.12.0 `phar` 同梱の `react/promise` v2が PHP v8.5+ で出す `Case statements followed by a semicolon` Deprecated はプラグイン起因ではない (判定は `okPASS`)。WP-CLI は nightly または次期安定版で同梱更新の予定 (upstream: [wp-cli/wp-cli#6271](https://github.com/wp-cli/wp-cli/issues/6271))
 
 ## 1.0.7 - 2026-10-11
 

@@ -35,11 +35,18 @@
     "lint:scss": "stylelint \"src/**/*.scss\" --allow-empty-input",
     "lint:scss:fix": "stylelint \"src/**/*.scss\" --allow-empty-input --fix",
     "lint:docs": "s2j-docs-linter ./README.md ./CHANGELOG.md ./docs/**/*.md ./docs_mod/**/*.md",
+    "makepot": "wp i18n make-pot . languages/s2j-media-library-date-corrector.pot --domain=s2j-media-library-date-corrector",
     "wp-env": "wp-env",
+    "pretest:phpunit": "composer install --no-interaction --prefer-dist",
+    "phpunit": "composer test",
+    "phpunit:local": "vendor/bin/phpunit -c phpunit.xml.dist",
+    "pretest:phpunit:wp-env": "npm run pretest:phpunit",
+    "phpunit:wp-env": "npm run test:unit:php",
     "pretest:unit:php": "wp-env start",
     "test:unit:php": "wp-env run tests-wordpress phpunit -c wp-content/plugins/s2j-media-library-date-corrector/phpunit.xml.dist",
-    "test:unit:php:local": "vendor/bin/phpunit -c phpunit.xml.dist",
-    "test:smoke:local": "bash tests/smoke-local.sh"
+    "test:unit:php:local": "npm run phpunit:local",
+    "test:smoke:local": "bash tests/smoke-local.sh",
+    "test:smoke:studio:rebuild": "bash tests/studio-rebuild.sh"
   },
   "dependencies": {
     "react": "^19.3.0",

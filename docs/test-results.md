@@ -97,7 +97,7 @@ npm ci && composer install && npm run test:unit:php
 | 日付 | 段階 | 環境 | 結果 | メモ |
 | --- | --- | --- | --- | --- |
 | 2026-10-12 | 1 | Local | PASS (部分) | `tests/smoke-local.sh` 追加。Site Shell から実行。UI は手動 checklist |
-| 2026-10-12 | 2 | WordPress Studio | PASS (初版) | `smoke-test-blueprint.json` + mu-plugin シード。MLDC は symlink + build 後に activate / upload.php 確認 |
+| 2026-10-12 | 2 | WordPress Studio (`mldc-smoke`, `:8883`) | PASS | Blueprint (`login: true`)、シード mismatch → 一覧 Mismatch / Date Correct →2024-01-01: Match。`WP_PATH=$HOME/Studio/mldc-smoke` で `npm run test:smoke:local` PASS |
 | (未記録) | 3 | Local + PHPUnit | — | `composer test` |
 | (未記録) | 3 | GitHub Actions | — | wp-env + PHPUnit |
 

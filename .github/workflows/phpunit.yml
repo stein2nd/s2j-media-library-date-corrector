@@ -29,8 +29,5 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist
-
       - name: Run PHPUnit in wp-env
-        run: npm run test:unit:php
+        run: npm run phpunit:wp-env

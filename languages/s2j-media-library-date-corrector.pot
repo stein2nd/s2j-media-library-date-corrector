@@ -1,0 +1,191 @@
+# Copyright (C) 2026 Koutarou ISHIKAWA
+# This file is distributed under the GPL v3 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: S2J Media Library Date Corrector 1.0.7\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/s2j-media-library-date-corrector\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-10-12T08:13:47+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: s2j-media-library-date-corrector\n"
+
+#. Plugin Name of the plugin
+#: s2j-media-library-date-corrector.php
+msgid "S2J Media Library Date Corrector"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: s2j-media-library-date-corrector.php
+msgid "https://github.com/stein2nd/s2j-media-library-date-corrector"
+msgstr ""
+
+#. Description of the plugin
+#: s2j-media-library-date-corrector.php
+msgid "Correct attachment post_date values from uploads path year/month on the media library list screen."
+msgstr ""
+
+#. Author of the plugin
+#: s2j-media-library-date-corrector.php
+msgid "Koutarou ISHIKAWA"
+msgstr ""
+
+#. Author URI of the plugin
+#: s2j-media-library-date-corrector.php
+msgid "https://stein2nd.wordpress.com"
+msgstr ""
+
+#: includes/class-media-date-service.php:227
+msgid "Target media was not found."
+msgstr ""
+
+#: includes/class-media-date-service.php:235
+msgid "You do not have permission to edit this item."
+msgstr ""
+
+#: includes/class-media-date-service.php:246
+msgid "Could not read year/month from the file path; skipping correction."
+msgstr ""
+
+#: includes/class-media-date-service.php:257
+msgid "The date already matches the path year/month."
+msgstr ""
+
+#: includes/class-media-date-service.php:286
+msgid "Date corrected."
+msgstr ""
+
+#: includes/class-media-library-columns.php:45
+#: includes/class-media-library-columns.php:51
+msgid "Year/month (path)"
+msgstr ""
+
+#: includes/class-media-library-columns.php:46
+#: includes/class-media-library-columns.php:52
+msgid "Difference"
+msgstr ""
+
+#: includes/class-media-library-columns.php:75
+msgid "Match"
+msgstr ""
+
+#: includes/class-media-library-columns.php:76
+msgid "Mismatch"
+msgstr ""
+
+#: includes/class-media-library-columns.php:77
+msgid "Unknown"
+msgstr ""
+
+#: includes/class-media-library-columns.php:91
+#: includes/class-media-library-columns.php:110
+msgid "Date Correct"
+msgstr ""
+
+#: includes/class-media-library-columns.php:129
+msgid "Date Correct (All)"
+msgstr ""
+
+#: includes/class-media-library-columns.php:159
+msgid "Some items have a file path year/month that does not match the attachment date. Check the Difference column and use Date Correct."
+msgstr ""
+
+#: includes/class-plugin.php:124
+#: dist/js/s2j-media-library-date-corrector-admin.js:1
+msgid "Processing…"
+msgstr ""
+
+#: includes/class-plugin.php:125
+#, php-format
+msgid "%d items processing…"
+msgstr ""
+
+#: includes/class-plugin.php:126
+msgid "Correct dates for all items matching the current search and filters?"
+msgstr ""
+
+#: includes/class-plugin.php:127
+#: dist/js/s2j-media-library-date-corrector-admin.js:1
+msgid "Retry Failed"
+msgstr ""
+
+#: includes/class-rest-controller.php:83
+msgid "You do not have permission to correct media dates."
+msgstr ""
+
+#: includes/class-rest-controller.php:102
+msgid "Invalid ids parameter."
+msgstr ""
+
+#: includes/class-rest-controller.php:110
+msgid "Too many ids in one request."
+msgstr ""
+
+#: includes/class-rest-controller.php:133
+msgid "Invalid query parameter."
+msgstr ""
+
+#: includes/class-settings.php:47
+#: includes/class-settings.php:48
+#: includes/class-settings.php:134
+msgid "Media dates"
+msgstr ""
+
+#: includes/class-settings.php:73
+msgid "Media library notices"
+msgstr ""
+
+#: includes/class-settings.php:80
+msgid "Mismatch notice"
+msgstr ""
+
+#: includes/class-settings.php:115
+msgid "Show mismatch notice on the media library list"
+msgstr ""
+
+#: includes/class-settings.php:116
+msgid "When the current list page has at least one mismatch, show a notice at the top. Correction actions are not affected."
+msgstr ""
+
+#: dist/js/s2j-media-library-date-corrector-admin.js:1
+msgid "Processing failed."
+msgstr ""
+
+#: dist/js/s2j-media-library-date-corrector-admin.js:1
+#, js-format
+msgid "%d items corrected."
+msgstr ""
+
+#: dist/js/s2j-media-library-date-corrector-admin.js:1
+#, js-format
+msgid "%d items were not updated."
+msgstr ""
+
+#: dist/js/s2j-media-library-date-corrector-admin.js:1
+msgid "No items were updated."
+msgstr ""
+
+#: dist/js/s2j-media-library-date-corrector-admin.js:1
+msgid "Processing completed with warnings."
+msgstr ""
+
+#: dist/js/s2j-media-library-date-corrector-admin.js:1
+msgid "Processing complete."
+msgstr ""
+
+#: dist/js/s2j-media-library-date-corrector-admin.js:1
+msgid "Some items were not processed."
+msgstr ""
+
+#: dist/js/s2j-media-library-date-corrector-admin.js:1
+#, js-format
+msgid "(%d)"
+msgstr ""
+
+#: dist/js/s2j-media-library-date-corrector-admin.js:1
+msgid "Request failed."
+msgstr ""

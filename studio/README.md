@@ -25,4 +25,17 @@
 5. **メディア > ライブラリ** (リスト表示) で [test-results.md](../docs/test-results.md) 段階1チェックリストを確認する。
 6. 結果を `docs/test-results.md` の「最新結果」に記録する。
 
+### 段階2環境の再構築 (fixtures + build + 反映)
+
+Blueprint でサイトを一度作ったあと、テスト用画像の再取得・ビルド・プラグイン反映・シードリセットをまとめて行う場合:
+
+```bash
+export WP_PATH="$HOME/Studio/mldc-smoke"   # Studio サイトの WordPress ルート
+npm run test:smoke:studio:rebuild
+```
+
+* デフォルトは `wp-content/plugins/` にリポジトリへの **symlink** (`STUDIO_PLUGIN_LINK=0` で rsync)。
+* フィクスチャは GitHub `main` の `studio/assets/` から取得 (失敗時はローカル `studio/assets/`)。
+* 完了後、管理画面を1回開いて mu-plugin シードを再実行する。
+
 Local の開発サイトと Studio の検証サイトを分けておくと、WP / PHP バージョン差の確認が Local の作業を壊しにくくなります。

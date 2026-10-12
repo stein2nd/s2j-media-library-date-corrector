@@ -7,8 +7,23 @@
 	list-style: disc;
 }
 
-#s2j-mldc-date-correct-all {
-	margin-left: 0.5rem;
+// Match core `.button` in `.tablenav` (avoid baseline drift and invalid inherited `font` shorthand).
+.upload-php .tablenav .s2j-mldc-correct-all-wrap {
+	display: inline-block;
+	margin: 0 0 0 4px;
+	vertical-align: middle;
+}
+
+.upload-php .tablenav #s2j-mldc-date-correct-all.button {
+	box-sizing: border-box;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,
+		"Helvetica Neue", sans-serif;
+	font-size: 13px;
+	font-weight: normal;
+	font-variation-settings: normal;
+	line-height: 2.1538;
+	min-height: 30px;
+	padding: 0 10px;
 	vertical-align: middle;
 }
 

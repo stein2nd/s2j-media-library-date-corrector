@@ -124,10 +124,12 @@ class S2J_MLDC_Media_Library_Columns {
 			return;
 		}
 
+		echo '<span class="s2j-mldc-correct-all-wrap">';
 		printf(
 			'<button type="button" class="button s2j-mldc-date-correct-all" id="s2j-mldc-date-correct-all">%s</button>',
 			esc_html__( 'Date Correct (All)', 's2j-media-library-date-corrector' )
 		);
+		echo '</span>';
 	}
 
 	/**
