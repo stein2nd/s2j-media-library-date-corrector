@@ -2,11 +2,24 @@
 
 ## unreleased
 
+### Added
+
+* v1 - プラグイン実装: PHP (`Media_Date_Service`、REST `attachments/correct`・`correct-query`、一覧列・設定) と管理画面 React (orchestrator / reducer / 上部通知)
+* `readme.txt`、`uninstall.php`。配布 zip (`npm run dist`) と `.github/workflows/dist-zip.yml`
+* PHPUnit スモーク (`tests/phpunit/`、`composer.json`、`phpunit.xml.dist`、`.wp-env.json`)、`npm run test:unit:php`、`.github/workflows/phpunit.yml`
+* 結合スモーク: WP-CLI `tests/smoke-local.sh` (`npm run test:smoke:local`)、Studio Blueprint `studio/smoke-test-blueprint.json`
+* 品質・記録: `eslint.config.js`、`phpstan.neon.dist`、`docs/test-results.md`
+
+### Changed
+
+* `README.md` のクイックスタートと `docs/status.md` の機能一覧を実装状況に更新
+* `vite.config.ts` を管理画面アセットビルド向けに調整
+
 ## 1.0.7 - 2026-10-11
 
 ### Changed
 
-* devDependencies を更新 (`@wordpress/*`、`vite`、`rollup`、`@typescript-eslint/*`、`@types/node` ほか)。`package-lock.json` のルート `version` を v1.0.7 に同期
+* devDependencies を更新 (`@wordpress/*`、`vite`、`rollup`、`@typescript-eslint/*`、`@types/node` ほか)。`package-lock.json` のルート `version` を v1.0.7に同期
 
 ## 1.0.7 - 2026-10-10
 

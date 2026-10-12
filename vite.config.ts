@@ -18,9 +18,9 @@ if (process.env.FLUSH_DIST === 'true') {
 const buildTarget = 'admin';
 
 const buildConfig = {
-  entry: resolve(__dirname, 'src/admin/index.tsx'),
+  entry: resolve(import.meta.dirname, 'src/admin/index.tsx'),
   name: 'S2JMediaLibraryDateCorrectorAdmin',
-  scss: resolve(__dirname, 'src/styles/admin.scss'),
+  scss: resolve(import.meta.dirname, 'src/styles/admin.scss'),
 };
 
 export default defineConfig({
@@ -61,6 +61,7 @@ export default defineConfig({
             if (id === '@wordpress/editor') return 'wp.editor';
             if (id === '@wordpress/block-editor') return 'wp.blockEditor';
             if (id === '@wordpress/core-data') return 'wp.coreData';
+            if (id === '@wordpress/api-fetch') return 'wp.apiFetch';
             return `wp.${module}`;
           }
           // React 関連
@@ -72,13 +73,12 @@ export default defineConfig({
         },
         assetFileNames: (assetInfo) => {
           if (assetInfo.name?.endsWith('.css')) {
-            return `css/s2j-alliance-manager-${buildTarget}.css`;
+            return `css/s2j-media-library-date-corrector-${buildTarget}.css`;
           }
           return 'js/[name][extname]';
         },
         chunkFileNames: 'js/[name]-[hash].js',
-        entryFileNames: `js/s2j-alliance-manager-${buildTarget}.js`,
-        inlineDynamicImports: false
+        entryFileNames: `js/s2j-media-library-date-corrector-${buildTarget}.js`,
       },
       onwarn(warning, warn) {
         // 特定の警告を抑制
@@ -129,7 +129,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
+      '@': resolve(import.meta.dirname, 'src'),
     }
   }
 });

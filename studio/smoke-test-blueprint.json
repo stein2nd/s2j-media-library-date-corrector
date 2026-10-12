@@ -1,0 +1,52 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"landingPage": "/wp-admin/upload.php",
+	"preferredVersions": {
+		"php": "8.2",
+		"wp": "latest"
+	},
+	"features": {
+		"networking": true
+	},
+	"siteOptions": {
+		"blogname": "MLDC Smoke Test",
+		"blogdescription": "WordPress Studio site for S2J Media Library Date Corrector",
+		"permalink_structure": "/%year%/%monthnum%/%postname%/"
+	},
+	"login": true,
+	"steps": [
+		{
+			"step": "defineWpConfigConsts",
+			"consts": {
+				"WP_DEBUG": true,
+				"WP_DEBUG_LOG": true,
+				"SCRIPT_DEBUG": true
+			}
+		},
+		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "wordpress.org/plugins",
+				"slug": "query-monitor"
+			},
+			"options": {
+				"activate": true
+			}
+		},
+		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "wordpress.org/plugins",
+				"slug": "plugin-check"
+			},
+			"options": {
+				"activate": true
+			}
+		},
+		{
+			"step": "writeFile",
+			"path": "/wordpress/wp-content/mu-plugins/s2j-mldc-smoke-seed.php",
+			"data": "<?php\n/**\n * Plugin Name: S2J MLDC Studio smoke seed\n * Description: After s2j-media-library-date-corrector is installed, adds one mismatched attachment for manual smoke tests.\n */\n\nadd_action(\n\t'admin_init',\n\tstatic function (): void {\n\t\tif ( ! is_admin() || ! current_user_can( 'upload_files' ) ) {\n\t\t\treturn;\n\t\t}\n\n\t\tif ( get_option( 's2j_mldc_studio_smoke_seeded' ) ) {\n\t\t\treturn;\n\t\t}\n\n\t\t$plugin = 's2j-media-library-date-corrector/s2j-media-library-date-corrector.php';\n\t\tif ( ! is_plugin_active( $plugin ) ) {\n\t\t\treturn;\n\t\t}\n\n\t\t$attachment_id = wp_insert_post(\n\t\t\tarray(\n\t\t\t\t'post_type'      => 'attachment',\n\t\t\t\t'post_status'    => 'inherit',\n\t\t\t\t'post_mime_type' => 'image/jpeg',\n\t\t\t\t'post_title'     => 'MLDC smoke mismatch sample',\n\t\t\t\t'post_date'      => '2019-06-01 00:00:00',\n\t\t\t\t'post_date_gmt'  => get_gmt_from_date( '2019-06-01 00:00:00' ),\n\t\t\t),\n\t\t\ttrue\n\t\t);\n\n\t\tif ( is_wp_error( $attachment_id ) ) {\n\t\t\treturn;\n\t\t}\n\n\t\tupdate_post_meta( $attachment_id, '_wp_attached_file', '2024/01/mldc-smoke-sample.jpg' );\n\t\tupdate_option( 's2j_mldc_studio_smoke_seeded', 1, false );\n\t}\n);\n"
+		}
+	]
+}

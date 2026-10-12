@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<phpunit
+	bootstrap="tests/bootstrap.php"
+	backupGlobals="false"
+	colors="true"
+	beStrictAboutOutputDuringTests="true"
+	beStrictAboutTestsThatDoNotTestAnything="true"
+	>
+	<testsuites>
+		<testsuite name="s2j-mldc">
+			<directory prefix="class-test-" suffix=".php">./tests/phpunit</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>

@@ -1,0 +1,19 @@
+.s2j-mldc-notice {
+	margin-top: 0.625rem;
+}
+
+.s2j-mldc-notice-details {
+	margin: 0.5em 0 0 1.5em;
+	list-style: disc;
+}
+
+#s2j-mldc-date-correct-all {
+	margin-left: 0.5rem;
+	vertical-align: middle;
+}
+
+.s2j-mldc-ui-root.is-busy .button,
+.s2j-mldc-ui-root.is-busy #s2j-mldc-date-correct-all {
+	pointer-events: none;
+	opacity: 0.6;
+}

@@ -1,4 +1,8 @@
 {
+  "intelephense.environment.includePaths": [
+    "${workspaceFolder}/tests/stubs"
+  ],
+  "phpstan.configFile": "${workspaceFolder}/phpstan.neon.dist",
   "npm.enableScriptExplorer": true,
   "textlint.configPath": "${workspaceFolder}/.textlintrc.json",
   "textlint.nodePath": "${workspaceFolder}/node_modules",

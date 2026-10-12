@@ -34,6 +34,19 @@
 * メディアの年月フィルターが崩れている場合に使います。
 * 既存の uploads 構造を維持したい場合に使います。
 
+## Tests
+
+テストは段階的に進めます。**Local** (日常スモーク)、**WordPress Studio** (Blueprint で再現可能な検証サイト)、**PHPUnit** (自動テスト / CI)。詳細は [docs/test-results.md](docs/test-results.md) と [studio/README.md](studio/README.md) を参照してください。
+
+```bash
+npm run test:smoke:local    # Local Site Shell、段階1 (WP-CLI)
+composer install
+export WP_TESTS_DIR=/tmp/wordpress-tests-lib   # install-wp-tests.sh の出力先
+composer test               # 段階3 PHPUnit
+```
+
+CI 向けに wp-env (Docker) を使う場合は `npm run test:unit:php` も利用できます。
+
 ## License
 
 このプロジェクトは GPL v3以降の下でライセンスされています - 詳細は [LICENSE](LICENSE) ファイルを参照してください。

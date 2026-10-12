@@ -1,0 +1,11 @@
+parameters:
+	level: 5
+	paths:
+		- includes
+		- tests/phpunit
+	bootstrapFiles:
+		- tests/stubs/wordpress-test-stubs.php
+		- tests/stubs/wordpress-test-functions.php
+	scanFiles:
+		- s2j-media-library-date-corrector.php
+		- tests/bootstrap.php

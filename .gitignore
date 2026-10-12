@@ -1,8 +1,11 @@
 # Dependencies
 node_modules/
+vendor/
 
 # Build outputs
 dist/
+/release/
+.dist-tmp/
 
 # Environment files
 .env
