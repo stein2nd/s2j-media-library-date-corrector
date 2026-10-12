@@ -10,7 +10,7 @@ require_once dirname( __DIR__ ) . '/stubs/wordpress-test-stubs.php';
 /**
  * REST controller smoke tests.
  */
-class Class_Test_Rest_Controller extends WP_UnitTestCase {
+class RestControllerTest extends WP_UnitTestCase {
 
 	/**
 	 * REST server instance.

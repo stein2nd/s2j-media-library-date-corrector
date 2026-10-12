@@ -8,7 +8,7 @@
 	>
 	<testsuites>
 		<testsuite name="s2j-mldc">
-			<directory prefix="class-test-" suffix=".php">./tests/phpunit</directory>
+			<directory suffix="Test.php">./tests/phpunit</directory>
 		</testsuite>
 	</testsuites>
 </phpunit>

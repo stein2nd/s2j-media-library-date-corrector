@@ -10,7 +10,7 @@ require_once dirname( __DIR__ ) . '/stubs/wordpress-test-stubs.php';
 /**
  * Media date service tests.
  */
-class Class_Test_Media_Date_Service extends WP_UnitTestCase {
+class MediaDateServiceTest extends WP_UnitTestCase {
 
 	/**
 	 * Valid yyyy/mm path prefix is parsed.
