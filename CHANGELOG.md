@@ -2,6 +2,12 @@
 
 ## unreleased
 
+## 1.0.8 - 2026-10-12
+
+### Fixed
+
+* GitHub Actions dist-zip: `tools/dist/make-dist-zip.mjs` をリポジトリに含める (`.gitignore` を `/dist/` に限定)
+
 ## 1.0.7 - 2026-10-12
 
 ### Added
