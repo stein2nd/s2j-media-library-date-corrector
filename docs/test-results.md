@@ -80,7 +80,7 @@ composer test
 npm run test:unit:php:local
 ```
 
-期待件数: **8** (`Class_Test_Media_Date_Service` 6、`Class_Test_Rest_Controller` 2)
+期待件数: **8** (`MediaDateServiceTest` 6、`RestControllerTest` 2)。wp-env 内では Composer の PHPUnit v9 (`vendor/bin/phpunit`) を使う (コンテナ同梱の PHPUnit v10は WP テストスイートと非互換)。
 
 ### CI (GitHub Actions)
 
