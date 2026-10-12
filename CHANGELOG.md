@@ -24,6 +24,12 @@
 * `vite.config.ts` を管理画面アセットビルド向けに調整
 * `docs/test-results.md`: 段階2の Studio (`mldc-smoke`) の手動シナリオ PASS と `WP_PATH` 指定の `test:smoke:local` PASS を記録
 
+### Fixed
+
+* GitHub Actions PHPUnit: workflow / `prephpunit:wp-env` で Composer 依存 (Polyfills) をインストール
+* テストを PHPUnit v10探索向けに `*Test.php` (`MediaDateServiceTest`、`RestControllerTest`) に改名
+* wp-env ではコンテナ同梱 PHPUnit v10 ではなく `vendor/bin/phpunit` (9) を実行
+
 ### テスト (既知)
 
 * `npm run test:smoke:local` 実行時、WP-CLI v2.12.0 `phar` 同梱の `react/promise` v2が PHP v8.5+ で出す `Case statements followed by a semicolon` Deprecated はプラグイン起因ではない (判定は `okPASS`)。WP-CLI は nightly または次期安定版で同梱更新の予定 (upstream: [wp-cli/wp-cli#6271](https://github.com/wp-cli/wp-cli/issues/6271))
