@@ -4,9 +4,20 @@
 
 ## 1.0.8 - 2026-10-12
 
+### Added
+
+* `package.json`: PHPUnit 用 `phpunit` / `phpunit:local` / `phpunit:wp-env` (`pretest:phpunit` で Composer install)
+
+### Changed
+
+* `.github/workflows/phpunit.yml`: `npm run phpunit:wp-env` に統一 (Composer install は pretest 経由)
+* `studio/smoke-test-blueprint.json`: トップレベル `login: true` と `siteOptions` に整理 (Playground スキーマ準拠)
+
 ### Fixed
 
 * GitHub Actions dist-zip: `tools/dist/make-dist-zip.mjs` をリポジトリに含める (`.gitignore` を `/dist/` に限定)
+* GitHub Actions PHPUnit: `composer.lock` の `doctrine/instantiator` v2.1.0 (PHP ^8.4) を v2.0.0に固定。`composer.json` に `platform.php` v8.2.34
+* Studio Blueprint: login ステップの非推奨 `password` を削除 (IDE「値は非推奨」)
 
 ## 1.0.7 - 2026-10-12
 
@@ -32,7 +43,7 @@
 
 ### Fixed
 
-* GitHub Actions PHPUnit: workflow / `prephpunit:wp-env` で Composer 依存 (Polyfills) をインストール
+* GitHub Actions PHPUnit: workflow / `pretest:phpunit:wp-env` で Composer 依存 (Polyfills) をインストール
 * テストを PHPUnit v10探索向けに `*Test.php` (`MediaDateServiceTest`、`RestControllerTest`) に改名
 * wp-env ではコンテナ同梱 PHPUnit v10ではなく `vendor/bin/phpunit` (9) を実行
 
