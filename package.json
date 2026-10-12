@@ -40,7 +40,7 @@
     "pretest:phpunit": "composer install --no-interaction --prefer-dist",
     "phpunit": "composer test",
     "phpunit:local": "vendor/bin/phpunit -c phpunit.xml.dist",
-    "pretest:phpunit:wp-env": "npm run pretest:phpunit",
+    "prephpunit:wp-env": "composer install --no-interaction --prefer-dist",
     "phpunit:wp-env": "npm run test:unit:php",
     "pretest:unit:php": "wp-env start",
     "test:unit:php": "wp-env run tests-wordpress phpunit -c wp-content/plugins/s2j-media-library-date-corrector/phpunit.xml.dist",
