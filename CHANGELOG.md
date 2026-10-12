@@ -28,7 +28,7 @@
 
 * GitHub Actions PHPUnit: workflow / `prephpunit:wp-env` で Composer 依存 (Polyfills) をインストール
 * テストを PHPUnit v10探索向けに `*Test.php` (`MediaDateServiceTest`、`RestControllerTest`) に改名
-* wp-env ではコンテナ同梱 PHPUnit v10 ではなく `vendor/bin/phpunit` (9) を実行
+* wp-env ではコンテナ同梱 PHPUnit v10ではなく `vendor/bin/phpunit` (9) を実行
 
 ### テスト (既知)
 
