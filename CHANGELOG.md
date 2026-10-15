@@ -2,6 +2,25 @@
 
 ## unreleased
 
+## 1.0.9 - 2026-10-15
+
+### Changed
+
+* 未使用の `@wordpress/scripts` を devDependencies から削除 (Vite / 独自 ESLint のみ)。`npm audit` **42→23** 件、パッケージ **2050→1304**。`npm audit --omit=dev` は0のまま
+* `@wordpress/scripts` 向けだった `overrides` (`serialize-javascript`、`markdownlint-cli`、`sockjs`) を削除
+* devDependencies を更新 (`@wordpress/env` v11、`react` 19.3.1、`@s2j/docs-linter` 1.0.29、`rollup` 4.64.7 ほか)
+
+### セキュリティ (開発依存 - upstream 待ち)
+
+最終確認: **2026-10-15** — `npm audit`: **23** 件 (moderate: 13 / high: 8 / critical: 2)、`npm audit --omit=dev`: **0**。`dependencies` のみが配布 zip に載る。`npm audit fix --force` は採用しない (破壊的ダウングレード)。
+
+依存更新 (`ncu` / `npm install`) のたびに上記2コマンドを再実行し、件数と下記の解消状況をこの節で更新する。
+
+* **`@wordpress/env`** (`wp-env` / CI PHPUnit): transitive **`simple-git` / `@simple-git/argv-parser`** (critical、[GHSA-v5rq-49vh-5v5c](https://github.com/advisories/GHSA-v5rq-49vh-5v5c))、**`qs`** (moderate)、**`@wp-playground/cli`** 経由。実行は開発、CI のみ。**待ち**: [WordPress `@wordpress/env`](https://github.com/WordPress/gutenberg/tree/trunk/packages/env) / Playground CLI の依存更新 (npm の自動 fix は `@wordpress/env@3` 提案のため不可)
+* **`@s2j/docs-linter`** (`npm run lint:docs`): **`textlint-rule-prh` / `prh`**、プリセット (`textlint-rule-preset-wp-docs-ja` 等)、**`sprintf-js`** (moderate、npm 上 fix なし)。**待ち**: [docs-linter](https://github.com/stein2nd/s2j-docs-linter) および textlint プリセット側
+* **`stylelint`** (`npm run lint:scss`): **`braces` / `micromatch` / `fast-glob` / `globby`** (high)。npm の自動 fix は stylelint v7ダウングレード提案のため不可。**待ち**: [stylelint/stylelint](https://github.com/stylelint/stylelint) の transitive 更新
+* **`vite-plugin-static-copy`** (`npm run build`): 同梱 **chokidar** 経由の **`braces`** (high)。npm の自動 fix は v0系ダウングレード提案のため不可。**待ち**: [vite-plugin-static-copy](https://github.com/sapphi-red/vite-plugin-static-copy) の chokidar 更新
+
 ## 1.0.8 - 2026-10-12
 
 ### Added
