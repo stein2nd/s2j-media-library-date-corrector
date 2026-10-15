@@ -8,11 +8,11 @@
 
 * 未使用の `@wordpress/scripts` を devDependencies から削除 (Vite / 独自 ESLint のみ)。`npm audit` **42→23** 件、パッケージ **2050→1304**。`npm audit --omit=dev` は0のまま
 * `@wordpress/scripts` 向けだった `overrides` (`serialize-javascript`、`markdownlint-cli`、`sockjs`) を削除
-* devDependencies を更新 (`@wordpress/env` v11、`react` 19.3.1、`@s2j/docs-linter` 1.0.29、`rollup` 4.64.7 ほか)
+* devDependencies を更新 (`@wordpress/env` v11、`react` 19.3.1、`@s2j/docs-linter` 1.0.29、`rollup` 4.64.7ほか)
 
 ### セキュリティ (開発依存 - upstream 待ち)
 
-最終確認: **2026-10-15** — `npm audit`: **23** 件 (moderate: 13 / high: 8 / critical: 2)、`npm audit --omit=dev`: **0**。`dependencies` のみが配布 zip に載る。`npm audit fix --force` は採用しない (破壊的ダウングレード)。
+最終確認: **2026-10-15** — `npm audit`: **23** 件 (moderate: 13/high: 8/critical: 2)、`npm audit --omit=dev`: **0**。`dependencies` のみが配布 zip に載る。`npm audit fix --force` は採用しない (破壊的ダウングレード)。
 
 依存更新 (`ncu` / `npm install`) のたびに上記2コマンドを再実行し、件数と下記の解消状況をこの節で更新する。
 
