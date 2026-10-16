@@ -7,8 +7,9 @@
 	beStrictAboutTestsThatDoNotTestAnything="true"
 	>
 	<testsuites>
-		<testsuite name="s2j-mldc">
+		<testsuite name="integration">
 			<directory suffix="Test.php">./tests/phpunit</directory>
+			<exclude>./tests/phpunit/Unit</exclude>
 		</testsuite>
 	</testsuites>
 </phpunit>

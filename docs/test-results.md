@@ -8,7 +8,7 @@
 | --- | --- | --- | --- |
 | **1** | WordPress 上で最低限動くこと (スモーク) | Local、Site Shell、WP-CLI | `tests/smoke-local.sh` / `npm run test:smoke:local` + 手動チェックリスト |
 | **2** | テストサイト構成の再現 (WP / PHP バージョン、プラグイン同梱) | **WordPress Studio**、Blueprints、`studio` CLI | `studio/smoke-test-blueprint.json` |
-| **3** | PHP / REST / DB 連携の自動テスト、PR 時のゲート | PHPUnit、GitHub Actions (wp-env) | PHPUnit 8件、`.github/workflows/phpunit.yml` |
+| **3** | PHP / REST / DB 連携の自動テスト、PR 時のゲート | PHPUnit (Local または wp-env CI) | PHPUnit 8件、[phpunit_local.md](./phpunit_local.md)、`.github/workflows/phpunit.yml` |
 
 段階1と2は「実際の WordPress サイト」、段階3は **テスト専用 DB** の PHPUnit です。開発用 Local の DB を PHPUnit が直接書き換える必要はありません。
 
@@ -57,34 +57,20 @@ Blueprint には Query Monitor / Plugin Check と、MLDC 有効化後に走る�
 
 ## 第3段階: PHPUnit (Local + テスト DB) と CI
 
-`WP_UnitTestCase` を使う PHPUnit は、WordPress 本体とは別の **テスト用 MySQL データベース** に対して動きます。
+手順の正本は **[phpunit_local.md](./phpunit_local.md)** です (wp-env なし、`svn` / MySQL / Local の socket、`.env.tests`、開発 DB `local` を使わない方針、トラブルシューティング)。
 
-### 初回セットアップ (Local マシン上)
-
-1. `composer install`
-2. [WordPress のユニットテスト手順](https://developer.wordpress.org/apis/handbook/configuring-unit-tests/) に沿い、`install-wp-tests.sh` でテストライブラリを取得する。
-3. Local の **Database** タブの接続情報を参照し、**テスト専用 DB** を指定してスクリプトを実行する。
-
-例:
+### 実行 (要約)
 
 ```bash
-bash bin/install-wp-tests.sh wordpress_unit_tests root 'root' localhost latest
-export WP_TESTS_DIR=/tmp/wordpress-tests-lib
+npm run test:unit:php:unit-only    # ユニット4件 (DB / Docker 不要)
+npm run test:unit:php:local        # 全8件 (初回 install あり)
 ```
 
-### 実行
-
-```bash
-composer test
-# または
-npm run test:unit:php:local
-```
-
-期待件数: **8** (`MediaDateServiceTest` 6、`RestControllerTest` 2)。wp-env 内では Composer の PHPUnit v9 (`vendor/bin/phpunit`) を使う (コンテナ同梱の PHPUnit v10は WP テストスイートと非互換)。
+期待件数: **8** — ユニット4 (`MediaDateServiceUnitTest`)、統合4 (`MediaDateServiceTest` 2、`RestControllerTest` 2)。wp-env CI でも Composer の PHPUnit v9 (`vendor/bin/phpunit`) を使用 (コンテナ同梱 PHPUnit v10は非互換)。
 
 ### CI (GitHub Actions)
 
-Push / PR では wp-env (Docker) 上で同じ PHPUnit を実行します。Local 開発者が Docker を入れていなくても問題ありません。
+Push / PR では wp-env (Docker) 上で同じ8件を実行します。
 
 ```bash
 npm ci && composer install && npm run test:unit:php

@@ -57,6 +57,11 @@ jspm_packages/
 
 # dotenv environment variables file
 .env.test
+.env.tests
+
+# Local WordPress PHPUnit install (bin/install-wp-tests.sh)
+tests/.wordpress/
+tests/.wordpress-tests-lib/
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

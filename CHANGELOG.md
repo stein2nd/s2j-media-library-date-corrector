@@ -2,6 +2,26 @@
 
 ## unreleased
 
+## 1.0.10 - 2026-10-16
+
+### Added
+
+* PHP 品質: `phpcs.xml.dist` (PSR-12 / `includes/`)、`phpcs.wpcs.xml.dist` / `phpcs.wpcs-includes.xml.dist`、`composer lint:php` (PHPStan → phpcs → WPCS)
+* PHPUnit: wp-env なしローカル実行 (`bin/phpunit-local.sh`、`bin/install-wp-tests.sh`、`bin/phpunit-ci.sh`)、ユニット4件 (`phpunit.unit.xml.dist` / `MediaDateServiceUnitTest`)、`.env.tests.example`
+* `phpstan-bootstrap.php` (プラグイン定数)
+
+### Changed
+
+* `includes/` を `namespace S2J\MLDC` + PSR-12化。クラスファイルを `class-s2j-mldc-*.php` にリネーム
+* PHPUnit: 統合4件 + ユニット4件の計8件 (`composer test:all`、`npm run test:unit:php:local` / `test:unit:php:unit-only`)。CI は `bin/phpunit-ci.sh`
+* 開発 DB `local` には接続しない (`WP_TESTS_DB_NAME=wordpress_test`。`local` は install / runner が拒否)
+* ドキュメント: [docs/phpunit_local.md](./docs/phpunit_local.md) (プラグイン固有)。共通手順は [wp-plugin-spec PHPUNIT_LOCAL.md](https://github.com/stein2nd/wp-plugin-spec/blob/main/docs/PHPUNIT_LOCAL.md)
+
+### Fixed
+
+* `install-wp-tests.sh`: Local の socket パス (空白含む `DB_HOST`) で DB 作成失敗していた問題
+* `install-wp-tests.sh`: コア tarball と PHPUnit includes の WordPress バージョン不一致 (`WP_Secrets_Store` 等)
+
 ## 1.0.9 - 2026-10-15
 
 ### Changed

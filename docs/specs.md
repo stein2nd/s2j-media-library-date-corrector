@@ -41,6 +41,8 @@ flowchart TD
 | [REST API 仕様](./rest_api_spec.md) | REST API エンドポイント、リクエスト/レスポンス、権限、セキュリティ |
 | [ブロック仕様](./block_spec.md) | 初期リリースではブロックもショートコードも作らない |
 | [管理画面の UI 仕様](./admin_ui_spec.md) | 管理画面のレイアウト、各機能 |
+| [PHPUnit (wp-env なし)](./phpunit_local.md) | Local + テスト専用 DB での PHPUnit 手順、下準備 (`svn` / MySQL / socket) |
+| [テスト結果記録](./test-results.md) | 段階1〜3の戦略、スモーク / Studio / CI、実行結果ログ |
 | [実装状況](./status.md) | 実装状況サマリー、Backlog、品質レポート、まとめ |
 
 *本プラグインの設計は上記共通仕様に準拠し、ここに列挙したドキュメントがプラグイン固有の仕様を定義します。*

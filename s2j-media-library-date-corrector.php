@@ -10,7 +10,7 @@
  * Plugin Name: S2J Media Library Date Corrector
  * Plugin URI: https://github.com/stein2nd/s2j-media-library-date-corrector
  * Description: Correct attachment post_date values from uploads path year/month on the media library list screen.
- * Version: 1.0.9
+ * Version: 1.0.10
  * Author: Koutarou ISHIKAWA
  * Author URI: https://stein2nd.wordpress.com
  * License: GPL v3 or later
@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'S2J_MLDC_VERSION', '1.0.9' );
+define( 'S2J_MLDC_VERSION', '1.0.10' );
 define( 'S2J_MLDC_PLUGIN_FILE', __FILE__ );
 define( 'S2J_MLDC_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'S2J_MLDC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -33,10 +33,10 @@ define( 'S2J_MLDC_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 define( 'S2J_MLDC_REST_NAMESPACE', 's2j-mldc/v1' );
 define( 'S2J_MLDC_CHUNK_SIZE', 100 );
 
-require_once S2J_MLDC_PLUGIN_DIR . 'includes/class-media-date-service.php';
-require_once S2J_MLDC_PLUGIN_DIR . 'includes/class-rest-controller.php';
-require_once S2J_MLDC_PLUGIN_DIR . 'includes/class-media-library-columns.php';
-require_once S2J_MLDC_PLUGIN_DIR . 'includes/class-settings.php';
-require_once S2J_MLDC_PLUGIN_DIR . 'includes/class-plugin.php';
+require_once S2J_MLDC_PLUGIN_DIR . 'includes/class-s2j-mldc-media-date-service.php';
+require_once S2J_MLDC_PLUGIN_DIR . 'includes/class-s2j-mldc-rest-controller.php';
+require_once S2J_MLDC_PLUGIN_DIR . 'includes/class-s2j-mldc-media-library-columns.php';
+require_once S2J_MLDC_PLUGIN_DIR . 'includes/class-s2j-mldc-settings.php';
+require_once S2J_MLDC_PLUGIN_DIR . 'includes/class-s2j-mldc-plugin.php';
 
-S2J_MLDC_Plugin::get_instance();
+\S2J\MLDC\Plugin::getInstance();

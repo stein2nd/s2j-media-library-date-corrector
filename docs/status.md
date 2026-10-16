@@ -43,5 +43,5 @@
 * テスト:
     * 段階1: Local 結合
     * 段階2: WordPress Studio (Blueprint は [studio/README.md](../studio/README.md))
-    * 段階3: PHPUnit — [test-results.md](./test-results.md)
+    * 段階3: PHPUnit — [phpunit_local.md](./phpunit_local.md) / [test-results.md](./test-results.md)
 * 日本語 `.po` の追加 (UI 文言は gettext 済み)

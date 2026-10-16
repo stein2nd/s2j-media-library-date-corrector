@@ -16,11 +16,14 @@ if ( file_exists( $polyfills ) ) {
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
 
 if ( ! $_tests_dir ) {
-	$_tests_dir = rtrim( sys_get_temp_dir(), '/\\' ) . '/wordpress-tests-lib';
+	$_tests_dir = TESTS_PLUGIN_DIR . '/tests/.wordpress-tests-lib';
 }
 
 if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
-	echo 'Could not find ' . $_tests_dir . '/includes/functions.php. Run tests via wp-env (npm run test:unit:php).' . PHP_EOL;
+	echo 'Could not find ' . $_tests_dir . '/includes/functions.php.' . PHP_EOL;
+	echo 'Local (no Docker): copy .env.tests.example to .env.tests, then run npm run test:unit:php:local' . PHP_EOL;
+	echo 'Or: bash bin/install-wp-tests.sh <db> <user> <pass> [host]' . PHP_EOL;
+	echo 'CI / Docker: npm run test:unit:php' . PHP_EOL;
 	exit( 1 );
 }
 

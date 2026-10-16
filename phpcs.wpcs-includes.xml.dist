@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ruleset name="s2j-plugin-wpcs-includes">
+	<description>WordPress i18n and security sniffs for PSR-12 includes/.</description>
+	<config name="minimum_supported_wp_version" value="6.9"/>
+	<rule ref="WordPress.WP.I18n"/>
+	<rule ref="WordPress.Security"/>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<file>includes</file>
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+	<arg value="sp"/>
+</ruleset>

@@ -36,16 +36,13 @@
 
 ## Tests
 
-テストは段階的に進めます。**Local** (日常スモーク)、**WordPress Studio** (Blueprint で再現可能な検証サイト)、**PHPUnit** (自動テスト / CI)。詳細は [docs/test-results.md](docs/test-results.md) と [studio/README.md](studio/README.md) を参照してください。
+テストは段階的に進めます。**Local** (日常スモーク)、**WordPress Studio** (Blueprint)、**PHPUnit** (自動 / CI)。手順の正本は [docs/phpunit_local.md](docs/phpunit_local.md) (wp-env なし Local 手順、`svn` / MySQL / socket 下準備)。結果記録は [docs/test-results.md](docs/test-results.md)。
 
 ```bash
-npm run test:smoke:local    # Local Site Shell、段階1 (WP-CLI)
 composer install
-export WP_TESTS_DIR=/tmp/wordpress-tests-lib   # install-wp-tests.sh の出力先
-composer test               # 段階3 PHPUnit
+npm run test:unit:php:unit-only   # ユニット 4 件 (DB 不要)
+npm run test:unit:php:local        # 全 8 件 — 初回 setup は phpunit_local.md 参照
 ```
-
-CI 向けに wp-env (Docker) を使う場合は `npm run test:unit:php` も利用できます。
 
 ## License
 

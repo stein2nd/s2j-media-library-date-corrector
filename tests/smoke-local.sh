@@ -56,7 +56,7 @@ do_action( 'rest_api_init' );
 if ( ! isset( \$routes[ \$route ] ) ) {
 	exit( 2 );
 }
-if ( ! class_exists( 'S2J_MLDC_Media_Date_Service' ) ) {
+if ( ! class_exists( 'S2J\\MLDC\\MediaDateService' ) ) {
 	exit( 3 );
 }
 echo 'ok';

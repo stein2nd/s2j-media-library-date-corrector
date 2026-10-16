@@ -8,13 +8,38 @@
 	},
 	"require-dev": {
 		"phpunit/phpunit": "^9.6",
-		"yoast/phpunit-polyfills": "^2.0"
+		"yoast/phpunit-polyfills": "^2.0",
+		"phpstan/phpstan": "^2.1",
+		"squizlabs/php_codesniffer": "^3.10",
+		"wp-coding-standards/wpcs": "^3.1",
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.1",
+		"php-stubs/wordpress-stubs": "^6.8"
 	},
 	"scripts": {
-		"test": "phpunit -c phpunit.xml.dist"
+		"test:unit": "phpunit -c phpunit.unit.xml.dist",
+		"test:integration": "phpunit -c phpunit.xml.dist",
+		"test:all": [
+			"@test:unit",
+			"@test:integration"
+		],
+		"test": "@test:all",
+		"phpstan": "@php vendor/bin/phpstan analyse -c phpstan.neon.dist --memory-limit=512M",
+		"phpcs": "@php vendor/bin/phpcs -p",
+		"phpcs:wpcs": [
+			"@php vendor/bin/phpcs -p --standard=phpcs.wpcs.xml.dist",
+			"@php vendor/bin/phpcs -p --standard=phpcs.wpcs-includes.xml.dist"
+		],
+		"phpcbf": "@php vendor/bin/phpcbf",
+		"lint:php": [
+			"@phpstan",
+			"@phpcs",
+			"@phpcs:wpcs"
+		]
 	},
 	"config": {
-		"allow-plugins": {},
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		},
 		"sort-packages": true,
 		"platform": {
 			"php": "8.2.34"
