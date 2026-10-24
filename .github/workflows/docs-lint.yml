@@ -7,12 +7,16 @@ on:
       - "**/*.md"
       - ".textlintrc*"
       - "package.json"
+      - "composer.json"
+      - ".github/workflows/**"
   pull_request:
     paths:
       - "docs/**/*.md"
       - "**/*.md"
       - ".textlintrc*"
       - "package.json"
+      - "composer.json"
+      - ".github/workflows/**"
 
 jobs:
   lint-docs:

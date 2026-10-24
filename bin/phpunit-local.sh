@@ -31,6 +31,52 @@ if [ "${DB_NAME}" = "local" ]; then
 	exit 1
 fi
 
+assert_mysql_for_tests() {
+	local DB_HOSTNAME="$DB_HOST"
+	local DB_SOCK=""
+	if [[ "$DB_HOST" == *:* ]]; then
+		DB_HOSTNAME="${DB_HOST%%:*}"
+		DB_SOCK="${DB_HOST#*:}"
+		if [ ! -S "$DB_SOCK" ]; then
+			echo "MySQL socket not found: ${DB_SOCK}" >&2
+			echo "Flywheel Local で該当サイトを Start してください (停止中は mysqld.sock がありません)。" >&2
+			echo ".env.tests の WP_TESTS_DB_HOST が Site → Database の socket と一致するか確認してください。" >&2
+			exit 1
+		fi
+	fi
+
+	if ! command -v mysql >/dev/null 2>&1; then
+		echo "mysql client not found in PATH; skipping DB reachability check." >&2
+		return 0
+	fi
+
+	local MYSQL_ARGS=( --user="$DB_USER" --password="$DB_PASSWORD" )
+	if [ -n "$DB_SOCK" ]; then
+		MYSQL_ARGS+=( --socket="$DB_SOCK" )
+	elif [ "$DB_HOSTNAME" != "localhost" ]; then
+		MYSQL_ARGS+=( --host="$DB_HOSTNAME" --protocol=tcp )
+	fi
+
+	if ! mysql "${MYSQL_ARGS[@]}" --execute="SELECT 1;" >/dev/null 2>&1; then
+		echo "Could not connect to MySQL for integration tests (database: ${DB_NAME})." >&2
+		echo "Check .env.tests and that Local MySQL is running." >&2
+		exit 1
+	fi
+}
+
+sync_wp_tests_config() {
+	local CONFIG="${WP_TESTS_DIR}/wp-tests-config.php"
+	if [ ! -f "$CONFIG" ]; then
+		return 0
+	fi
+	WP_TESTS_CONFIG_FILE="$CONFIG" \
+	WP_TESTS_DB_NAME="$DB_NAME" \
+	WP_TESTS_DB_USER="$DB_USER" \
+	WP_TESTS_DB_PASSWORD="$DB_PASSWORD" \
+	WP_TESTS_DB_HOST="$DB_HOST" \
+	php "${SCRIPT_DIR}/wp-tests-config-sync.php"
+}
+
 cd "${PLUGIN_DIR}"
 
 echo "Running unit tests (no WordPress DB)…"
@@ -42,6 +88,9 @@ if [ ! -f "${WP_TESTS_DIR}/includes/functions.php" ]; then
 	bash "${SCRIPT_DIR}/install-wp-tests.sh" \
 		"${DB_NAME}" "${DB_USER}" "${DB_PASSWORD}" "${DB_HOST}" "${WP_VERSION}" "${SKIP_DB_CREATE}"
 fi
+
+assert_mysql_for_tests
+sync_wp_tests_config
 
 echo ""
 echo "Running integration tests (WordPress test suite)…"

@@ -12,7 +12,7 @@
 `~/Local Sites/blockpluginbase/app/public/wp-content/plugins/s2j-media-library-date-corrector`  
 (他プラグイン clone と並置) で作業します。PHPUnit の MySQL 接続は [`.env.tests.example`](../.env.tests.example) → `.env.tests` (gitignore) で指定します (手順は正本)。
 
-* **Requires PHP:** 8.0+ (platform / CI では8.2)
+* **Requires PHP:** v8.3+ (platform / CI / wp-env も v8.3)
 * **PHPUnit:** Composer `vendor/bin/phpunit` v9 (wp-env CI も同じ)
 
 ## テスト構成 (8件)
@@ -23,6 +23,8 @@
 | 統合 | 4 | `phpunit.xml.dist` | `MediaDateServiceTest` (一覧行・`correctIds`)、`RestControllerTest` (REST 権限・補正)。**`wordpress_test` のみ** |
 
 統合側は attachment の `post_date` 更新と REST `POST …/attachments/correct` を含みます。開発サイト DB 名 `local` には接続しません (`bin/phpunit-local.sh` / `bin/install-wp-tests.sh` が拒否)。
+
+**Local が Stop 中**だと `mysqld.sock` がなく、`No such file or directory` / `Error establishing a database connection` になります。該当サイトを **Start** してから再実行してください。`.env.tests` を変えた場合は `bin/phpunit-local.sh` が `wp-tests-config.php` の `DB_*` を同期します。
 
 ## 実行コマンド (本リポジトリ)
 

@@ -6,7 +6,7 @@
 
 | ファイル | 内容 |
 | --- | --- |
-| `smoke-test-blueprint.json` | Studio / Playground 形式の検証サイト定義 (PHP 8.2、WP latest、Query Monitor、Plugin Check、シード用 mu-plugin) |
+| `smoke-test-blueprint.json` | Studio / Playground 形式の検証サイト定義 (PHP v8.3、WP latest、Query Monitor、Plugin Check、シード用 mu-plugin) |
 | `mu-plugin-smoke-seed.php` | 上記 Blueprint に同梱される mu-plugin の **ソース** (JSON 内 `writeFile` と同期) |
 
 ## 手順

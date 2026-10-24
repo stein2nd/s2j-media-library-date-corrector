@@ -3,8 +3,8 @@ Contributors: stein2nd
 Tags: media, library, date, attachment
 Requires at least: 6.3
 Tested up to: 6.9
-Requires PHP: 8.0
-Stable tag: 1.0.10
+Requires PHP: 8.3
+Stable tag: 1.0.11
 License: GPL v3 (or later)
 License URI: https: //www.gnu.org/licenses/gpl-3.0.html
 

@@ -18,6 +18,7 @@
 * プラグイン・スラッグ: s2j-media-library-date-corrector
 * テキスト・ドメイン: s2j-media-library-date-corrector
 * ライセンス: GPL v3以降
+* 実行環境: WordPress v6.9+、PHP v8.3+ (WordPress [必須要件](https://ja.wordpress.org/about/requirements/) に準拠)
 * 特徴: 
     * 本『S2J MediaLibrary Date Corrector』は、WordPress のメディアライブラリにおける日付メタデータ (`post_date`) と、添付の相対パスメタ `_wp_attached_file` (先頭 `yyyy/mm/`。アップロード基準ディレクトリからの相対パス。例: `2017/12/file.jpg`。文字列に `uploads/` は含めない) との不一致を補正するためのプラグインである。ディスク上の実ファイル配置は読まない。物理移動はスコープ外である。
     * [Bulk Media Register](https://ja.wordpress.org/plugins/bulk-media-register/) などのツールを用いた一括登録後、メディアの「日付」が現在日時として保存されることにより、メディアライブラリの年月フィルターが正しく機能しなくなる問題を解消する。

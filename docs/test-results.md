@@ -26,7 +26,7 @@
 | 4 | 行アクション **Date Correct** | 不一致時に `post_date` がパス年月の1日 `00:00:00` にそろう |
 | 5 | 一括 **Date Correct** (チェック選択) | 選択分のみ補正。未選択では実行しない |
 | 6 | **Date Correct (All)** | 現在の検索・フィルター範囲で分割補正・完了通知 |
-| 7 | 設定 > メディアの日付 | 不一致案内の表示オン / オフ |
+| 7 | 設定 > S2J Media Library Date Corrector | 不一致案内の表示オン / オフ |
 | 8 | 処理後 **Reload** 通知 | 一覧再読み込みで差分が更新される |
 
 テスト用メディアは、Bulk Media Register 等の実データ、または `_wp_attached_file` と `post_date` を意図的にずらした attachment でかまいません。
@@ -66,7 +66,7 @@ npm run test:unit:php:unit-only    # ユニット4件 (DB / Docker 不要)
 npm run test:unit:php:local        # 全8件 (初回 install あり)
 ```
 
-期待件数: **8** — ユニット4 (`MediaDateServiceUnitTest`)、統合4 (`MediaDateServiceTest` 2、`RestControllerTest` 2)。wp-env CI でも Composer の PHPUnit v9 (`vendor/bin/phpunit`) を使用 (コンテナ同梱 PHPUnit v10は非互換)。
+期待件数: **8** — ユニット4 (`MediaDateServiceUnitTest`)、統合4 (`MediaDateServiceTest` 2、`RestControllerTest` 2)。wp-env CI でも Composer の PHPUnit v9 (`vendor/bin/phpunit`) を使用 (コンテナ同梱 PHPUnit v10は非互換)。CI の PHP は **8.3** (`.wp-env.json` / `.github/workflows/phpunit.yml`)。Actions では `npm run phpunit:wp-env` → `test:unit:php`。
 
 ### CI (GitHub Actions)
 

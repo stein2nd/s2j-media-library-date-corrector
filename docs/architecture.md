@@ -730,7 +730,7 @@ flowchart TD
 | 層 | 採用技術 | 備考 |
 | --- | --- | --- |
 | 基盤 | WordPress 6.9+ (README の下限に準拠) | メディアは `attachment` 投稿タイプである。 |
-| サーバー | PHP (WordPress 要件に準拠) | 直接 SQL は `wpdb` 経由に限定する。 |
+| サーバー | PHP v8.3+ (WordPress [必須要件](https://ja.wordpress.org/about/requirements/) に準拠) | 直接 SQL は `wpdb` 経由に限定する。 |
 | 管理 UI | React、TypeScript、`@wordpress/element`、`components`、`i18n` 等 | README 記載の方針。 |
 | ビルド | Vite、Dart Sass、PostCSS (Autoprefixer) | ビルドの定義は、`vite.config.ts` にある。 |
 | スタイル | SCSS | スタイルのソースは、`src/styles/*.scss` である。 |

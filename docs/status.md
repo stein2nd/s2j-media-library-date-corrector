@@ -25,7 +25,7 @@
 | 一括 Date Correct (チェック選択) | 実装済み | 100 | 同上。チェックなしでは実行しない。クライアントが100件分割 |
 | Date Correct (All) | 実装済み | 100 | `POST …/attachments/correct-query`。走査窓の集約は orchestrator |
 | 不一致案内バナー | 実装済み | 100 | option `s2j_mldc_mismatch_notice` |
-| サイト設定 (案内の表示) | 実装済み | 100 | 設定 > メディアの日付 |
+| サイト設定 (案内の表示) | 実装済み | 100 | 設定 > S2J Media Library Date Corrector |
 | REST (`correct` / `correct-query`) | 実装済み | 100 | [rest_api_spec.md](./rest_api_spec.md) |
 | `post_date` / `post_date_gmt` 補正 | 実装済み | 100 | `Media_Date_Service` |
 | 管理画面 JS (通知・再試行・再読み込み) | 実装済み | 90 | 手動確認、E2E は未 |

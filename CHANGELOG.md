@@ -2,6 +2,19 @@
 
 ## unreleased
 
+## 1.0.11 - 2026-10-24
+
+### Fixed
+
+* `bin/phpunit-local.sh`: Local 停止時に socket 不在を先に検知して案内。`.env.tests` と `wp-tests-config.php` の `DB_*` を実行前に同期
+
+### Changed
+
+* 設定画面: **設定 > S2J Media Library Date Corrector** (S2J シリーズと同様。旧 **設定 > メディアの日付**)
+* 対応 PHP の下限を **8.3** に引き上げ (WordPress [必須要件](https://ja.wordpress.org/about/requirements/) に合わせる)。`Requires PHP`、`composer.json` (`>=8.3` / platform **8.3.14**)、README バッジ
+* CI / ローカル wp-env: `.wp-env.json`、`.github/workflows/phpunit.yml`、dist-zip の Setup PHP を **8.3**
+* 仕様・ Studio: [docs/overview.md](./docs/overview.md)、[docs/architecture.md](./docs/architecture.md)、[docs/phpunit_local.md](./docs/phpunit_local.md)、`studio/smoke-test-blueprint.json` (PHP **8.3**)
+
 ## 1.0.10 - 2026-10-16
 
 ### Added

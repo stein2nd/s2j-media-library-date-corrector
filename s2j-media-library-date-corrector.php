@@ -9,8 +9,8 @@
  *
  * Plugin Name: S2J Media Library Date Corrector
  * Plugin URI: https://github.com/stein2nd/s2j-media-library-date-corrector
- * Description: Correct attachment post_date values from uploads path year/month on the media library list screen.
- * Version: 1.0.10
+ * Description: Designed to resolve metadata inconsistencies that occur after bulk media uploads in WordPress. Correct attachment post_date values from uploads path year/month.
+ * Version: 1.0.11
  * Author: Koutarou ISHIKAWA
  * Author URI: https://stein2nd.wordpress.com
  * License: GPL v3 or later
@@ -18,14 +18,14 @@
  * Text Domain: s2j-media-library-date-corrector
  * Domain Path: /languages
  * Requires at least: 6.3
- * Requires PHP: 8.0
+ * Requires PHP: 8.3
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'S2J_MLDC_VERSION', '1.0.10' );
+define( 'S2J_MLDC_VERSION', '1.0.11' );
 define( 'S2J_MLDC_PLUGIN_FILE', __FILE__ );
 define( 'S2J_MLDC_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'S2J_MLDC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Settings screen (Settings > Media dates).
+ * Settings screen (Settings > S2J Media Library Date Corrector).
  *
  * @package S2J_MLDC
  */
@@ -46,8 +46,8 @@ class Settings
     public function registerMenu(): void
     {
         add_options_page(
-            __('Media dates', 's2j-media-library-date-corrector'),
-            __('Media dates', 's2j-media-library-date-corrector'),
+            __('S2J Media Library Date Corrector', 's2j-media-library-date-corrector'),
+            __('S2J Media Library Date Corrector', 's2j-media-library-date-corrector'),
             'manage_options',
             's2j-mldc-settings',
             array( $this, 'renderPage' )
@@ -138,7 +138,7 @@ class Settings
         }
         ?>
         <div class="wrap">
-            <h1><?php echo esc_html__('Media dates', 's2j-media-library-date-corrector'); ?></h1>
+            <h1><?php echo esc_html__('S2J Media Library Date Corrector', 's2j-media-library-date-corrector'); ?></h1>
             <form action="options.php" method="post">
                 <?php
                 settings_fields('s2j_mldc_settings');
