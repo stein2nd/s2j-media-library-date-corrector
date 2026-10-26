@@ -13,7 +13,7 @@ PLUGIN_SLUG="s2j-media-library-date-corrector"
 PLUGIN_ENTRY="${PLUGIN_SLUG}/${PLUGIN_SLUG}.php"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-ADMIN_JS="${PLUGIN_ROOT}/dist/js/s2j-media-library-date-corrector-admin.js"
+ADMIN_JS="${PLUGIN_ROOT}/dist/js/s2j-media-library-date-corrector-settings.js"
 
 WP_ARGS=()
 if [[ -n "${WP_PATH:-}" ]]; then

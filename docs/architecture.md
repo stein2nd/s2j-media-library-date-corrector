@@ -75,9 +75,9 @@ s2j-media-library-date-corrector/
 │　└─ `dom.d.ts`  # DOM
 └┬── dist/  # Vite ビルド成果物 (Git 管理外)、アイコン
 　├┬─ css/  # プラグイン用のスタイル定義
-　│└─ `s2j-media-library-date-corrector-admin.css`
+　│└─ `s2j-media-library-date-corrector-settings.css`
 　└┬─ js/  # 管理画面
-　　└─ `s2j-media-library-date-corrector-admin.js`
+　　└─ `s2j-media-library-date-corrector-settings.js`
 ```
 
 **注記:** `WP_List_Table` を直接継承するのではなく、`manage_media_custom_column` 等のフィルターと `bulk_actions-upload` 等で拡張する想定です。上記 `class-media-library-columns.php` は仮称です。実装時に確定します。

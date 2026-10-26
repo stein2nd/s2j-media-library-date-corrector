@@ -15,7 +15,7 @@ if (process.env.FLUSH_DIST === 'true') {
 }
 
 // 初期リリースのビルド対象は admin だけです。
-const buildTarget = 'admin';
+const buildTarget = 'settings';
 
 const buildConfig = {
   entry: resolve(import.meta.dirname, 'src/admin/index.tsx'),

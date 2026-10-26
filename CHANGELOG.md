@@ -2,6 +2,13 @@
 
 ## unreleased
 
+## 1.0.12 - 2026-10-26
+
+### Changed
+
+* ビルド成果物: `dist/*/*-admin.{js,css}` → `*-settings.{js,css}` (`vite.config.ts` の `buildTarget`、PHP enqueue、`tests/smoke-local.sh`、architecture 図)
+* i18n: `npm run makejson` はデフォルトで孤児 JED を purge。残す場合は `makejson:keep` (`--no-purge`)。`.gitignore` に JED 方針をコメント
+
 ## 1.0.11 - 2026-10-24
 
 ### Fixed

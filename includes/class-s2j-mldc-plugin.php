@@ -93,8 +93,8 @@ class Plugin
             return;
         }
 
-        $script_path = S2J_MLDC_PLUGIN_DIR . 'dist/js/s2j-media-library-date-corrector-admin.js';
-        $style_path  = S2J_MLDC_PLUGIN_DIR . 'dist/css/s2j-media-library-date-corrector-admin.css';
+        $script_path = S2J_MLDC_PLUGIN_DIR . 'dist/js/s2j-media-library-date-corrector-settings.js';
+        $style_path  = S2J_MLDC_PLUGIN_DIR . 'dist/css/s2j-media-library-date-corrector-settings.css';
 
         if (! file_exists($script_path)) {
             return;
@@ -102,7 +102,7 @@ class Plugin
 
         wp_enqueue_script(
             's2j-media-library-date-corrector-admin',
-            S2J_MLDC_PLUGIN_URL . 'dist/js/s2j-media-library-date-corrector-admin.js',
+            S2J_MLDC_PLUGIN_URL . 'dist/js/s2j-media-library-date-corrector-settings.js',
             array( 'wp-api-fetch', 'wp-api', 'wp-element', 'wp-i18n', 'react', 'react-dom' ),
             S2J_MLDC_VERSION,
             true
@@ -111,7 +111,7 @@ class Plugin
         if (file_exists($style_path)) {
             wp_enqueue_style(
                 's2j-media-library-date-corrector-admin',
-                S2J_MLDC_PLUGIN_URL . 'dist/css/s2j-media-library-date-corrector-admin.css',
+                S2J_MLDC_PLUGIN_URL . 'dist/css/s2j-media-library-date-corrector-settings.css',
                 array(),
                 S2J_MLDC_VERSION
             );
