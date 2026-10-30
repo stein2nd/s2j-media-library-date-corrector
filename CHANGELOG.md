@@ -2,6 +2,13 @@
 
 ## unreleased
 
+## 1.0.13 - 2026-10-30
+
+### Changed
+
+* devDependencies 更新 (`@s2j/docs-linter` v1.0.31、`@typescript-eslint/*` v8.72.1、`rollup` v4.66、`sass` v1.107、`autoprefixer` v10.6.2、`@types/node` v26.6.6ほか)
+* `composer.lock`: Composer ロック形式のメタデータ更新 (`published-time` 等)。`composer.json` の require / require-dev 変更なし
+
 ## 1.0.12 - 2026-10-26
 
 ### Changed
