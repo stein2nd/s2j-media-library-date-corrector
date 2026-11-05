@@ -2,6 +2,13 @@
 
 ## unreleased
 
+## 1.0.14 - 2026-11-05
+
+### Changed
+
+* devDependencies 更新: `@wordpress/*` (block-editor v20、components v44、`@wordpress/env` v12.1ほか)、`@s2j/docs-linter` v1.0.32、`rollup` v4.67、`stylelint` v18、`eslint` v10.14、`vite` v8.3.6、`sass` v1.107.1
+* PHPStan v2.3.5 (`composer.lock`)。README バッジ (SCSS / Rollup)
+
 ## 1.0.13 - 2026-10-30
 
 ### Changed
