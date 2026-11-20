@@ -2,6 +2,14 @@
 
 ## unreleased
 
+## 1.0.15 - 2026-11-20
+
+### Changed
+
+* CI: GitHub Actions を Node.js **24** と `ubuntu-24.04` に更新 (`docs-lint` / `dist-zip` / `phpunit`)。ランナーの Node.js v20非推奨アノテーション回避
+* devDependencies 更新: `@wordpress/*` (components v45、`@wordpress/env` v12.2ほか)、`@s2j/docs-linter` v1.0.34、`rollup` v4.68、`stylelint` v18.1 / `stylelint-config-standard-scss` v18、`eslint` v10.15、`vite` v8.3.8、`sass` v1.108.2、`autoprefixer` v10.7、`@typescript-eslint/*` v8.73ほか
+* PHPStan v2.3.7、PHPUnit v9.6.39 (`composer.lock`)
+
 ## 1.0.14 - 2026-11-05
 
 ### Changed
