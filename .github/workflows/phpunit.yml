@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "24"
           cache: npm
@@ -32,5 +32,12 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist
 
+      - name: Start wp-env (tests)
+        run: bash bin/wp-env-start-tests-ci.sh
+
       - name: Run PHPUnit in wp-env
-        run: npm run phpunit:wp-env
+        run: npm run test:unit:php
+
+      - name: Stop wp-env (tests)
+        if: always()
+        run: npm run wp-env:stop:tests || true

@@ -33,7 +33,7 @@
 | `npm run test:unit:php:unit-only` | 4 | `pretest:unit:php:local` で `composer install` |
 | `npm run test:unit:php:local` | 8 | `bin/phpunit-local.sh` (初回 install あり) |
 | `composer test:unit` / `composer test:all` | 4 / 8 | Node 不要 |
-| `npm run test:unit:php` | 8 | **CI のみ** (wp-env → `bin/phpunit-ci.sh`) |
+| `npm run test:unit:php` | 8 | **CI のみ** (`.wp-env.tests.json` → `cli` で `bin/phpunit-ci.sh`) |
 
 ```bash
 composer install
@@ -54,7 +54,7 @@ npm run test:unit:php:local
 
 ## CI
 
-[`.github/workflows/phpunit.yml`](../.github/workflows/phpunit.yml) が push / PR で `npm run test:unit:php` を実行します。ローカルでは Docker なしで上記 `test:unit:php:local` により同じ8件を再現できます。
+[`.github/workflows/phpunit.yml`](../.github/workflows/phpunit.yml) が push / PR で `bin/wp-env-start-tests-ci.sh` のあと `npm run test:unit:php` を実行します。ローカルで Docker を使う場合は `npm run phpunit:wp-env`。Docker なしでは `test:unit:php:local` で同じ8件を再現できます。
 
 ## 関連
 

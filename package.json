@@ -1,6 +1,6 @@
 {
     "name": "s2j-media-library-date-corrector",
-    "version": "1.0.15",
+    "version": "1.0.16",
     "description": "Designed to resolve metadata inconsistencies that occur after bulk media uploads in WordPress. Correct attachment post_date values from uploads path year/month.",
     "type": "module",
     "author": "Koutarou ISHIKAWA",
@@ -35,7 +35,9 @@
         "phpcs": "composer phpcs",
         "phpcs:wpcs": "composer phpcs:wpcs",
         "test:smoke:local": "bash tests/smoke-local.sh",
-        "test:unit:php": "wp-env run tests-wordpress wp-content/plugins/s2j-media-library-date-corrector/bin/phpunit-ci.sh",
+        "wp-env:start:tests": "wp-env start --config=.wp-env.tests.json",
+        "wp-env:stop:tests": "wp-env stop --config=.wp-env.tests.json",
+        "test:unit:php": "wp-env run --config=.wp-env.tests.json cli wp-content/plugins/s2j-media-library-date-corrector/bin/phpunit-ci.sh",
         "test:unit:php:unit-only": "composer test:unit",
         "test:unit:php:local": "bash bin/phpunit-local.sh",
         "build": "NODE_ENV=production vite build",
@@ -54,8 +56,7 @@
         "phpunit": "composer test",
         "phpunit:local": "vendor/bin/phpunit -c phpunit.xml.dist",
         "prephpunit:wp-env": "composer install --no-interaction --prefer-dist",
-        "phpunit:wp-env": "npm run test:unit:php",
-        "pretest:unit:php": "wp-env start",
+        "phpunit:wp-env": "npm run wp-env:start:tests && npm run test:unit:php",
         "test:smoke:studio:rebuild": "bash tests/studio-rebuild.sh",
         "pretest:unit:php:local": "composer install --no-interaction --prefer-dist",
         "pretest:lint:php": "composer install --no-interaction --prefer-dist"

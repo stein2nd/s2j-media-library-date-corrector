@@ -2,6 +2,13 @@
 
 ## unreleased
 
+## 1.0.16 - 2026-11-20
+
+### Changed
+
+* CI: `actions/checkout@v5`、`actions/setup-node@v5`、`actions/upload-artifact@v6` (Action ランタイム Node24)。v4の Node.js v20非推奨アノテーション解消
+* CI PHPUnit: `.wp-env.tests.json` でテスト用 wp-env のみ起動 (`tests-wordpress` 二重スタック廃止)。`bin/wp-env-start-tests-ci.sh` で Docker 起動リトライ。`cli` コンテナで `bin/phpunit-ci.sh`
+
 ## 1.0.15 - 2026-11-20
 
 ### Changed

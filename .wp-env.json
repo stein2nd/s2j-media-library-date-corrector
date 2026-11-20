@@ -4,6 +4,7 @@
 		"."
 	],
 	"phpVersion": "8.3",
+	"testsEnvironment": false,
 	"config": {
 		"WP_DEBUG": true
 	}
