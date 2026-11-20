@@ -2,6 +2,12 @@
 
 ## unreleased
 
+## 1.0.17 - 2026-11-20
+
+### Fixed
+
+* CI: `.wp-env.tests.json` に `testsEnvironment: false` を追加 (`port` とデフォルト `testsPort` の衝突による wp-env 起動失敗を解消)
+
 ## 1.0.16 - 2026-11-20
 
 ### Changed

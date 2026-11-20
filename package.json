@@ -1,6 +1,6 @@
 {
     "name": "s2j-media-library-date-corrector",
-    "version": "1.0.16",
+    "version": "1.0.17",
     "description": "Designed to resolve metadata inconsistencies that occur after bulk media uploads in WordPress. Correct attachment post_date values from uploads path year/month.",
     "type": "module",
     "author": "Koutarou ISHIKAWA",
